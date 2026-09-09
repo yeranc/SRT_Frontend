@@ -76,7 +76,8 @@
         "sap.m": {},
         "sap.ui.layout": {},
         "sap.f": {},
-        "sap.ui.unified": {}
+        "sap.ui.unified": {},
+        "sap.ushell": {}
       }
     },
     "contentDensities": {
