@@ -102,13 +102,13 @@
                             class="srtHeroTitle"
                         />
 
-                        <Text
+                        <!-- <Text
                             text="Configure migration parameters and define"
                             class="srtHeroDescription"
-                        />
+                        /> -->
 
                         <Text
-                            text="selection criteria to refresh the required data."
+                            text="define selection criteria to refresh the required data."
                             class="srtHeroDescription"
                         />
                     </VBox>
@@ -173,7 +173,7 @@
                     />
 
                     <Title
-                        text="Migration Parameters"
+                        text="Selective Refresh Parameters"
                         level="H2"
                         class="srtSectionTitle"
                     />
@@ -207,7 +207,7 @@
                     </VBox>
 
                     <!-- PROCESS ID -->
-                    <VBox class="srtField">
+                    <!-- <VBox class="srtField">
                         <Label
                             text="Process Id"
                             class="srtFieldLabel"
@@ -226,7 +226,7 @@
                                 class="srtInfoIcon"
                             />
                         </HBox>
-                    </VBox>
+                    </VBox> -->
 
                     <!-- RFC DESTINATION -->
                     <VBox class="srtField">
