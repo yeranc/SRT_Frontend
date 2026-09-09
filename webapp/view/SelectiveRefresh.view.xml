@@ -1,0 +1,474 @@
+<mvc:View
+    controllerName="srt.app.controller.SelectiveRefresh"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <Page
+        id="selectiveRefreshPage"
+        showHeader="false"
+        enableScrolling="true"
+        class="srtSelectivePage"
+    >
+        <content>
+            <!-- ================= HEADER ================= -->
+            <Toolbar
+                class="srtHeaderBar"
+                height="4rem"
+            >
+                <HBox
+                    class="srtHeaderGroup"
+                    alignItems="Center"
+                >
+                    <Button
+                        icon="sap-icon://nav-back"
+                        type="Transparent"
+                        tooltip="Back"
+                        press="onNavBack"
+                        class="srtBackButton"
+                    />
+                </HBox>
+
+                <!-- MSG -->
+                <HBox
+                    class="srtHeaderGroup"
+                    alignItems="Center"
+                >
+                    <core:Icon
+                        src="sap-icon://circle-task"
+                        class="srtMsgIcon"
+                    />
+
+                    <Text
+                        text="msg"
+                        class="srtBrandMsg"
+                    />
+                </HBox>
+
+                <!-- Divider 1 -->
+                <Text
+                    text="|"
+                    class="srtHeaderDivider"
+                />
+
+                <!-- SRT -->
+                <Text
+                    text="SRT"
+                    class="srtBrandSrt"
+                />
+
+                <!-- Divider 2 -->
+                <Text
+                    text="|"
+                    class="srtHeaderDivider"
+                />
+
+                <!-- Application Name -->
+                <HBox
+                    class="srtAppGroup"
+                    alignItems="Center"
+                >
+                    <Text
+                        text="Selective Refresh Tool"
+                        class="srtAppNameHeader"
+                    />
+
+                    <core:Icon
+                        src="sap-icon://slim-arrow-down"
+                        class="srtHeaderArrow"
+                    />
+                </HBox>
+
+                <ToolbarSpacer />
+            </Toolbar>
+
+            <!-- ================= HERO ================= -->
+            <VBox class="srtRefreshHero">
+                <HBox
+                    class="srtHeroContent"
+                    alignItems="Center"
+                >
+                    <VBox class="srtHeroDocumentIcon">
+                        <core:Icon
+                            src="sap-icon://document-text"
+                            size="1.4rem"
+                        />
+                    </VBox>
+
+                    <VBox class="srtHeroText">
+                        <Title
+                            text="Selective Refresh Tool"
+                            level="H4"
+                            class="srtHeroTitle"
+                        />
+
+                        <Text
+                            text="Configure migration parameters and define"
+                            class="srtHeroDescription"
+                        />
+
+                        <Text
+                            text="selection criteria to refresh the required data."
+                            class="srtHeroDescription"
+                        />
+                    </VBox>
+
+                    <ToolbarSpacer />
+
+                    <!-- STEP INDICATOR
+                    <HBox
+                        class="srtStepContainer"
+                        alignItems="Center"
+                    >
+
+                        <VBox
+                            class="srtStepItem"
+                            alignItems="Center"
+                        >
+
+                            <Text
+                                text="1"
+                                class="srtStepCircle srtStepActive"
+                            />
+
+                            <Text
+                                text="Configure Parameters"
+                                class="srtStepLabel srtStepLabelActive"
+                            />
+
+                        </VBox>
+
+                        <VBox class="srtStepLine" />
+
+                        <VBox
+                            class="srtStepItem"
+                            alignItems="Center"
+                        >
+
+                            <Text
+                                text="2"
+                                class="srtStepCircle srtStepInactive"
+                            />
+
+                            <Text
+                                text="Review &amp; Execute"
+                                class="srtStepLabel"
+                            />
+
+                        </VBox>
+
+                    </HBox> -->
+                </HBox>
+            </VBox>
+
+            <!-- ================= MIGRATION PARAMETERS ================= -->
+            <VBox class="srtContentCard">
+                <HBox
+                    class="srtSectionTitleRow"
+                    alignItems="Center"
+                >
+                    <core:Icon
+                        src="sap-icon://action-settings"
+                        class="srtSectionIcon"
+                    />
+
+                    <Title
+                        text="Migration Parameters"
+                        level="H2"
+                        class="srtSectionTitle"
+                    />
+                </HBox>
+
+                <HBox
+                    class="srtParameterRow"
+                    alignItems="Start"
+                >
+                    <!-- GROUP ID -->
+                    <VBox class="srtField srtFieldGroup">
+                        <Label
+                            text="Group Id"
+                            required="true"
+                            class="srtFieldLabel"
+                        />
+
+                        <Select
+                            id="groupIdSelect"
+                            width="50%"
+                            selectedKey="{wizard>/groupId}"
+                            items="{
+        path: '/ZRI_GRPID_VH'
+    }"
+                        >
+                            <core:Item
+                                key="{GrpId}"
+                                text="{GrpId} - {Description}"
+                            />
+                        </Select>
+                    </VBox>
+
+                    <!-- PROCESS ID -->
+                    <VBox class="srtField">
+                        <Label
+                            text="Process Id"
+                            class="srtFieldLabel"
+                        />
+
+                        <HBox>
+                            <Input
+                                id="processIdInput"
+                                width="50%"
+                                placeholder="Enter Process Id"
+                                value="{wizard>/processId}"
+                            />
+
+                            <core:Icon
+                                src="sap-icon://message-information"
+                                class="srtInfoIcon"
+                            />
+                        </HBox>
+                    </VBox>
+
+                    <!-- RFC DESTINATION -->
+                    <VBox class="srtField">
+                        <Label
+                            text="RFC Destination"
+                            required="true"
+                            class="srtFieldLabel"
+                        />
+
+                        <Select
+                            id="rfcDestinationSelect"
+                            width="50%"
+                            selectedKey="{wizard>/rfcDestination}"
+                        >
+                            <items>
+                                <core:Item
+                                    key="T30CLNT700"
+                                    text="T30CLNT700"
+                                />
+                            </items>
+                        </Select>
+                    </VBox>
+
+                    <!-- COPY AGAIN -->
+                    <VBox class="srtCopyField">
+                        <HBox alignItems="Center">
+                            <Label
+                                text="Copy Again"
+                                class="srtFieldLabel"
+                            />
+
+                            <core:Icon
+                                src="sap-icon://message-information"
+                                class="srtInfoIcon srtCopyInfo"
+                            />
+                        </HBox>
+
+                        <HBox
+                            alignItems="Center"
+                            class="srtSwitchRow"
+                        >
+                            <Switch
+                                id="copyAgainSwitch"
+                                state="{wizard>/copyAgain}"
+                                customTextOn=""
+                                customTextOff=""
+                            />
+
+                            <Text
+                                text="{= ${wizard>/copyAgain} ? 'Yes' : 'No' }"
+                                class="srtSwitchText"
+                            />
+                        </HBox>
+                    </VBox>
+
+                    <!-- COPY LOSS -->
+                    <VBox class="srtCopyField">
+                        <HBox alignItems="Center">
+                            <Label
+                                text="Copy Loss"
+                                class="srtFieldLabel"
+                            />
+
+                            <core:Icon
+                                src="sap-icon://message-information"
+                                class="srtInfoIcon srtCopyInfo"
+                            />
+                        </HBox>
+
+                        <HBox
+                            alignItems="Center"
+                            class="srtSwitchRow"
+                        >
+                            <Switch
+                                id="copyLossSwitch"
+                                state="{wizard>/copyLoss}"
+                                customTextOn=""
+                                customTextOff=""
+                            />
+
+                            <Text
+                                text="{= ${wizard>/copyLoss} ? 'Yes' : 'No' }"
+                                class="srtSwitchText"
+                            />
+                        </HBox>
+                    </VBox>
+                    <!-- COPY ACCOUNT -->
+                    <VBox class="srtCopyField">
+                        <HBox alignItems="Center">
+                            <Label
+                                text="Copy Account"
+                                class="srtFieldLabel"
+                            />
+
+                            <core:Icon
+                                src="sap-icon://message-information"
+                                class="srtInfoIcon srtCopyInfo"
+                            />
+                        </HBox>
+
+                        <HBox
+                            alignItems="Center"
+                            class="srtSwitchRow"
+                        >
+                            <Switch
+                                id="copyAccSwitch"
+                                state="{wizard>/copyAccount}"
+                                customTextOn=""
+                                customTextOff=""
+                            />
+
+                            <Text
+                                text="{= ${wizard>/copyAccount} ? 'Yes' : 'No' }"
+                                class="srtSwitchText"
+                            />
+                        </HBox>
+                    </VBox>
+                </HBox>
+
+                <HBox class="srtDashedLine" />
+            </VBox>
+
+            <!-- ================= SELECTION CRITERIA ================= -->
+            <VBox class="srtContentCard">
+                <HBox
+                    class="srtSectionTitleRow"
+                    alignItems="Center"
+                >
+                    <core:Icon
+                        src="sap-icon://filter"
+                        class="srtSectionIcon"
+                    />
+
+                    <Title
+                        text="Selection Criteria"
+                        level="H2"
+                        class="srtSectionTitle"
+                    />
+                </HBox>
+
+                <VBox>
+                    <Label
+                        text="Range"
+                        required="true"
+                        class="srtFieldLabel"
+                    />
+
+                    <HBox
+                        class="srtRangeRow"
+                        alignItems="Center"
+                    >
+                        <Input
+                            id="rangeFromInput"
+                            width="15rem"
+                            placeholder="Enter From Value"
+                            value="{wizard>/ranges/0/from}"
+                            showValueHelp="true"
+                            valueHelpRequest="onRangeFromValueHelp"
+                        />
+
+                        <Text
+                            text="to"
+                            class="srtToText"
+                        />
+
+                        <Input
+                            id="rangeToInput"
+                            width="15rem"
+                            placeholder="Enter To Value"
+                            value="{wizard>/ranges/0/to}"
+                            showValueHelp="true"
+                            valueHelpRequest="onRangeToValueHelp"
+                        />
+
+                        <Button
+                            text="Clear"
+                            icon="sap-icon://delete"
+                            type="Transparent"
+                            press="onClearRanges"
+                            class="srtOutlineButton srtClearButton"
+                        />
+
+                        <!-- <Button
+                            text="Add Range"
+                            icon="sap-icon://add"
+                            type="Transparent"
+                            press="onAddRange"
+                            class="srtOutlineButton srtAddButton"
+                        /> -->
+                    </HBox>
+
+                    <!-- INFO MESSAGE -->
+                    <HBox
+                        class="srtInfoMessage"
+                        alignItems="Center"
+                    >
+                        <core:Icon
+                            src="sap-icon://message-information"
+                            class="srtInfoMessageIcon"
+                        />
+
+                        <Text
+                            text="Enter values based on the key field for the selected object."
+                            class="srtInfoMessageText"
+                        />
+                    </HBox>
+                </VBox>
+            </VBox>
+
+            <!-- ================= FOOTER ACTIONS ================= -->
+            <VBox class="srtActionCard">
+                <HBox
+                    justifyContent="End"
+                    alignItems="Center"
+                    class="srtActionRow"
+                >
+                    <Button
+                        text="Cancel"
+                        icon="sap-icon://decline"
+                        type="Transparent"
+                        press="onCancel"
+                        class="srtOutlineButton srtCancelButton"
+                    />
+
+                    <Button
+                        text="Save as Variant"
+                        icon="sap-icon://save"
+                        type="Transparent"
+                        press="onSaveAsVariant"
+                        class="srtOutlineButton srtVariantButton"
+                    />
+
+                    <Button
+                        text="Execute"
+                        icon="sap-icon://navigation-right-arrow"
+                        iconFirst="false"
+                        type="Unstyled"
+                        press="onNext"
+                        class="srtNextButton"
+                    />
+                </HBox>
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

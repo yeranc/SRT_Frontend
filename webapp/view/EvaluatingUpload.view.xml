@@ -1,0 +1,43 @@
+<mvc:View
+    controllerName="srt.app.controller.EvaluatingUpload"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:u="sap.ui.unified"
+    xmlns="sap.m">
+    <Page id="evaluatingUploadPage"
+          title="{i18n>evaluatingUploadTitle}"
+          showNavButton="true"
+          navButtonPress="onNavBack"
+          class="srtPageHeaderBar">
+        <content>
+            <VBox class="sapUiMediumMargin" width="auto">
+
+                <Panel headerText="{i18n>selectFileLabel}" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+
+                            <u:FileUploader
+                                id="fileUploader"
+                                name="evaluationFile"
+                                width="100%"
+                                placeholder="{i18n>chooseFileButton}"
+                                change="onFileChange" />
+
+                            <Button text="{i18n>uploadButton}"
+                                    type="Emphasized"
+                                    press="onUpload"
+                                    class="sapUiMediumMarginTop" />
+
+                            <Panel headerText="{i18n>statusLabel}" class="srtStatusPanel">
+                                <content>
+                                    <Text id="uploadStatusText" text="{i18n>uploadStatusReady}" class="sapUiSmallMargin" />
+                                </content>
+                            </Panel>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

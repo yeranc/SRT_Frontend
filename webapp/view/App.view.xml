@@ -1,0 +1,14 @@
+<mvc:View
+    controllerName="srt.app.controller.App"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    displayBlock="true">
+    <!--
+        Root view of the application.
+        It only contains a plain sap.m.App control.
+        The router places all page views (Home, SelectiveRefresh, ...)
+        inside this App's "pages" aggregation, as configured
+        in manifest.json > sap.ui5 > routing > config > controlAggregation.
+    -->
+    <App id="app" />
+</mvc:View>

@@ -1,0 +1,789 @@
+:root {
+    --srtMaroon: #6b1327;
+    --srtMaroonDark: #4a0d1b;
+    --srtMaroonLight: #8a1c35;
+}
+
+
+/* =========================================================
+   COMMON TOP HEADER
+   ========================================================= */
+
+.srtHeaderBar {
+    background-color: #ffffff !important;
+    border-bottom: 1px solid #e5e5e5 !important;
+    padding: 0 1.5rem !important;
+    height: 4rem !important;
+    box-sizing: border-box;
+}
+
+.srtHeaderContent {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+
+.srtHeaderGroup {
+    display: flex;
+    align-items: center;
+}
+
+
+/* =========================================================
+   MSG
+   ========================================================= */
+
+.srtMsgIcon {
+    color: var(--srtMaroon) !important;
+    font-size: 0.55rem !important;
+    margin-right: 0.3rem !important;
+}
+/* MSG */
+.srtBrandMsg {
+    color: var(--srtMaroon) !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+
+/* Divider | */
+.srtHeaderDivider {
+    color: #777777 !important;
+    font-size: 1.15rem !important;
+
+    margin-left: 0.9rem !important;
+    margin-right: 0.9rem !important;
+
+    padding: 0 !important;
+}
+
+
+/* SRT */
+.srtBrandSrt {
+    color: #1a1a1a !important;
+    font-size: 1.2rem !important;
+    font-weight: 700 !important;
+    margin: 0 !important;
+}
+
+
+/* Selective Refresh Tool */
+.srtAppGroup {
+    display: flex;
+    align-items: center;
+   
+}
+
+.srtAppNameHeader {
+    color: #333333 !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+}
+
+.srtHeaderArrow {
+    color: #333333 !important;
+    font-size: 0.65rem !important;
+}
+
+
+/* =========================================================
+   SUB NAVIGATION
+   ========================================================= */
+
+.srtSubNavBar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 0 1rem;
+}
+
+.srtSubNavActive {
+    color: var(--srtMaroon) !important;
+    font-weight: 700 !important;
+}
+
+
+/* =========================================================
+   HOME PAGE - HERO IMAGE
+   ========================================================= */
+
+.srtHeroImage {
+    display: block;
+
+    width: calc(100% - 2rem);
+    height: 310px;
+
+    margin: 1rem;
+
+    object-fit: cover;
+    object-position: center center;
+
+    border-radius: 0.5rem;
+}
+
+
+/* =========================================================
+   HOME PAGE - CARDS
+   ========================================================= */
+
+.srtCardWrapper {
+    padding: 0.5rem;
+
+    flex: 1 1 22%;
+
+    min-width: 260px;
+}
+
+.srtCard {
+    background-color: #ffffff;
+
+    border: 1px solid #e5e5e5;
+
+    border-radius: 0.5rem;
+}
+
+.srtCardIcon {
+    background-color: var(--srtMaroon);
+
+    border-radius: 50%;
+
+    width: 3rem;
+    height: 3rem;
+    min-width: 3rem;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 0.75rem;
+}
+
+.srtCardIcon .sapMBtnIcon {
+    color: #ffffff !important;
+}
+
+.srtCardTitle {
+    font-weight: 700;
+
+    color: #1a1a1a;
+}
+
+.srtCardDescription {
+    color: #6e6e6e;
+
+    font-size: 0.85rem;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.srtFooter {
+    background-color: #ffffff;
+
+    border-top: 1px solid #e5e5e5;
+
+    padding: 0.75rem 2rem 0.75rem 0.5rem;
+}
+
+.srtFooterText {
+    color: #6e6e6e;
+
+    font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   SUB PAGES
+   ========================================================= */
+
+.srtPageHeaderBar {
+    background-color: var(--srtMaroon) !important;
+}
+
+.srtStatusPanel {
+    margin-top: 1rem;
+}
+
+
+/* =========================================================
+   SELECTIVE REFRESH PAGE
+   ========================================================= */
+
+.srtSelectivePage {
+    background: #f7f7f8;
+}
+
+
+/* =========================================================
+   SELECTIVE REFRESH - MAROON HERO
+   ========================================================= */
+
+.srtRefreshHero {
+    background:
+        linear-gradient(
+            105deg,
+            #651027 0%,
+            #7b1233 48%,
+            #4c0b21 100%
+        );
+
+    height: 7.5rem;
+    min-height: 7.5rem;
+
+    padding: 1.15rem 2rem;
+
+    box-sizing: border-box;
+}
+
+.srtHeroContent {
+    width: 100%;
+}
+
+
+/* =========================================================
+   DOCUMENT ICON
+   ========================================================= */
+
+.srtHeroDocumentIcon {
+    width: 4.2rem;
+    height: 4.2rem;
+
+    min-width: 4.2rem;
+
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
+
+    border-radius: 50%;
+
+    align-items: center;
+    justify-content: center;
+
+    margin-right: 1.2rem;
+}
+
+.srtHeroDocumentIcon .sapUiIcon {
+    color: #ffffff;
+
+    font-size: 1.4rem !important;
+}
+
+
+/* =========================================================
+   HERO TEXT
+   ========================================================= */
+
+.srtHeroText {
+    margin-top: 0;
+}
+
+.srtHeroTitle {
+    color: #ffffff !important;
+
+    font-size: 1.45rem !important;
+
+    font-weight: 700 !important;
+
+    margin-bottom: 0.2rem;
+}
+
+.srtHeroDescription {
+    color: #ffffff !important;
+
+    font-size: 0.85rem !important;
+
+    line-height: 1.25 !important;
+}
+
+
+/* =========================================================
+   STEP INDICATOR
+   ========================================================= */
+
+.srtStepContainer {
+    min-width: 21rem;
+
+    margin-right: 0.5rem;
+
+    justify-content: center;
+}
+
+.srtStepItem {
+    min-width: 7rem;
+}
+
+.srtStepCircle {
+    width: 2.2rem;
+    height: 2.2rem;
+
+    line-height: 2.2rem;
+
+    text-align: center;
+
+    border-radius: 50%;
+
+    font-size: 0.85rem;
+
+    font-weight: 600;
+}
+
+.srtStepActive {
+    background: #ffffff;
+
+    color: #7b1233;
+}
+
+.srtStepInactive {
+    border: 1px solid #ffffff;
+
+    color: #ffffff;
+
+    background: transparent;
+}
+
+.srtStepLabel {
+    color: #ffffff;
+
+    font-size: 0.75rem;
+
+    margin-top: 0.45rem;
+
+    white-space: nowrap;
+}
+
+.srtStepLabelActive {
+    font-weight: 700;
+}
+
+.srtStepLine {
+    width: 3.5rem;
+
+    height: 1px;
+
+    background: rgba(255, 255, 255, 0.75);
+
+    margin: 0 0.3rem 1.5rem;
+}
+
+
+/* =========================================================
+   CONTENT CARDS
+   ========================================================= */
+
+.srtContentCard {
+    background: #ffffff;
+
+    margin: 1rem 1.2rem 0;
+
+    padding: 1.2rem 1.4rem;
+
+    border-radius: 0.5rem;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SECTION TITLES
+   ========================================================= */
+
+.srtSectionTitleRow {
+    margin-bottom: 1.1rem;
+}
+
+.srtSectionIcon {
+    color: #7b1233;
+
+    font-size: 1.25rem;
+
+    margin-right: 0.7rem;
+}
+
+.srtSectionTitle {
+    color: #7b1233 !important;
+
+    font-size: 1.15rem !important;
+
+    font-weight: 700 !important;
+}
+
+
+/* =========================================================
+   MIGRATION PARAMETERS
+   ========================================================= */
+
+.srtParameterRow {
+    width: 100%;
+
+    gap: 1.5rem;
+}
+
+.srtField,
+.srtFieldGroup {
+    width: 23% !important;
+}
+
+.srtCopyField {
+    width: 17% !important;
+}
+
+
+/* =========================================================
+   FIELD LABELS
+   ========================================================= */
+
+.srtFieldLabel {
+    color: #222222 !important;
+
+    font-size: 0.85rem !important;
+
+    margin-bottom: 0.35rem;
+}
+
+
+/* =========================================================
+   INPUTS / SELECTS
+   ========================================================= */
+
+.srtField .sapMInputBase,
+.srtField .sapMSlt,
+.srtFieldGroup .sapMSlt {
+    width: 100% !important;
+}
+
+.srtField .sapMInputBaseContentWrapper,
+.srtFieldGroup .sapMSlt,
+.srtField .sapMSlt {
+    height: 2.5rem !important;
+
+    min-height: 2.5rem !important;
+
+    border: 1px solid #c7cbd1;
+
+    border-radius: 0.3rem;
+}
+
+.srtField input {
+    height: 2.35rem !important;
+
+    font-size: 0.85rem !important;
+}
+
+.srtField .sapMSltLabel,
+.srtFieldGroup .sapMSltLabel {
+    line-height: 2.5rem !important;
+
+    font-size: 0.85rem !important;
+}
+
+
+/* =========================================================
+   INFORMATION ICONS
+   ========================================================= */
+
+.srtInfoIcon {
+    color: #969da8;
+
+    margin-left: 0.45rem;
+
+    margin-top: 0.55rem;
+}
+
+.srtCopyInfo {
+    margin-top: 0;
+}
+
+
+/* =========================================================
+   COPY AGAIN SWITCH
+   ========================================================= */
+
+.srtSwitchRow {
+    margin-top: 0.35rem;
+}
+
+.srtSwitchText {
+    margin-left: 0.5rem;
+
+    font-size: 0.85rem;
+
+    color: #222222;
+}
+
+.srtSwitchRow .sapMSwt {
+    width: 3.2rem;
+
+    transform: scale(0.85);
+
+    transform-origin: left center;
+}
+
+
+/* =========================================================
+   DIVIDER
+   ========================================================= */
+
+.srtDashedLine {
+    border-top: 1px dashed #d4d6da;
+
+    margin-top: 1.3rem;
+}
+
+
+/* =========================================================
+   SELECTION CRITERIA
+   ========================================================= */
+
+.srtRangeRow {
+    gap: 0.7rem;
+}
+
+
+/* ---------- Range inputs ---------- */
+
+.srtRangeRow .sapMInputBase {
+    width: 12rem !important;
+}
+
+.srtRangeRow .sapMInputBaseContentWrapper {
+    height: 2.5rem !important;
+
+    border: 1px solid #c7cbd1;
+
+    border-radius: 0.3rem;
+}
+
+.srtRangeRow input {
+    height: 2.35rem !important;
+
+    font-size: 0.85rem !important;
+}
+
+.srtToText {
+    font-size: 0.85rem;
+
+    color: #222222;
+
+    margin: 0 0.2rem;
+}
+
+
+/* =========================================================
+   OUTLINE BUTTONS
+   ========================================================= */
+
+.srtOutlineButton {
+    height: 2.5rem !important;
+
+    border: 1px solid #8a1738 !important;
+
+    border-radius: 0.35rem !important;
+
+    background: #ffffff !important;
+}
+
+.srtOutlineButton .sapMBtnContent,
+.srtOutlineButton .sapUiIcon {
+    color: #7b1233 !important;
+
+    font-weight: 600;
+}
+
+
+/* ---------- Clear ---------- */
+
+.srtClearButton {
+    min-width: 6.5rem;
+
+    margin-left: 0.7rem;
+}
+
+
+/* ---------- Add Range ---------- */
+
+.srtAddButton {
+    min-width: 8rem;
+}
+
+
+/* =========================================================
+   INFORMATION MESSAGE
+   ========================================================= */
+
+.srtInfoMessage {
+    background: #eef4ff;
+
+    border-radius: 0.45rem;
+
+    min-height: 2.7rem;
+
+    padding: 0 0.9rem;
+
+    margin-top: 1.2rem;
+}
+
+.srtInfoMessageIcon {
+    color: #0069d9;
+
+    font-size: 1rem;
+
+    margin-right: 0.7rem;
+}
+
+.srtInfoMessageText {
+    color: #20262e;
+
+    font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   BOTTOM ACTION CARD
+   ========================================================= */
+
+.srtActionCard {
+    background: #ffffff;
+
+    margin: 1rem 1.2rem 1rem;
+
+    padding: 0.7rem 1rem;
+
+    border-radius: 0.5rem;
+
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.srtActionRow {
+    gap: 1rem;
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+   ========================================================= */
+
+.srtCancelButton {
+    min-width: 7.5rem;
+}
+
+
+/* =========================================================
+   SAVE AS VARIANT
+   ========================================================= */
+
+.srtVariantButton {
+    min-width: 11rem;
+}
+
+
+/* =========================================================
+   NEXT BUTTON
+   ========================================================= */
+
+.srtNextButton {
+    min-width: 7rem;
+
+    height: 2.5rem !important;
+
+    border-radius: 0.35rem !important;
+
+    background: #A01441 !important;
+
+    border-color: #A01441 !important;
+}
+
+.srtNextButton .sapMBtnContent,
+.srtNextButton .sapUiIcon {
+    color: #ffffff !important;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESPONSIVE - 1100px AND BELOW
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .srtHeaderBar {
+        padding: 0 1rem !important;
+    }
+
+    .srtHeaderDivider {
+        margin-left: 0.65rem !important;
+        margin-right: 0.65rem !important;
+    }
+
+    .srtBrandMsg,
+    .srtBrandSrt {
+        font-size: 1.1rem !important;
+    }
+
+    .srtAppNameHeader {
+        font-size: 0.95rem !important;
+    }
+
+
+    /* Hero */
+
+    .srtRefreshHero {
+        padding: 1rem 1.2rem;
+    }
+
+    .srtHeroDocumentIcon {
+        width: 3.6rem;
+        height: 3.6rem;
+        min-width: 3.6rem;
+
+        margin-right: 0.8rem;
+    }
+
+    .srtHeroTitle {
+        font-size: 1.25rem !important;
+    }
+
+    .srtHeroDescription {
+        font-size: 0.75rem !important;
+    }
+
+
+    /* Steps */
+
+    .srtStepContainer {
+        min-width: 17rem;
+    }
+
+    .srtStepItem {
+        min-width: 5.5rem;
+    }
+
+    .srtStepLine {
+        width: 2.5rem;
+    }
+
+
+    /* Fields */
+
+    .srtParameterRow {
+        gap: 1rem;
+    }
+
+    .srtField,
+    .srtFieldGroup {
+        width: 22% !important;
+    }
+
+    .srtCopyField {
+        width: 18% !important;
+    }
+
+    .srtRangeRow .sapMInputBase {
+        width: 10rem !important;
+    }
+}

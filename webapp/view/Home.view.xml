@@ -1,0 +1,312 @@
+<mvc:View
+    controllerName="srt.app.controller.Home"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m"
+>
+    <Page
+        id="homePage"
+        showHeader="false"
+        class="sapUiNoContentPadding"
+    >
+        <content>
+            <VBox>
+                <!-- ============ Top header bar: logo, brand, app name ============ -->
+           <Toolbar class="srtHeaderBar" height="4rem">
+
+    <HBox
+        class="srtHeaderContent"
+        alignItems="Center">
+
+        <!-- MSG -->
+        <HBox
+            class="srtHeaderGroup"
+            alignItems="Center">
+
+            <core:Icon
+                src="sap-icon://circle-task"
+                class="srtMsgIcon" />
+
+            <Text
+                text="msg"
+                class="srtBrandMsg" />
+        </HBox>
+
+        <!-- Divider -->
+        <Text
+            text="|"
+            class="srtHeaderDivider" />
+
+        <!-- SRT -->
+        <Text
+            text="SRT"
+            class="srtBrandSrt" />
+
+        <!-- Divider -->
+        <Text
+            text="|"
+            class="srtHeaderDivider" />
+
+        <!-- Application -->
+        <HBox
+            class="srtHeaderGroup srtAppGroup"
+            alignItems="Center">
+
+            <Text
+                text="{i18n>homePageTitle}"
+                class="srtAppNameHeader" />
+
+            <core:Icon
+                src="sap-icon://slim-arrow-down"
+                class="srtHeaderArrow" />
+
+        </HBox>
+
+    </HBox>
+
+    <ToolbarSpacer />
+
+</Toolbar>
+
+                <!-- ============ Sub navigation bar ============
+                <Toolbar class="srtSubNavBar">
+                    <Link text="Menu" />
+                    <core:Icon src="sap-icon://slim-arrow-down" class="sapUiTinyMarginBegin sapUiTinyMarginEnd" />
+                    <Link text="{i18n>backButton}" class="sapUiSmallMarginEnd" />
+                    <Link text="{i18n>cardSrtTitle}" class="srtSubNavActive sapUiSmallMarginEnd" />
+                    <Link text="{i18n>cardEvaluatingTitle}" class="sapUiSmallMarginEnd" press="onNavToEvaluating" />
+                    <Link text="{i18n>cardEvaluatingUploadTitle}" press="onNavToEvaluatingUpload" />
+                    <ToolbarSpacer />
+                </Toolbar> -->
+
+                <!-- ============ Hero / banner section ============ -->
+                <!-- <VBox class="srtHero">
+                    <HBox class="srtHeroBrandRow" alignItems="Center">
+                        <core:Icon src="sap-icon://circle-task" size="0.9rem" class="srtHeroDot" />
+                        <Text text="msg" class="srtHeroMsg" />
+                        <Text text="|" class="srtHeroDivider" />
+                        <Text text="SRT" class="srtHeroSrt" />
+                    </HBox>
+                    <Text text="{i18n>heroSubTitle}" class="srtHeroSubtitle" />
+                </VBox> -->
+
+                <Image
+                    src="/images/hero-background.png"
+                    class="srtHeroImage"
+                    decorative="true"
+                    densityAware="false"
+                    id = "heroImage"
+                />
+
+                <!-- ============ Application cards ============ -->
+                <FlexBox
+                    wrap="Wrap"
+                    justifyContent="SpaceBetween"
+                    class="sapUiSmallMargin"
+                >
+                    <!-- Card 1: Selective Refresh Tool -->
+                    <VBox class="srtCardWrapper">
+                        <List
+                            class="srtCard"
+                            showSeparators="None"
+                        >
+                            <CustomListItem
+                                type="Navigation"
+                                press="onCardPress"
+                            >
+                                <customData>
+                                    <core:CustomData
+                                        key="route"
+                                        value="selectiveRefresh"
+                                    />
+                                </customData>
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMargin"
+                                >
+                                    <VBox
+                                        class="srtCardIcon"
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://search"
+                                            color="#ffffff"
+                                            size="1.3rem"
+                                        />
+                                    </VBox>
+                                    <VBox>
+                                        <Text
+                                            text="{i18n>cardSrtTitle}"
+                                            class="srtCardTitle"
+                                        />
+                                        <Text
+                                            text="{i18n>cardSrtDescription}"
+                                            class="srtCardDescription"
+                                        />
+                                    </VBox>
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                    </VBox>
+
+                    <!-- Card 2: Evaluating -->
+                    <VBox class="srtCardWrapper">
+                        <List
+                            class="srtCard"
+                            showSeparators="None"
+                        >
+                            <CustomListItem
+                                type="Navigation"
+                                press="onCustomPress"
+                            >
+                                <customData>
+                                    <core:CustomData
+                                        key="route"
+                                        value="Customize"
+                                    />
+                                </customData>
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMargin"
+                                >
+                                    <VBox
+                                        class="srtCardIcon"
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://checklist-item"
+                                            color="#ffffff"
+                                            size="1.3rem"
+                                        />
+                                    </VBox>
+                                    <VBox>
+                                        <Text
+                                            text="{i18n>cardEvaluatingTitle}"
+                                            class="srtCardTitle"
+                                        />
+                                        <Text
+                                            text="{i18n>cardEvaluatingDescription}"
+                                            class="srtCardDescription"
+                                        />
+                                    </VBox>
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                    </VBox>
+
+                    <!-- Card 3: Evaluating Upload -->
+                    <VBox class="srtCardWrapper">
+                        <List
+                            class="srtCard"
+                            showSeparators="None"
+                        >
+                            <CustomListItem
+                                type="Navigation"
+                                press="onCustomPress"
+                            >
+                                <customData>
+                                    <core:CustomData
+                                        key="route"
+                                        value="CustomizingUpload"
+                                    />
+                                </customData>
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMargin"
+                                >
+                                    <VBox
+                                        class="srtCardIcon"
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://upload-to-cloud"
+                                            color="#ffffff"
+                                            size="1.3rem"
+                                        />
+                                    </VBox>
+                                    <VBox>
+                                        <Text
+                                            text="{i18n>cardEvaluatingUploadTitle}"
+                                            class="srtCardTitle"
+                                        />
+                                        <Text
+                                            text="{i18n>cardEvaluatingUploadDescription}"
+                                            class="srtCardDescription"
+                                        />
+                                    </VBox>
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                    </VBox>
+
+                    <!-- Card 4: Reports -->
+                    <VBox class="srtCardWrapper">
+                        <List
+                            class="srtCard"
+                            showSeparators="None"
+                        >
+                            <CustomListItem
+                                type="Navigation"
+                                press="onCardPress"
+                            >
+                                <customData>
+                                    <core:CustomData
+                                        key="route"
+                                        value="reports"
+                                    />
+                                </customData>
+                                <HBox
+                                    alignItems="Center"
+                                    class="sapUiSmallMargin"
+                                >
+                                    <VBox
+                                        class="srtCardIcon"
+                                        alignItems="Center"
+                                        justifyContent="Center"
+                                    >
+                                        <core:Icon
+                                            src="sap-icon://bar-chart"
+                                            color="#ffffff"
+                                            size="1.3rem"
+                                        />
+                                    </VBox>
+                                    <VBox>
+                                        <Text
+                                            text="{i18n>cardReportsTitle}"
+                                            class="srtCardTitle"
+                                        />
+                                        <Text
+                                            text="{i18n>cardReportsDescription}"
+                                            class="srtCardDescription"
+                                        />
+                                    </VBox>
+                                </HBox>
+                            </CustomListItem>
+                        </List>
+                    </VBox>
+                </FlexBox>
+            </VBox>
+        </content>
+
+        <!-- ============ Footer ============ -->
+        <footer>
+            <Bar class="srtFooter">
+                <!-- <contentLeft>
+                    <Text
+                        text="{i18n>footerCopyright}"
+                        class="srtFooterText"
+                    />
+                </contentLeft> -->
+                <contentRight>
+                    <Text
+                        text="{i18n>footerAppName}"
+                        class="srtFooterText"
+                    />
+                </contentRight>
+            </Bar>
+        </footer>
+    </Page>
+</mvc:View>

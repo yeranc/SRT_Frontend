@@ -1,0 +1,56 @@
+<mvc:View
+    controllerName="srt.app.controller.Reports"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <Page id="reportsPage"
+          title="{i18n>reportsTitle}"
+          showNavButton="true"
+          navButtonPress="onNavBack"
+          class="srtPageHeaderBar">
+        <content>
+            <VBox class="sapUiMediumMargin">
+
+                <Panel headerText="{i18n>reportsTitle}" class="sapUiResponsiveMargin">
+                    <content>
+                        <VBox class="sapUiSmallMargin">
+
+                            <HBox wrap="Wrap" alignItems="End">
+                                <VBox class="sapUiTinyMarginEnd">
+                                    <Label text="{i18n>dateFromLabel}" labelFor="dateFrom" />
+                                    <DatePicker id="dateFrom" width="12rem" />
+                                </VBox>
+                                <VBox class="sapUiTinyMarginEnd">
+                                    <Label text="{i18n>dateToLabel}" labelFor="dateTo" />
+                                    <DatePicker id="dateTo" width="12rem" />
+                                </VBox>
+                                <Button text="{i18n>searchButton}" press="onSearchReports" class="sapUiTinyMarginEnd" />
+                                <Button text="{i18n>refreshButton}" icon="sap-icon://refresh" press="onRefreshReports" />
+                            </HBox>
+
+                        </VBox>
+                    </content>
+                </Panel>
+
+                <Table id="reportsTable" items="{reports>/items}" class="sapUiResponsiveMargin">
+                    <columns>
+                        <Column><Text text="{i18n>colReport}" /></Column>
+                        <Column><Text text="{i18n>colReportStatus}" /></Column>
+                        <Column><Text text="{i18n>colCreatedOn}" /></Column>
+                        <Column><Text text="{i18n>colRecords}" /></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{reports>report}" />
+                                <ObjectStatus text="{reports>status}" state="{reports>statusState}" />
+                                <Text text="{reports>createdOn}" />
+                                <Text text="{reports>records}" />
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+
+            </VBox>
+        </content>
+    </Page>
+</mvc:View>

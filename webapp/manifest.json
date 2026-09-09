@@ -1,0 +1,185 @@
+{
+  "_version": "1.59.0",
+  "sap.app": {
+    "id": "srt.app",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": {
+      "version": "1.0.0"
+    },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "resources": "resources.json",
+    "sourceTemplate": {
+      "id": "servicecatalog.connectivityComponentForManifest",
+      "version": "0.0.0"
+    },
+    "dataSources": {
+      "mainService": {
+        "uri": "/sap/opu/odata/sap/ZRI_SB_DATA/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "2.0"
+        }
+      },
+      "ZRI_SB_RIP_DATA_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_RIP_DATA_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZRI_SB_RIP_DATA/ZRI_SB_RIP_DATA_VAN.xml"
+        }
+      },
+      "ZRI_SB_RIP_DATA": {
+        "uri": "/sap/opu/odata/sap/ZRI_SB_RIP_DATA/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZRI_SB_RIP_DATA_VAN"
+          ],
+          "localUri": "localService/ZRI_SB_RIP_DATA/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      },
+      "ZGS_SRT_SRV": {
+        "uri": "/sap/opu/odata/sap/ZGS_SRT_SRV/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "localUri": "localService/ZGS_SRT_SRV/metadata.xml",
+          "odataVersion": "2.0"
+        }
+      }
+    }
+  },
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": {
+      "icon": "",
+      "favIcon": ""
+    },
+    "deviceTypes": {
+      "desktop": true,
+      "tablet": true,
+      "phone": true
+    }
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "srt.app.view.App",
+      "type": "XML",
+      "id": "app"
+    },
+    "dependencies": {
+      "minUI5Version": "1.120.0",
+      "libs": {
+        "sap.ui.core": {},
+        "sap.m": {},
+        "sap.ui.layout": {},
+        "sap.f": {},
+        "sap.ui.unified": {}
+      }
+    },
+    "contentDensities": {
+      "compact": true,
+      "cozy": true
+    },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "srt.app.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "defaultBindingMode": "TwoWay",
+          "defaultCountMode": "Inline"
+        }
+      },
+      "ZRI_SB_RIP_DATA": {
+        "dataSource": "ZRI_SB_RIP_DATA",
+        "preload": true,
+        "settings": {}
+      },
+      "ZGS_SRT_SRV": {
+        "dataSource": "ZGS_SRT_SRV",
+        "preload": true,
+        "settings": {}
+      }
+    },
+    "resources": {
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
+    },
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewType": "XML",
+        "viewPath": "srt.app.view",
+        "controlId": "app",
+        "controlAggregation": "pages",
+        "transition": "slide",
+        "async": true
+      },
+      "routes": [
+        {
+          "pattern": "",
+          "name": "home",
+          "target": "home"
+        },
+        {
+          "pattern": "selective-refresh",
+          "name": "selectiveRefresh",
+          "target": "selectiveRefresh"
+        },
+        {
+          "pattern": "evaluating",
+          "name": "evaluating",
+          "target": "evaluating"
+        },
+        {
+          "pattern": "evaluating-upload",
+          "name": "evaluatingUpload",
+          "target": "evaluatingUpload"
+        },
+        {
+          "pattern": "reports",
+          "name": "reports",
+          "target": "reports"
+        }
+      ],
+      "targets": {
+        "home": {
+          "viewId": "home",
+          "viewName": "Home",
+          "viewLevel": 1
+        },
+        "selectiveRefresh": {
+          "viewId": "selectiveRefresh",
+          "viewName": "SelectiveRefresh",
+          "viewLevel": 2
+        },
+        "evaluating": {
+          "viewId": "evaluating",
+          "viewName": "Evaluating",
+          "viewLevel": 2
+        },
+        "evaluatingUpload": {
+          "viewId": "evaluatingUpload",
+          "viewName": "EvaluatingUpload",
+          "viewLevel": 2
+        },
+        "reports": {
+          "viewId": "reports",
+          "viewName": "Reports",
+          "viewLevel": 2
+        }
+      }
+    }
+  }
+}

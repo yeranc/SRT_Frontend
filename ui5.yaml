@@ -1,0 +1,44 @@
+# yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
+specVersion: "4.0"
+metadata:
+  name: project1
+type: application
+server:
+  customMiddleware:
+    - name: fiori-tools-proxy
+      afterMiddleware: compression
+      configuration:
+        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ui5:
+          path:
+            - /resources
+            - /test-resources
+          url: https://ui5.sap.com
+        backend:
+          - path: /sap
+            url: http://mgss81a.aws.msg.de:44300
+            destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZRI_SB_RIP_DATA/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZGS_SRT_SRV/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
+    - name: fiori-tools-appreload
+      afterMiddleware: compression
+      configuration:
+        port: 35729
+        path: webapp
+        delay: 300
+    - name: fiori-tools-preview
+      afterMiddleware: fiori-tools-appreload
+      configuration:
+        flp:
+          theme: sap_horizon
+builder:
+  resources:
+    excludes:
+      - /test/**
+      - /localService/**

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="1.0" xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx" xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData">
+    <edmx:DataServices m:DataServiceVersion="2.0">
+        <Schema Namespace="ZGS_SRT_SRV" xml:lang="en" sap:schema-version="1" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+            <EntityType Name="RIP" sap:content-version="1">
+                <Key>
+                    <PropertyRef Name="iv_rfc"/>
+                    <PropertyRef Name="iv_grp_id"/>
+                    <PropertyRef Name="iv_rip_from"/>
+                    <PropertyRef Name="iv_rip_to"/>
+                    <PropertyRef Name="iv_copy_again"/>
+                </Key>
+                <Property Name="iv_rfc" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="RFC" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="iv_grp_id" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="GRP ID" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="iv_rip_from" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="RIP FROM" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="iv_rip_to" Type="Edm.String" Nullable="false" sap:unicode="false" sap:label="RIP TO" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+                <Property Name="iv_copy_again" Type="Edm.Boolean" Nullable="false" sap:unicode="false" sap:label="COPY AGAIN" sap:creatable="false" sap:updatable="false" sap:sortable="false" sap:filterable="false"/>
+            </EntityType>
+            <EntityContainer Name="ZGS_SRT_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx">
+                <EntitySet Name="RIPSet" EntityType="ZGS_SRT_SRV.RIP" sap:creatable="false" sap:updatable="false" sap:deletable="false" sap:pageable="false" sap:addressable="false" sap:content-version="1"/>
+            </EntityContainer>
+            <Annotation Term="Core.SchemaVersion" String="1.0.0" xmlns="http://docs.oasis-open.org/odata/ns/edm"/>
+            <atom:link rel="self" href="https://mgss81a.aws.msg.de:44300/sap/opu/odata/sap/ZGS_SRT_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+            <atom:link rel="latest-version" href="https://mgss81a.aws.msg.de:44300/sap/opu/odata/sap/ZGS_SRT_SRV/$metadata" xmlns:atom="http://www.w3.org/2005/Atom"/>
+        </Schema>
+    </edmx:DataServices>
+</edmx:Edmx>
