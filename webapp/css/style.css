@@ -787,3 +787,43 @@
         width: 10rem !important;
     }
 }
+ /* =========================================================
+   RESULT TABLE - COMPACT
+   ========================================================= */
+
+.srtResultTable {
+    font-size: 0.75rem !important;
+}
+
+/* Compact data cells */
+.srtResultTable .sapUiTableCell {
+    padding: 0 0.35rem !important;
+}
+
+/* Compact cell text */
+.srtResultTable .sapMText {
+    font-size: 0.75rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+/* Compact headers */
+.srtResultTable .sapUiTableColCell {
+    padding: 0 0.35rem !important;
+}
+
+.srtResultTable .sapUiTableColCell .sapMLabel {
+    font-size: 0.75rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.srtBusyDialog .sapMDialogScrollCont {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0rem !important;
+}
+.srtBusyDialog.sapMDialog {
+    width: 18rem !important;
+    min-width: 18rem !important;
+}

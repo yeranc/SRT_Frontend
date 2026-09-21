@@ -26,6 +26,10 @@ server:
             url: http://mgss81a.aws.msg.de:44300
             client: '800'
             destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZRI_S_BUSINESS_PARTNER/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:

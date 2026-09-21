@@ -1,0 +1,22 @@
+<core:FragmentDefinition
+    xmlns="sap.ui.table"
+    xmlns:core="sap.ui.core"
+    xmlns:m="sap.m">
+
+    <Table
+        id="resultTable"
+        width="100%"
+        class="srtResultTable"
+        selectionMode="Multi"
+        enableSelectAll="false"
+        enableColumnReordering="true"
+        alternateRowColors="false">
+
+        <rowMode>
+            <rowm:Auto
+                xmlns:rowm="sap.ui.table.rowmodes" />
+        </rowMode>
+
+    </Table>
+
+</core:FragmentDefinition>

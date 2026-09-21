@@ -9,7 +9,9 @@ sap.ui.define([
     "sap/m/Text",
     "sap/m/Label",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
+    "sap/ui/model/FilterOperator",
+    "sap/ui/table/Column",
+    "sap/m/BusyDialog"
 ], function (
     Controller,
     JSONModel,
@@ -20,7 +22,9 @@ sap.ui.define([
     Text,
     Label,
     Filter,
-    FilterOperator
+    FilterOperator,
+    TableColumn,
+    BusyDialog
 ) {
     "use strict";
 
@@ -37,6 +41,7 @@ sap.ui.define([
                     copyAgain: false,
                     copyLoss: false,
                     copyAccount: false,
+                    copyAgainEnabled: false,
                     ranges: [
                         {
                             from: "",
@@ -97,6 +102,15 @@ sap.ui.define([
                 );
 
             }
+            this._oBusyDialog = new BusyDialog({
+                
+                text: "Please wait while the data is being fetched..."
+                
+            });
+
+            this._oBusyDialog.addStyleClass("srtBusyDialog");
+
+this.getView().addDependent(this._oBusyDialog);
         },
 
 
@@ -148,7 +162,153 @@ sap.ui.define([
                 .getRouter()
                 .navTo("home");
         },
+        onGroupIdChange: function (oEvent) {
 
+            var sGroupId = oEvent
+                .getSource()
+                .getSelectedKey();
+
+            var oWizardModel =
+                this.getView().getModel("wizard");
+
+            oWizardModel.setProperty(
+                "/groupId",
+                sGroupId
+            );
+
+            // =====================================================
+            // SHOW / HIDE COPY OPTIONS BASED ON GROUP ID
+            // =====================================================
+
+            var oCopyLossField =
+                this.byId("copyLossField");
+
+            var oCopyAccountField =
+                this.byId("copyAccountField");
+
+            if (sGroupId === "B") {
+
+                // Business Partner
+                oCopyLossField.setVisible(false);
+                oCopyAccountField.setVisible(false);
+
+                // Reset values because these options are not applicable
+                oWizardModel.setProperty(
+                    "/copyLoss",
+                    false
+                );
+
+                oWizardModel.setProperty(
+                    "/copyAccount",
+                    false
+                );
+
+                this.byId("copyLossSwitch")
+                    .setState(false);
+
+                this.byId("copyAccSwitch")
+                    .setState(false);
+
+            } else {
+
+                // Other objects
+                oCopyLossField.setVisible(true);
+                oCopyAccountField.setVisible(true);
+            }
+
+            // Clear previous result table
+            this._clearResultTable();
+
+            // Load filters for selected object
+            this._showSelectionFragment(sGroupId);
+        },
+        _clearResultTable: function () {
+
+            var oContainer =
+                this.byId("resultTableContainer");
+
+            if (!oContainer) {
+                return;
+            }
+
+            if (this._oResultTable) {
+
+                this._oResultTable.destroy();
+
+                this._oResultTable = null;
+            }
+
+            oContainer.removeAllItems();
+
+            oContainer.setVisible(false);
+        },
+        _showSelectionFragment: function (sGroupId) {
+
+            var oContainer = this.byId("selectionCriteriaContainer");
+
+            if (!oContainer) {
+                console.error("selectionCriteriaContainer was not found.");
+                return;
+            }
+
+            // Destroy previously loaded fragment/control
+            if (this._oSelectionFragment) {
+                this._oSelectionFragment.destroy();
+                this._oSelectionFragment = null;
+            }
+
+            oContainer.removeAllItems();
+
+            var sFragmentName;
+
+            switch (sGroupId) {
+
+                case "B":
+                    sFragmentName =
+                        "srt.app.view.fragments.Partner";
+                    break;
+
+                // case "A":
+                //     sFragmentName =
+                //         "srt.app.view.fragment.selection.AccountFilters";
+                //     break;
+
+                // case "RIP":
+                //     sFragmentName =
+                //         "srt.app.view.fragment.selection.RIPFilters";
+                //     break;
+
+                // case "T":
+                //     sFragmentName =
+                //         "srt.app.view.fragment.selection.TreatyFilters";
+                //     break;
+
+                // case "L":
+                //     sFragmentName =
+                //         "srt.app.view.fragment.selection.LossFilters";
+                //     break;
+
+                default:
+                    return;
+            }
+
+            this.loadFragment({
+                name: sFragmentName
+            }).then(function (oFragment) {
+
+                this._oSelectionFragment = oFragment;
+
+                oContainer.addItem(oFragment);
+
+            }.bind(this)).catch(function (oError) {
+
+                console.error(
+                    "Error loading selection fragment:",
+                    oError
+                );
+
+            });
+        },
 
         onCancel: function () {
 
@@ -351,23 +511,25 @@ sap.ui.define([
              */
             oRIPModel.read(
                 "/RIPSet",
-                { 
+                {
 
                     filters: aFilters,
 
-                    success: function (oData) { console.log("========== BACKEND SUCCESS ==========");
-                         console.log("Status Code: 200"); console.log("Service URL:", oRIPModel.sServiceUrl); 
-                         console.log("Full Response:", oData); console.log("Results:", oData.results); 
-                         if (oData.results && oData.results.length > 0) 
-                            { console.log("========== BACKEND RESULT VALUES ==========");
-                                 console.log("iv_grp_id:", oData.results[0].iv_grp_id);
-                                  console.log("iv_rfc:", oData.results[0].iv_rfc); 
-                                  console.log("iv_copy_again:", oData.results[0].iv_copy_again);
-                                   console.log("iv_rip_from:", oData.results[0].iv_rip_from); 
-                                   console.log("iv_rip_to:", oData.results[0].iv_rip_to); 
-                                   console.log("==========================================");
+                    success: function (oData) {
+                        console.log("========== BACKEND SUCCESS ==========");
+                        console.log("Status Code: 200"); console.log("Service URL:", oRIPModel.sServiceUrl);
+                        console.log("Full Response:", oData); console.log("Results:", oData.results);
+                        if (oData.results && oData.results.length > 0) {
+                            console.log("========== BACKEND RESULT VALUES ==========");
+                            console.log("iv_grp_id:", oData.results[0].iv_grp_id);
+                            console.log("iv_rfc:", oData.results[0].iv_rfc);
+                            console.log("iv_copy_again:", oData.results[0].iv_copy_again);
+                            console.log("iv_rip_from:", oData.results[0].iv_rip_from);
+                            console.log("iv_rip_to:", oData.results[0].iv_rip_to);
+                            console.log("==========================================");
 
-                     } MessageToast.show("RIP execution started successfully."); },
+                        } MessageToast.show("RIP execution started successfully.");
+                    },
 
 
                     error: function (oError) {
@@ -792,8 +954,8 @@ sap.ui.define([
                             return oContext
                                 ? oContext
                                     .getObject()[
-                                        sKeyField
-                                    ]
+                                sKeyField
+                                ]
                                 : null;
 
                         }
@@ -842,8 +1004,479 @@ sap.ui.define([
             oEvent
                 .getSource()
                 .destroy();
-        }
+        },
 
+        onBPGo: function () {
+
+            console.log("========== BP GO CLICKED ==========");
+
+            var oWizardModel = this.getView().getModel("wizard");
+
+            var aFilters = [];
+
+            var sBusinessPartner =
+                oWizardModel.getProperty("/businessPartner");
+
+            var sProcessRefId =
+                oWizardModel.getProperty("/processRefId");
+
+            var sTargetSystem =
+                oWizardModel.getProperty("/targetSystem");
+
+            console.log("Business Partner:", sBusinessPartner);
+            console.log("Process Ref ID:", sProcessRefId);
+            console.log("Target System:", sTargetSystem);
+
+            if (sBusinessPartner) {
+                aFilters.push(
+                    new Filter(
+                        "bp_external",
+                        FilterOperator.EQ,
+                        sBusinessPartner
+                    )
+                );
+            }
+
+            if (sProcessRefId) {
+                aFilters.push(
+                    new Filter(
+                        "Process_id",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
+
+            if (sTargetSystem) {
+                aFilters.push(
+                    new Filter(
+                        "destination",
+                        FilterOperator.EQ,
+                        sTargetSystem
+                    )
+                );
+            }
+
+            var oModel =
+                this.getView().getModel("ZRI_S_BUSINESS_PARTNER");
+
+            if (!oModel) {
+
+                console.error(
+                    "businessPartner model is NOT available"
+                );
+
+                MessageToast.show(
+                    "Business Partner OData model is not available."
+                );
+
+                return;
+            }
+
+            console.log("Filters:", aFilters);
+            console.log("Calling BP OData service...");
+            this._oBusyDialog.open();
+            oModel.read(
+                "/ZRI_C_BUSINESS_PARTNER",
+                {
+                    filters: aFilters,
+
+                    urlParameters: {
+                        "$top": "5000"
+                    },
+
+                    success: function (oData) {
+
+                        console.log(
+                            "Returned records:",
+                            oData.results.length
+                        );
+
+                        this._showResultTable(
+                            oData.results
+                        );
+                    this._oBusyDialog.close();
+                    }.bind(this),
+
+                    error: function (oError) {
+
+                        console.error(
+                            "BP DATA ERROR:",
+                            oError
+                        );
+
+                        MessageToast.show(
+                            "Error while reading Business Partner data."
+                        );
+
+                    }.bind(this)
+                }
+            );
+        },
+        _showResultTable: function (aResults) {
+
+            var oContainer = this.byId("resultTableContainer");
+
+            if (!oContainer) {
+                console.error(
+                    "resultTableContainer was NOT found."
+                );
+                return;
+            }
+
+            // Destroy previous result table
+            if (this._oResultTable) {
+                this._oResultTable.destroy();
+                this._oResultTable = null;
+            }
+
+            oContainer.removeAllItems();
+
+            this.loadFragment({
+                name: "srt.app.view.fragments.ResultTable",
+                id: this.getView().getId() + "--resultTableFragment"
+            }).then(function (oTable) {
+
+                this._oResultTable = oTable;
+
+                oContainer.addItem(oTable);
+
+                this._configureResultTable(
+                    oTable,
+                    aResults
+                );
+
+                oContainer.setVisible(true);
+
+            }.bind(this)).catch(function (oError) {
+
+                console.error(
+                    "Error loading result table:",
+                    oError
+                );
+
+            });
+        },
+        _configureResultTable: function (oTable, aResults) {
+
+            var sGroupId = this.getView()
+                .getModel("wizard")
+                .getProperty("/groupId");
+
+            var oConfig = this._getResultTableConfig(sGroupId);
+
+            if (!oConfig) {
+                console.error(
+                    "No result table configuration for Group ID:",
+                    sGroupId
+                );
+                return;
+            }
+
+            // Remove existing columns
+            oTable.removeAllColumns();
+
+            // Create columns dynamically
+            oConfig.columns.forEach(function (oColumn) {
+
+                oTable.addColumn(
+                    new TableColumn({
+
+                        label: new Label({
+                            text: oColumn.label
+                        }),
+
+                        template: new Text({
+                            text: "{result>" + oColumn.property + "}"
+                        }),
+
+                        width: "12rem"
+
+                    })
+                );
+
+            });
+
+            // Create result model
+            var oResultModel = new JSONModel({
+                results: aResults
+            });
+
+            // Set result model
+            oTable.setModel(
+                oResultModel,
+                "result"
+            );
+            oTable.attachRowSelectionChange(
+    this._onResultRowSelectionChange,
+    this
+);
+
+            // Bind rows
+            oTable.bindRows(
+                "result>/results"
+            );
+
+            console.log(
+                "Result table configured for:",
+                sGroupId
+            );
+
+            console.log(
+                "Number of rows:",
+                aResults.length
+            );
+        },
+
+        _onResultRowSelectionChange: function (oEvent) {
+
+    var oTable = oEvent.getSource();
+
+    var oWizardModel =
+        this.getView().getModel("wizard");
+
+    var sGroupId =
+        oWizardModel.getProperty("/groupId");
+
+    var oConfig =
+        this._getResultTableConfig(sGroupId);
+
+    // No configuration or target property
+    if (!oConfig || !oConfig.targetProperty) {
+
+        oWizardModel.setProperty(
+            "/copyAgainEnabled",
+            false
+        );
+
+        oWizardModel.setProperty(
+            "/copyAgain",
+            false
+        );
+
+        return;
+    }
+
+    var iRowIndex =
+        oEvent.getParameter("rowIndex");
+
+    // No row selected
+    if (iRowIndex < 0) {
+
+        oWizardModel.setProperty(
+            "/copyAgainEnabled",
+            false
+        );
+
+        oWizardModel.setProperty(
+            "/copyAgain",
+            false
+        );
+
+        return;
+    }
+
+    var oContext =
+        oTable.getContextByIndex(iRowIndex);
+
+    if (!oContext) {
+
+        oWizardModel.setProperty(
+            "/copyAgainEnabled",
+            false
+        );
+
+        oWizardModel.setProperty(
+            "/copyAgain",
+            false
+        );
+
+        return;
+    }
+
+    var oSelectedObject =
+        oContext.getObject();
+
+    var sTargetProperty =
+        oConfig.targetProperty;
+
+    var vTargetValue =
+        oSelectedObject[sTargetProperty];
+
+    console.log(
+        "========== COPY AGAIN CHECK =========="
+    );
+
+    console.log(
+        "Group ID:",
+        sGroupId
+    );
+
+    console.log(
+        "Target Property:",
+        sTargetProperty
+    );
+
+    console.log(
+        "Target Value:",
+        vTargetValue
+    );
+
+    var bHasTarget =
+        vTargetValue !== null &&
+        vTargetValue !== undefined &&
+        String(vTargetValue).trim() !== "";
+
+    console.log(
+        "Has Target:",
+        bHasTarget
+    );
+
+    console.log(
+        "======================================"
+    );
+
+    // Enable / disable Copy Again
+    oWizardModel.setProperty(
+        "/copyAgainEnabled",
+        bHasTarget
+    );
+
+    // If target does not exist,
+    // Copy Again must always be OFF
+    if (!bHasTarget) {
+
+        oWizardModel.setProperty(
+            "/copyAgain",
+            false
+        );
+
+        this.byId("copyAgainSwitch")
+            .setState(false);
+    }
+},
+        _getResultTableConfig: function (sGroupId) {
+
+            switch (sGroupId) {
+
+                case "B":
+
+                    return {
+                        targetProperty: "TargetBpNum",
+                        columns: [
+                            {
+                                label: "Business Partner",
+                                property: "bp_external"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "Process_id"
+                            },
+                            {
+                                label: "Target System",
+                                property: "destination"
+                            },
+                            {
+                                label: "BP Type",
+                                property: "type"
+                            },
+                            {
+                                label: "External BP Number",
+                                property: "bpext"
+                            },
+                            {
+                                label: "Target Business Partner",
+                                property: "TargetBpNum"
+                            }
+                        ]
+                    };
+
+                case "A":
+
+                    return {
+                        columns: [
+                            // Account columns will go here
+                        ]
+                    };
+
+                case "RIP":
+
+                    return {
+                        columns: [
+                            // RIP columns will go here
+                        ]
+                    };
+
+                default:
+                    return null;
+            }
+        },
+_updateCopyAgainState: function (oSelectedObject) {
+
+    var oWizardModel =
+        this.getView().getModel("wizard");
+
+    var sGroupId =
+        oWizardModel.getProperty("/groupId");
+
+    var sTargetProperty = null;
+
+    switch (sGroupId) {
+
+        case "B":
+            sTargetProperty = "TargetBpNum";
+            break;
+
+        case "A":
+            sTargetProperty = "TargetAccount";
+            break;
+
+        case "RIP":
+            sTargetProperty = "TargetRIP";
+            break;
+
+        case "T":
+            sTargetProperty = "TargetTreaty";
+            break;
+
+        case "L":
+            sTargetProperty = "TargetLoss";
+            break;
+
+        default:
+            break;
+    }
+
+    var bHasTarget = false;
+
+    if (
+        sTargetProperty &&
+        oSelectedObject &&
+        oSelectedObject[sTargetProperty] !== null &&
+        oSelectedObject[sTargetProperty] !== undefined &&
+        String(oSelectedObject[sTargetProperty]).trim() !== ""
+    ) {
+        bHasTarget = true;
+    }
+
+    oWizardModel.setProperty(
+        "/copyAgainEnabled",
+        bHasTarget
+    );
+
+    // Always reset Copy Again when target does not exist
+    if (!bHasTarget) {
+
+        oWizardModel.setProperty(
+            "/copyAgain",
+            false
+        );
+
+        this.byId("copyAgainSwitch")
+            .setState(false);
+    }
+},
     });
+
 });
 

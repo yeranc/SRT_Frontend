@@ -48,6 +48,24 @@
           "localUri": "localService/ZGS_SRT_SRV/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZRI_S_BUSINESS_PARTNER_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_BUSINESS_PARTNER_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZRI_S_BUSINESS_PARTNER/ZRI_S_BUSINESS_PARTNER_VAN.xml"
+        }
+      },
+      "ZRI_S_BUSINESS_PARTNER": {
+        "uri": "/sap/opu/odata/sap/ZRI_S_BUSINESS_PARTNER/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZRI_S_BUSINESS_PARTNER_VAN"
+          ],
+          "localUri": "localService/ZRI_S_BUSINESS_PARTNER/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -77,7 +95,8 @@
         "sap.ui.layout": {},
         "sap.f": {},
         "sap.ui.unified": {},
-        "sap.ushell": {}
+        "sap.ushell": {},
+         "sap.ui.table": {}
       }
     },
     "contentDensities": {
@@ -106,6 +125,11 @@
       },
       "ZGS_SRT_SRV": {
         "dataSource": "ZGS_SRT_SRV",
+        "preload": true,
+        "settings": {}
+      },
+      "ZRI_S_BUSINESS_PARTNER": {
+        "dataSource": "ZRI_S_BUSINESS_PARTNER",
         "preload": true,
         "settings": {}
       }
