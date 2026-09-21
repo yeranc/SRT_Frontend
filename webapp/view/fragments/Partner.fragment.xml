@@ -43,7 +43,7 @@
                 width="100%"
                 value="{wizard>/processRefId}"
                 placeholder="Enter Process Ref ID"
-                showValueHelp="true"
+                showValueHelp="false"
                 valueHelpRequest="onProcessRefIdValueHelp"
             />
         </VBox>

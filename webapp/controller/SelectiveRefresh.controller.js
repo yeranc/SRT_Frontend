@@ -38,6 +38,7 @@ sap.ui.define([
                 new JSONModel({
                     groupId: "",
                     rfcDestination: "T30CLNT700",
+                    copy: false,
                     copyAgain: false,
                     copyLoss: false,
                     copyAccount: false,
@@ -175,7 +176,17 @@ this.getView().addDependent(this._oBusyDialog);
                 "/groupId",
                 sGroupId
             );
+             this._clearResultTable();
+             oWizardModel.setProperty("/copy", false);
+    oWizardModel.setProperty("/copyAgain", false);
+    oWizardModel.setProperty("/copyLoss", false);
+    oWizardModel.setProperty("/copyAccount", false);
 
+    // Also reset the switches themselves
+    this.byId("copySwitch").setState(false);
+    this.byId("copyAgainSwitch").setState(false);
+    this.byId("copyLossSwitch").setState(false);
+    this.byId("copyAccSwitch").setState(false);
             // =====================================================
             // SHOW / HIDE COPY OPTIONS BASED ON GROUP ID
             // =====================================================
@@ -185,10 +196,15 @@ this.getView().addDependent(this._oBusyDialog);
 
             var oCopyAccountField =
                 this.byId("copyAccountField");
+            
+            var oCopyAgainField =
+                this.byId("copyAgainField");
+
 
             if (sGroupId === "B") {
 
                 // Business Partner
+                oCopyAgainField.setVisible(false);
                 oCopyLossField.setVisible(false);
                 oCopyAccountField.setVisible(false);
 
@@ -1228,131 +1244,70 @@ this.getView().addDependent(this._oBusyDialog);
             );
         },
 
-        _onResultRowSelectionChange: function (oEvent) {
+__onResultRowSelectionChange: function (oEvent) {
 
     var oTable = oEvent.getSource();
+    var oWizardModel = this.getView().getModel("wizard");
 
-    var oWizardModel =
-        this.getView().getModel("wizard");
+    var sGroupId = oWizardModel.getProperty("/groupId");
 
-    var sGroupId =
-        oWizardModel.getProperty("/groupId");
+    // For BP, only Copy is relevant
+    if (sGroupId !== "B") {
+        return;
+    }
 
-    var oConfig =
-        this._getResultTableConfig(sGroupId);
+    var oConfig = this._getResultTableConfig(sGroupId);
 
-    // No configuration or target property
     if (!oConfig || !oConfig.targetProperty) {
-
-        oWizardModel.setProperty(
-            "/copyAgainEnabled",
-            false
-        );
-
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
-
         return;
     }
 
-    var iRowIndex =
-        oEvent.getParameter("rowIndex");
+    var aSelectedIndices = oTable.getSelectedIndices();
 
-    // No row selected
-    if (iRowIndex < 0) {
-
-        oWizardModel.setProperty(
-            "/copyAgainEnabled",
-            false
-        );
-
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
-
+    // Nothing selected
+    if (!aSelectedIndices || aSelectedIndices.length === 0) {
+        oWizardModel.setProperty("/copyEnabled", false);
+        oWizardModel.setProperty("/copy", false);
         return;
     }
 
-    var oContext =
-        oTable.getContextByIndex(iRowIndex);
+    var bHasTarget = false;
+    var bHasNoTarget = false;
 
-    if (!oContext) {
+    aSelectedIndices.forEach(function (iIndex) {
 
-        oWizardModel.setProperty(
-            "/copyAgainEnabled",
-            false
-        );
+        var oContext = oTable.getContextByIndex(iIndex);
 
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
+        if (!oContext) {
+            return;
+        }
 
-        return;
-    }
+        var oObject = oContext.getObject();
 
-    var oSelectedObject =
-        oContext.getObject();
+        var vTargetValue = oObject[oConfig.targetProperty];
 
-    var sTargetProperty =
-        oConfig.targetProperty;
+        var bTargetExists =
+            vTargetValue !== null &&
+            vTargetValue !== undefined &&
+            String(vTargetValue).trim() !== "";
 
-    var vTargetValue =
-        oSelectedObject[sTargetProperty];
+        if (bTargetExists) {
+            bHasTarget = true;
+        } else {
+            bHasNoTarget = true;
+        }
+    });
 
-    console.log(
-        "========== COPY AGAIN CHECK =========="
-    );
+    // Only rows without target -> Copy enabled
+    if (bHasNoTarget && !bHasTarget) {
 
-    console.log(
-        "Group ID:",
-        sGroupId
-    );
+        oWizardModel.setProperty("/copyEnabled", true);
 
-    console.log(
-        "Target Property:",
-        sTargetProperty
-    );
+    } else {
 
-    console.log(
-        "Target Value:",
-        vTargetValue
-    );
-
-    var bHasTarget =
-        vTargetValue !== null &&
-        vTargetValue !== undefined &&
-        String(vTargetValue).trim() !== "";
-
-    console.log(
-        "Has Target:",
-        bHasTarget
-    );
-
-    console.log(
-        "======================================"
-    );
-
-    // Enable / disable Copy Again
-    oWizardModel.setProperty(
-        "/copyAgainEnabled",
-        bHasTarget
-    );
-
-    // If target does not exist,
-    // Copy Again must always be OFF
-    if (!bHasTarget) {
-
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
-
-        this.byId("copyAgainSwitch")
-            .setState(false);
+        // Target rows OR mixed selection -> Copy disabled
+        oWizardModel.setProperty("/copyEnabled", false);
+        oWizardModel.setProperty("/copy", false);
     }
 },
         _getResultTableConfig: function (sGroupId) {
@@ -1363,6 +1318,7 @@ this.getView().addDependent(this._oBusyDialog);
 
                     return {
                         targetProperty: "TargetBpNum",
+                        copyEnabledWhenNoTarget: true,
                         columns: [
                             {
                                 label: "Business Partner",
