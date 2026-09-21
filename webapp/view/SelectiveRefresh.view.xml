@@ -250,38 +250,7 @@
                             </items>
                         </Select>
                     </VBox>
-                    <!-- COPY -->
-                    <VBox class="srtCopyField">
-                        <HBox alignItems="Center">
-                            <Label
-                                text="Copy"
-                                class="srtFieldLabel"
-                            />
-
-                            <core:Icon
-                                src="sap-icon://message-information"
-                                class="srtInfoIcon srtCopyInfo"
-                            />
-                        </HBox>
-
-                        <HBox
-                            alignItems="Center"
-                            class="srtSwitchRow"
-                        >
-                            <Switch
-                                id="copySwitch"
-                                state="{wizard>/copy}"
-                               enabled="{wizard>/copyEnabled}"
-                                customTextOn=""
-                                customTextOff=""
-                            />
-
-                            <Text
-                                text="{= ${wizard>/copy} ? 'Yes' : 'No' }"
-                                class="srtSwitchText"
-                            />
-                        </HBox>
-                    </VBox>
+                
            
                     <!-- COPY AGAIN -->
                     <VBox 

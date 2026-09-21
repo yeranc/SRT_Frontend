@@ -1,0 +1,125 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="srtFilterContainer">
+
+        <HBox
+            wrap="Wrap"
+            alignItems="End"
+            class="srtFilterRow"
+            justifyContent="Start"
+        >
+
+            <!-- Treaty Number -->
+            <VBox class="srtFilterField">
+                <Label text="Treaty Number" />
+
+                <Input
+                    id="treatyInput"
+                    value="{wizard>/treaty}"
+                    placeholder="Enter Treaty Number"
+                />
+            </VBox>
+<ToolbarSpacer width="1rem" />
+
+            <!-- Period Start Date -->
+            <VBox class="srtFilterField">
+                <Label text="Period Start Date" />
+
+                <DatePicker
+                    id="treatyPeriodStartDate"
+                    value="{wizard>/treatyPeriodStartDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date"
+                />
+            </VBox>
+
+<ToolbarSpacer width="1rem" />
+            <!-- Line of Business -->
+            <VBox class="srtFilterField">
+                <Label text="Line of Business" />
+
+                <Input
+                    id="treatyLineOfBusiness"
+                    value="{wizard>/treatyLineOfBusiness}"
+                    placeholder="Enter Line of Business"
+                />
+            </VBox>
+
+<ToolbarSpacer width="2rem" />
+            <!-- Class of Business -->
+            <VBox class="srtFilterField">
+                <Label text="Class of Business" />
+
+                <Input
+                    id="treatyClassOfBusiness"
+                    value="{wizard>/treatyClassOfBusiness}"
+                    placeholder="Enter Class of Business"
+                />
+            </VBox>
+
+<ToolbarSpacer width="2rem" />
+            <!-- Process Ref ID -->
+            <VBox class="srtFilterField">
+                <Label text="Process Ref ID" />
+
+                <Input
+                    id="treatyProcessRefIdInput"
+                    value="{wizard>/treatyProcessRefId}"
+                    placeholder="Enter Process Ref ID"
+                />
+            </VBox>
+<ToolbarSpacer width="2rem" />
+
+            <!-- Area -->
+            <VBox class="srtFilterField">
+                <Label text="Area" />
+
+                <Input
+                    id="treatyArea"
+                    value="{wizard>/treatyArea}"
+                    placeholder="Enter Area"
+                />
+            </VBox>
+
+<ToolbarSpacer width="2rem" />
+            <!-- Created By -->
+            <VBox class="srtFilterField">
+                <Label text="Created By" />
+
+                <Input
+                    id="treatyCreatedBy"
+                    value="{wizard>/treatyCreatedBy}"
+                    placeholder="Enter Created By"
+                />
+            </VBox>
+<ToolbarSpacer width="2rem" />
+
+            <!-- Creation Date -->
+            <VBox class="srtFilterField">
+                <Label text="Creation Date" />
+
+                <DatePicker
+                    id="treatyCreationDate"
+                    value="{wizard>/treatyCreationDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date"
+                />
+            </VBox>
+
+<ToolbarSpacer width="2rem" />
+            <!-- Search -->
+            <Button
+                text="Go"
+                type="Emphasized"
+                press="onTreatyGo"
+            />
+
+        </HBox>
+
+    </VBox>
+</core:FragmentDefinition>
+

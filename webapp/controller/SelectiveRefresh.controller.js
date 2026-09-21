@@ -104,14 +104,14 @@ sap.ui.define([
 
             }
             this._oBusyDialog = new BusyDialog({
-                
+
                 text: "Please wait while the data is being fetched..."
-                
+
             });
 
             this._oBusyDialog.addStyleClass("srtBusyDialog");
 
-this.getView().addDependent(this._oBusyDialog);
+            this.getView().addDependent(this._oBusyDialog);
         },
 
 
@@ -176,17 +176,17 @@ this.getView().addDependent(this._oBusyDialog);
                 "/groupId",
                 sGroupId
             );
-             this._clearResultTable();
-             oWizardModel.setProperty("/copy", false);
-    oWizardModel.setProperty("/copyAgain", false);
-    oWizardModel.setProperty("/copyLoss", false);
-    oWizardModel.setProperty("/copyAccount", false);
+            this._clearResultTable();
 
-    // Also reset the switches themselves
-    this.byId("copySwitch").setState(false);
-    this.byId("copyAgainSwitch").setState(false);
-    this.byId("copyLossSwitch").setState(false);
-    this.byId("copyAccSwitch").setState(false);
+            oWizardModel.setProperty("/copyAgain", false);
+            oWizardModel.setProperty("/copyLoss", false);
+            oWizardModel.setProperty("/copyAccount", false);
+
+            // Also reset the switches themselves
+
+            this.byId("copyAgainSwitch").setState(false);
+            this.byId("copyLossSwitch").setState(false);
+            this.byId("copyAccSwitch").setState(false);
             // =====================================================
             // SHOW / HIDE COPY OPTIONS BASED ON GROUP ID
             // =====================================================
@@ -196,7 +196,7 @@ this.getView().addDependent(this._oBusyDialog);
 
             var oCopyAccountField =
                 this.byId("copyAccountField");
-            
+
             var oCopyAgainField =
                 this.byId("copyAgainField");
 
@@ -225,11 +225,18 @@ this.getView().addDependent(this._oBusyDialog);
                 this.byId("copyAccSwitch")
                     .setState(false);
 
-            } else {
+            }
 
-                // Other objects
+            else {
+
+                // Treaty / other objects
+                oCopyAgainField.setVisible(true);
                 oCopyLossField.setVisible(true);
                 oCopyAccountField.setVisible(true);
+
+                // Initially disabled until a row with target is selected
+                oWizardModel.setProperty("/copyAgain", false);
+                oWizardModel.setProperty("/copyAgainEnabled", false);
             }
 
             // Clear previous result table
@@ -262,55 +269,33 @@ this.getView().addDependent(this._oBusyDialog);
 
             var oContainer = this.byId("selectionCriteriaContainer");
 
-            if (!oContainer) {
-                console.error("selectionCriteriaContainer was not found.");
-                return;
-            }
-
-            // Destroy previously loaded fragment/control
+            // Destroy previously loaded fragment
             if (this._oSelectionFragment) {
                 this._oSelectionFragment.destroy();
                 this._oSelectionFragment = null;
             }
 
+            // Remove anything still inside the container
             oContainer.removeAllItems();
 
-            var sFragmentName;
+            var sFragmentName = "";
 
-            switch (sGroupId) {
-
-                case "B":
-                    sFragmentName =
-                        "srt.app.view.fragments.Partner";
-                    break;
-
-                // case "A":
-                //     sFragmentName =
-                //         "srt.app.view.fragment.selection.AccountFilters";
-                //     break;
-
-                // case "RIP":
-                //     sFragmentName =
-                //         "srt.app.view.fragment.selection.RIPFilters";
-                //     break;
-
-                // case "T":
-                //     sFragmentName =
-                //         "srt.app.view.fragment.selection.TreatyFilters";
-                //     break;
-
-                // case "L":
-                //     sFragmentName =
-                //         "srt.app.view.fragment.selection.LossFilters";
-                //     break;
-
-                default:
-                    return;
+            if (sGroupId === "B") {
+                sFragmentName = "srt.app.view.fragments.Partner";
+            } else if (sGroupId === "T") {
+                sFragmentName = "srt.app.view.fragments.Treaty";
+            } else {
+                console.log("No selection fragment configured for:", sGroupId);
+                return;
             }
+
+            console.log("Loading selection fragment:", sFragmentName);
 
             this.loadFragment({
                 name: sFragmentName
             }).then(function (oFragment) {
+
+                console.log("Selection fragment loaded:", oFragment);
 
                 this._oSelectionFragment = oFragment;
 
@@ -318,12 +303,9 @@ this.getView().addDependent(this._oBusyDialog);
 
             }.bind(this)).catch(function (oError) {
 
-                console.error(
-                    "Error loading selection fragment:",
-                    oError
-                );
+                console.error("Error loading selection fragment:", oError);
 
-            });
+            }.bind(this));
         },
 
         onCancel: function () {
@@ -1111,7 +1093,7 @@ this.getView().addDependent(this._oBusyDialog);
                         this._showResultTable(
                             oData.results
                         );
-                    this._oBusyDialog.close();
+                        this._oBusyDialog.close();
                     }.bind(this),
 
                     error: function (oError) {
@@ -1224,9 +1206,10 @@ this.getView().addDependent(this._oBusyDialog);
                 "result"
             );
             oTable.attachRowSelectionChange(
-    this._onResultRowSelectionChange,
-    this
-);
+                this._onResultRowSelectionChange,
+                this
+
+            );
 
             // Bind rows
             oTable.bindRows(
@@ -1244,72 +1227,52 @@ this.getView().addDependent(this._oBusyDialog);
             );
         },
 
-__onResultRowSelectionChange: function (oEvent) {
+        _onResultRowSelectionChange: function (oEvent) {
 
-    var oTable = oEvent.getSource();
-    var oWizardModel = this.getView().getModel("wizard");
+            var oTable = oEvent.getSource();
+            var oWizardModel = this.getView().getModel("wizard");
 
-    var sGroupId = oWizardModel.getProperty("/groupId");
+            var sGroupId = oWizardModel.getProperty("/groupId");
 
-    // For BP, only Copy is relevant
-    if (sGroupId !== "B") {
-        return;
-    }
+            var aSelectedIndices = oTable.getSelectedIndices();
 
-    var oConfig = this._getResultTableConfig(sGroupId);
+            // No row selected
+            if (!aSelectedIndices || aSelectedIndices.length === 0) {
 
-    if (!oConfig || !oConfig.targetProperty) {
-        return;
-    }
+                oWizardModel.setProperty("/copyAgainEnabled", false);
+                oWizardModel.setProperty("/copyAgain", false);
 
-    var aSelectedIndices = oTable.getSelectedIndices();
+                this.byId("copyAgainSwitch").setState(false);
 
-    // Nothing selected
-    if (!aSelectedIndices || aSelectedIndices.length === 0) {
-        oWizardModel.setProperty("/copyEnabled", false);
-        oWizardModel.setProperty("/copy", false);
-        return;
-    }
+                return;
+            }
 
-    var bHasTarget = false;
-    var bHasNoTarget = false;
+            // For now Copy Again logic is only required for Treaty
+            if (sGroupId !== "T") {
+                return;
+            }
 
-    aSelectedIndices.forEach(function (iIndex) {
+            // Get selected Treaty row
+            var iIndex = aSelectedIndices[0];
 
-        var oContext = oTable.getContextByIndex(iIndex);
+            var oContext = oTable.getContextByIndex(iIndex);
 
-        if (!oContext) {
-            return;
-        }
+            if (!oContext) {
+                oWizardModel.setProperty("/copyAgainEnabled", false);
+                oWizardModel.setProperty("/copyAgain", false);
+                return;
+            }
 
-        var oObject = oContext.getObject();
+            var oSelectedObject = oContext.getObject();
 
-        var vTargetValue = oObject[oConfig.targetProperty];
+            console.log("========== SELECTED TREATY ==========");
+            console.log("Selected row:", oSelectedObject);
+            console.log("CreatedTreaty:", oSelectedObject.CreatedTreaty);
+            console.log("=====================================");
 
-        var bTargetExists =
-            vTargetValue !== null &&
-            vTargetValue !== undefined &&
-            String(vTargetValue).trim() !== "";
-
-        if (bTargetExists) {
-            bHasTarget = true;
-        } else {
-            bHasNoTarget = true;
-        }
-    });
-
-    // Only rows without target -> Copy enabled
-    if (bHasNoTarget && !bHasTarget) {
-
-        oWizardModel.setProperty("/copyEnabled", true);
-
-    } else {
-
-        // Target rows OR mixed selection -> Copy disabled
-        oWizardModel.setProperty("/copyEnabled", false);
-        oWizardModel.setProperty("/copy", false);
-    }
-},
+            // Update Copy Again based on target Treaty
+            this._updateCopyAgainState(oSelectedObject);
+        },
         _getResultTableConfig: function (sGroupId) {
 
             switch (sGroupId) {
@@ -1362,76 +1325,223 @@ __onResultRowSelectionChange: function (oEvent) {
                             // RIP columns will go here
                         ]
                     };
+                case "T":
+                    return {
+                        targetProperty: "CreatedTreaty",
+
+                        columns: [
+                            {
+                                label: "Treaty Number",
+                                property: "vtgnr"
+                            },
+                            {
+                                label: "Period Start Date",
+                                property: "PeriodStartDate"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "processingID"
+                            },
+                            {
+                                label: "Target System",
+                                property: "syst"
+                            },
+                            {
+                                label: "Target Treaty Number",
+                                property: "CreatedTreaty"
+                            },
+                            {
+                                label: "Line of Business",
+                                property: "LineOfBusiness"
+                            },
+                            {
+                                label: "Class of Business",
+                                property: "ClassOfBusiness"
+                            },
+                            {
+                                label: "Business Type",
+                                property: "BusinessTypeNumber"
+                            },
+                            {
+                                label: "Area",
+                                property: "Area"
+                            }
+                        ]
+                    };
 
                 default:
                     return null;
             }
         },
-_updateCopyAgainState: function (oSelectedObject) {
+        _updateCopyAgainState: function (oSelectedObject) {
 
-    var oWizardModel =
-        this.getView().getModel("wizard");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
-    var sGroupId =
-        oWizardModel.getProperty("/groupId");
+            var sGroupId =
+                oWizardModel.getProperty("/groupId");
 
-    var sTargetProperty = null;
+            var sTargetProperty = null;
 
-    switch (sGroupId) {
+            switch (sGroupId) {
 
-        case "B":
-            sTargetProperty = "TargetBpNum";
-            break;
+                case "B":
+                    sTargetProperty = "TargetBpNum";
+                    break;
 
-        case "A":
-            sTargetProperty = "TargetAccount";
-            break;
+                case "A":
+                    sTargetProperty = "TargetAccount";
+                    break;
 
-        case "RIP":
-            sTargetProperty = "TargetRIP";
-            break;
+                case "RIP":
+                    sTargetProperty = "TargetRIP";
+                    break;
 
-        case "T":
-            sTargetProperty = "TargetTreaty";
-            break;
+                case "T":
+                    sTargetProperty = "CreatedTreaty"
+                    break;
 
-        case "L":
-            sTargetProperty = "TargetLoss";
-            break;
+                case "L":
+                    sTargetProperty = "TargetLoss";
+                    break;
 
-        default:
-            break;
-    }
+                default:
+                    break;
+            }
 
-    var bHasTarget = false;
+            var bHasTarget = false;
 
-    if (
-        sTargetProperty &&
-        oSelectedObject &&
-        oSelectedObject[sTargetProperty] !== null &&
-        oSelectedObject[sTargetProperty] !== undefined &&
-        String(oSelectedObject[sTargetProperty]).trim() !== ""
-    ) {
-        bHasTarget = true;
-    }
+            if (
+                sTargetProperty &&
+                oSelectedObject &&
+                oSelectedObject[sTargetProperty] !== null &&
+                oSelectedObject[sTargetProperty] !== undefined &&
+                String(oSelectedObject[sTargetProperty]).trim() !== ""
+            ) {
+                bHasTarget = true;
+            }
 
-    oWizardModel.setProperty(
-        "/copyAgainEnabled",
-        bHasTarget
-    );
+            oWizardModel.setProperty(
+                "/copyAgainEnabled",
+                bHasTarget
+            );
 
-    // Always reset Copy Again when target does not exist
-    if (!bHasTarget) {
+            // Always reset Copy Again when target does not exist
+            if (!bHasTarget) {
 
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
+                oWizardModel.setProperty(
+                    "/copyAgain",
+                    false
+                );
 
-        this.byId("copyAgainSwitch")
-            .setState(false);
-    }
-},
+                this.byId("copyAgainSwitch")
+                    .setState(false);
+            }
+        },
+
+        //Treaty
+        onTreatyGo: function () {
+
+            var oWizardModel = this.getView().getModel("wizard");
+
+            var aFilters = [];
+
+            var sTreaty =
+                oWizardModel.getProperty("/treaty");
+
+            var sProcessRefId =
+                oWizardModel.getProperty("/treatyProcessRefId");
+
+            var sTargetSystem =
+                oWizardModel.getProperty("/treatyTargetSystem");
+
+            // Treaty Number
+            if (sTreaty) {
+                aFilters.push(
+                    new Filter(
+                        "vtgnr",
+                        FilterOperator.EQ,
+                        sTreaty
+                    )
+                );
+            }
+
+            // Process Ref ID
+            if (sProcessRefId) {
+                aFilters.push(
+                    new Filter(
+                        "processingID",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
+
+            // Target System
+            if (sTargetSystem) {
+                aFilters.push(
+                    new Filter(
+                        "syst",
+                        FilterOperator.EQ,
+                        sTargetSystem
+                    )
+                );
+            }
+
+            var oModel =
+                this.getView().getModel("ZRI_S_TTY_DATA");
+
+            if (!oModel) {
+
+                MessageToast.show(
+                    "Treaty service is not available."
+                );
+
+                return;
+            }
+
+            this._oBusyDialog.open();
+
+            oModel.read("/Treaty", {
+
+                filters: aFilters,
+
+                urlParameters: {
+                    "$top": "5000"
+                },
+
+                success: function (oData) {
+
+                    this._oBusyDialog.close();
+
+                    var aResults =
+                        oData.results || [];
+
+                    console.log(
+                        "Treaty records:",
+                        aResults.length
+                    );
+
+                    this._showResultTable(aResults);
+
+                }.bind(this),
+
+                error: function (oError) {
+
+                    this._oBusyDialog.close();
+
+                    console.error(
+                        "Treaty read error:",
+                        oError
+                    );
+
+                    MessageToast.show(
+                        "Error while reading Treaty data."
+                    );
+
+                }.bind(this)
+            });
+        },
     });
 
 });
