@@ -3,14 +3,12 @@
     xmlns:core="sap.ui.core"
 >
     <VBox class="srtFilterContainer">
-
         <HBox
             wrap="Wrap"
             alignItems="End"
             class="srtFilterRow"
             justifyContent="Start"
         >
-
             <!-- Treaty Number -->
             <VBox class="srtFilterField">
                 <Label text="Treaty Number" />
@@ -21,7 +19,7 @@
                     placeholder="Enter Treaty Number"
                 />
             </VBox>
-<ToolbarSpacer width="1rem" />
+            
 
             <!-- Period Start Date -->
             <VBox class="srtFilterField">
@@ -36,7 +34,7 @@
                 />
             </VBox>
 
-<ToolbarSpacer width="1rem" />
+           
             <!-- Line of Business -->
             <VBox class="srtFilterField">
                 <Label text="Line of Business" />
@@ -48,7 +46,7 @@
                 />
             </VBox>
 
-<ToolbarSpacer width="2rem" />
+          
             <!-- Class of Business -->
             <VBox class="srtFilterField">
                 <Label text="Class of Business" />
@@ -60,7 +58,7 @@
                 />
             </VBox>
 
-<ToolbarSpacer width="2rem" />
+           
             <!-- Process Ref ID -->
             <VBox class="srtFilterField">
                 <Label text="Process Ref ID" />
@@ -71,7 +69,7 @@
                     placeholder="Enter Process Ref ID"
                 />
             </VBox>
-<ToolbarSpacer width="2rem" />
+           
 
             <!-- Area -->
             <VBox class="srtFilterField">
@@ -84,7 +82,7 @@
                 />
             </VBox>
 
-<ToolbarSpacer width="2rem" />
+           
             <!-- Created By -->
             <VBox class="srtFilterField">
                 <Label text="Created By" />
@@ -95,7 +93,7 @@
                     placeholder="Enter Created By"
                 />
             </VBox>
-<ToolbarSpacer width="2rem" />
+           
 
             <!-- Creation Date -->
             <VBox class="srtFilterField">
@@ -110,16 +108,13 @@
                 />
             </VBox>
 
-<ToolbarSpacer width="2rem" />
+            
             <!-- Search -->
             <Button
                 text="Go"
                 type="Emphasized"
                 press="onTreatyGo"
             />
-
         </HBox>
-
     </VBox>
 </core:FragmentDefinition>
-

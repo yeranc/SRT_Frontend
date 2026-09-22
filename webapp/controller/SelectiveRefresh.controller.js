@@ -284,6 +284,8 @@ sap.ui.define([
                 sFragmentName = "srt.app.view.fragments.Partner";
             } else if (sGroupId === "T") {
                 sFragmentName = "srt.app.view.fragments.Treaty";
+            } else if (sGroupId === "A") {
+                sFragmentName = "srt.app.view.fragments.Account";
             } else {
                 console.log("No selection fragment configured for:", sGroupId);
                 return;
@@ -1248,7 +1250,7 @@ sap.ui.define([
             }
 
             // For now Copy Again logic is only required for Treaty
-            if (sGroupId !== "T") {
+            if (sGroupId !== "T" && sGroupId !== "A") {
                 return;
             }
 
@@ -1269,6 +1271,13 @@ sap.ui.define([
             console.log("Selected row:", oSelectedObject);
             console.log("CreatedTreaty:", oSelectedObject.CreatedTreaty);
             console.log("=====================================");
+            if (sGroupId === "T") {
+                console.log("CreatedTreaty:", oSelectedObject.CreatedTreaty);
+            }
+
+            if (sGroupId === "A") {
+                console.log("CreatedAcc:", oSelectedObject.CreatedAcc);
+            }
 
             // Update Copy Again based on target Treaty
             this._updateCopyAgainState(oSelectedObject);
@@ -1313,8 +1322,65 @@ sap.ui.define([
                 case "A":
 
                     return {
+                        targetProperty: "CreatedAcc",
+
                         columns: [
-                            // Account columns will go here
+                            {
+                                label: "Account Number",
+                                property: "AccountNumber"
+                            },
+                            {
+                                label: "FI Posting Date",
+                                property: "FIpostingdate"
+                            },
+                            {
+                                label: "Section Number",
+                                property: "SectionNumber"
+                            },
+                            {
+                                label: "UW Year",
+                                property: "UWyear"
+                            },
+                            {
+                                label: "Line of Business",
+                                property: "Lineofbusiness"
+                            },
+                            {
+                                label: "Class of Business",
+                                property: "Classofbusiness"
+                            },
+                            {
+                                label: "Business Type",
+                                property: "Businesstype"
+                            },
+                            {
+                                label: "Period Start Date",
+                                property: "Startofaccperiod"
+                            },
+                            {
+                                label: "Period End Date",
+                                property: "Endofaccperiod"
+                            },
+                            {
+                                label: "Account Function",
+                                property: "AccFunction"
+                            },
+                            {
+                                label: "Created By",
+                                property: "CreatedBy"
+                            },
+                            {
+                                label: "Creation Date",
+                                property: "CreationDate"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "processingID"
+                            },
+                            {
+                                label: "Target Account Number",
+                                property: "CreatedAcc"
+                            }
                         ]
                     };
 
@@ -1390,7 +1456,7 @@ sap.ui.define([
                     break;
 
                 case "A":
-                    sTargetProperty = "TargetAccount";
+                    sTargetProperty = "CreatedAcc";
                     break;
 
                 case "RIP":
@@ -1542,6 +1608,318 @@ sap.ui.define([
                 }.bind(this)
             });
         },
+
+// =========================================================
+// ACCOUNT SEARCH
+// =========================================================
+onAccountGo: function () {
+
+    var oWizardModel =
+        this.getView().getModel("wizard");
+
+    var aFilters = [];
+
+    // -----------------------------------------------------
+    // Read Account filter values
+    // -----------------------------------------------------
+
+    var sAccountNumber =
+        oWizardModel.getProperty("/accountNumber");
+
+    var sFIPostingDate =
+        oWizardModel.getProperty("/accountFIPostingDate");
+
+    var sSectionNumber =
+        oWizardModel.getProperty("/accountSectionNumber");
+
+    var sUWYear =
+        oWizardModel.getProperty("/accountUWYear");
+
+    var sLineOfBusiness =
+        oWizardModel.getProperty("/accountLineOfBusiness");
+
+    var sClassOfBusiness =
+        oWizardModel.getProperty("/accountClassOfBusiness");
+
+    var sBusinessType =
+        oWizardModel.getProperty("/accountBusinessType");
+
+    var sStartPeriodDate =
+        oWizardModel.getProperty("/accountStartPeriodDate");
+
+    var sEndPeriodDate =
+        oWizardModel.getProperty("/accountEndPeriodDate");
+
+    var sAccountFunction =
+        oWizardModel.getProperty("/accountFunction");
+
+    var sCreatedBy =
+        oWizardModel.getProperty("/accountCreatedBy");
+
+    var sCreationDate =
+        oWizardModel.getProperty("/accountCreationDate");
+
+    var sProcessRefId =
+        oWizardModel.getProperty("/accountProcessRefId");
+
+
+    console.log("========== ACCOUNT SEARCH ==========");
+    console.log("Account Number:", sAccountNumber);
+    console.log("FI Posting Date:", sFIPostingDate);
+    console.log("Section Number:", sSectionNumber);
+    console.log("UW Year:", sUWYear);
+    console.log("Line of Business:", sLineOfBusiness);
+    console.log("Class of Business:", sClassOfBusiness);
+    console.log("Business Type:", sBusinessType);
+    console.log("Period Start Date:", sStartPeriodDate);
+    console.log("Period End Date:", sEndPeriodDate);
+    console.log("Account Function:", sAccountFunction);
+    console.log("Created By:", sCreatedBy);
+    console.log("Creation Date:", sCreationDate);
+    console.log("Process Ref ID:", sProcessRefId);
+    console.log("====================================");
+
+
+    // -----------------------------------------------------
+    // Build filters
+    // -----------------------------------------------------
+
+    if (sAccountNumber) {
+
+        aFilters.push(
+            new Filter(
+                "AccountNumber",
+                FilterOperator.EQ,
+                sAccountNumber
+            )
+        );
+    }
+
+
+    if (sFIPostingDate) {
+
+        aFilters.push(
+            new Filter(
+                "FIpostingdate",
+                FilterOperator.EQ,
+                new Date(sFIPostingDate + "T00:00:00")
+            )
+        );
+    }
+
+
+    if (sSectionNumber) {
+
+        aFilters.push(
+            new Filter(
+                "SectionNumber",
+                FilterOperator.EQ,
+                sSectionNumber
+            )
+        );
+    }
+
+
+    if (sUWYear) {
+
+        aFilters.push(
+            new Filter(
+                "UWyear",
+                FilterOperator.EQ,
+                sUWYear
+            )
+        );
+    }
+
+
+    if (sLineOfBusiness) {
+
+        aFilters.push(
+            new Filter(
+                "Lineofbusiness",
+                FilterOperator.EQ,
+                sLineOfBusiness
+            )
+        );
+    }
+
+
+    if (sClassOfBusiness) {
+
+        aFilters.push(
+            new Filter(
+                "Classofbusiness",
+                FilterOperator.EQ,
+                sClassOfBusiness
+            )
+        );
+    }
+
+
+    if (sBusinessType) {
+
+        aFilters.push(
+            new Filter(
+                "Businesstype",
+                FilterOperator.EQ,
+                sBusinessType
+            )
+        );
+    }
+
+
+    if (sStartPeriodDate) {
+
+        aFilters.push(
+            new Filter(
+                "Startofaccperiod",
+                FilterOperator.EQ,
+                new Date(sStartPeriodDate + "T00:00:00")
+            )
+        );
+    }
+
+
+    if (sEndPeriodDate) {
+
+        aFilters.push(
+            new Filter(
+                "Endofaccperiod",
+                FilterOperator.EQ,
+                new Date(sEndPeriodDate + "T00:00:00")
+            )
+        );
+    }
+
+
+    if (sAccountFunction) {
+
+        aFilters.push(
+            new Filter(
+                "AccFunction",
+                FilterOperator.EQ,
+                sAccountFunction
+            )
+        );
+    }
+
+
+    if (sCreatedBy) {
+
+        aFilters.push(
+            new Filter(
+                "CreatedBy",
+                FilterOperator.EQ,
+                sCreatedBy
+            )
+        );
+    }
+
+
+    if (sCreationDate) {
+
+        aFilters.push(
+            new Filter(
+                "CreationDate",
+                FilterOperator.EQ,
+                new Date(sCreationDate + "T00:00:00")
+            )
+        );
+    }
+
+
+    if (sProcessRefId) {
+
+        aFilters.push(
+            new Filter(
+                "processingID",
+                FilterOperator.EQ,
+                sProcessRefId
+            )
+        );
+    }
+
+
+    // -----------------------------------------------------
+    // ACCOUNT ODATA MODEL
+    // -----------------------------------------------------
+
+    /*
+     * Replace the model name below with the actual Account
+     * model name from manifest.json.
+     */
+    var oModel =
+        this.getView().getModel("ZRI_SB_ACC_DATA");
+
+
+    if (!oModel) {
+
+        MessageToast.show(
+            "Account service is not available."
+        );
+
+        console.error(
+            "Account OData model is NOT available."
+        );
+
+        return;
+    }
+
+
+    // -----------------------------------------------------
+    // Read Account data
+    // -----------------------------------------------------
+
+    this._oBusyDialog.open();
+
+    /*
+     * Replace /YOUR_ACCOUNT_ENTITY_SET with the actual
+     * Account EntitySet from metadata.
+     */
+    oModel.read("/Account", {
+
+        filters: aFilters,
+
+        urlParameters: {
+            "$top": "5000"
+        },
+
+        success: function (oData) {
+
+            console.log(
+                "Account records:",
+                oData.results.length
+            );
+
+            console.log(
+                "Account result:",
+                oData.results
+            );
+
+            this._showResultTable(
+                oData.results
+            );
+
+            this._oBusyDialog.close();
+
+        }.bind(this),
+
+        error: function (oError) {
+
+            console.error(
+                "ACCOUNT DATA ERROR:",
+                oError
+            );
+
+            MessageToast.show(
+                "Error while reading Account data."
+            );
+
+            this._oBusyDialog.close();
+
+        }.bind(this)
+    });
+},
     });
 
 });

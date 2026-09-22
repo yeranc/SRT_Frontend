@@ -84,6 +84,24 @@
           "localUri": "localService/ZRI_S_TTY_DATA/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZRI_SB_ACC_DATA_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_ACC_DATA_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZRI_SB_ACC_DATA/ZRI_SB_ACC_DATA_VAN.xml"
+        }
+      },
+      "ZRI_SB_ACC_DATA": {
+        "uri": "/sap/opu/odata/sap/ZRI_SB_ACC_DATA/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZRI_SB_ACC_DATA_VAN"
+          ],
+          "localUri": "localService/ZRI_SB_ACC_DATA/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -153,6 +171,11 @@
       },
       "ZRI_S_TTY_DATA": {
         "dataSource": "ZRI_S_TTY_DATA",
+        "preload": true,
+        "settings": {}
+      },
+      "ZRI_SB_ACC_DATA": {
+        "dataSource": "ZRI_SB_ACC_DATA",
         "preload": true,
         "settings": {}
       }

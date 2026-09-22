@@ -827,3 +827,84 @@
     width: 18rem !important;
     min-width: 18rem !important;
 }
+
+/* =========================================================
+   FILTERS - MATCH COMPACT SECOND SCREENSHOT
+   ========================================================= */
+
+.srtFilterContainer {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* The wrapping row */
+.srtFilterRow {
+    width: 100%;
+    column-gap: 2rem;
+    row-gap: 0.35rem;   /* THIS controls Treaty row-to-row spacing */
+    box-sizing: border-box;
+}
+
+/* 5 fields per row */
+.srtFilterField {
+    width: calc((100% - 8rem) / 5) !important;
+    min-width: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Labels */
+.srtFilterField .sapMLabel {
+    color: #40566f !important;
+    font-size: 0.9rem !important;
+    margin-bottom: 0.18rem !important;
+}
+
+/* Input + DatePicker */
+.srtFilterField .sapMInputBase {
+    width: 100% !important;
+}
+
+/* Compact control height */
+.srtFilterField .sapMInputBaseContentWrapper {
+    height: 2.1rem !important;
+    min-height: 2.1rem !important;
+}
+
+/* Input text area */
+.srtFilterField .sapMInputBaseInner {
+    height: 2rem !important;
+    line-height: 2rem !important;
+    font-size: 0.85rem !important;
+}
+
+/* DatePicker icon */
+.srtFilterField .sapMInputBaseIconContainer {
+    height: 2rem !important;
+}
+
+.srtFilterField .sapMInputBaseIcon {
+    height: 2rem !important;
+    line-height: 2rem !important;
+}
+
+/* compact Go button */
+.srtFilterGoButton .sapMBtnInner {
+    height: 2.15rem !important;
+    min-height: 2.15rem !important;
+    padding: 0 0.75rem !important;
+}
+
+.srtFilterGoButton .sapMBtnContent {
+    line-height: 2.05rem !important;
+    font-size: 0.85rem !important;
+}
+
+.srtFilterField .sapMInputBaseContentWrapper {
+    height: 2.1rem !important;
+    min-height: 2.1rem !important;
+}
+
+.srtFilterField .sapMInputBaseInner {
+    height: 2rem !important;
+    line-height: 2rem !important;
+}

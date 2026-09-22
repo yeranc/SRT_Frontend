@@ -1,0 +1,153 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="srtFilterContainer">
+
+        <!-- ROW 1 -->
+        <HBox
+            class="srtFilterRow"
+            wrap="NoWrap"
+            alignItems="End">
+
+            <VBox class="srtFilterField">
+                <Label text="Account Number" />
+                <Input
+                    id="accountNumberInput"
+                    value="{wizard>/accountNumber}"
+                    placeholder="Enter Account Number" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="FI Posting Date" />
+                <DatePicker
+                    id="accountFIPostingDate"
+                    value="{wizard>/accountFIPostingDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Section Number" />
+                <Input
+                    id="accountSectionNumberInput"
+                    value="{wizard>/accountSectionNumber}"
+                    placeholder="Enter Section Number" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="UW Year" />
+                <Input
+                    id="accountUWYearInput"
+                    value="{wizard>/accountUWYear}"
+                    placeholder="Enter UW Year" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Line of Business" />
+                <Input
+                    id="accountLineOfBusinessInput"
+                    value="{wizard>/accountLineOfBusiness}"
+                    placeholder="Enter Line of Business" />
+            </VBox>
+
+        </HBox>
+
+
+        <!-- ROW 2 -->
+        <HBox
+            class="srtFilterRow"
+            wrap="NoWrap"
+            alignItems="End">
+
+            <VBox class="srtFilterField">
+                <Label text="Class of Business" />
+                <Input
+                    id="accountClassOfBusinessInput"
+                    value="{wizard>/accountClassOfBusiness}"
+                    placeholder="Enter Class of Business" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Business Type" />
+                <Input
+                    id="accountBusinessTypeInput"
+                    value="{wizard>/accountBusinessType}"
+                    placeholder="Enter Business Type" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Period Start Date" />
+                <DatePicker
+                    id="accountStartPeriodDate"
+                    value="{wizard>/accountStartPeriodDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Period End Date" />
+                <DatePicker
+                    id="accountEndPeriodDate"
+                    value="{wizard>/accountEndPeriodDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Account Function" />
+                <Input
+                    id="accountFunctionInput"
+                    value="{wizard>/accountFunction}"
+                    placeholder="Enter Account Function" />
+            </VBox>
+
+        </HBox>
+
+
+        <!-- ROW 3 -->
+        <HBox
+            class="srtFilterRow"
+            wrap="NoWrap"
+            alignItems="End">
+
+            <VBox class="srtFilterField">
+                <Label text="Created By" />
+                <Input
+                    id="accountCreatedByInput"
+                    value="{wizard>/accountCreatedBy}"
+                    placeholder="Enter Created By" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Creation Date" />
+                <DatePicker
+                    id="accountCreationDate"
+                    value="{wizard>/accountCreationDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date" />
+            </VBox>
+
+            <VBox class="srtFilterField">
+                <Label text="Process Ref ID" />
+                <Input
+                    id="accountProcessRefIdInput"
+                    value="{wizard>/accountProcessRefId}"
+                    placeholder="Enter Process Ref ID" />
+            </VBox>
+
+            <Button
+                text="Go"
+                type="Emphasized"
+                class="srtFilterGoButton"
+                press="onAccountGo" />
+
+        </HBox>
+
+    </VBox>
+
+</core:FragmentDefinition>
