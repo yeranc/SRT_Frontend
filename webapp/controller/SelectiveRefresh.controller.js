@@ -171,7 +171,10 @@ sap.ui.define([
 
             var oWizardModel =
                 this.getView().getModel("wizard");
-
+            oWizardModel.setProperty(
+                "/selectedResult",
+                null
+            );
             oWizardModel.setProperty(
                 "/groupId",
                 sGroupId
@@ -247,29 +250,29 @@ sap.ui.define([
         },
         _clearResultTable: function () {
 
-    var oContainer =
-        this.byId("resultTableContainer");
+            var oContainer =
+                this.byId("resultTableContainer");
 
-    if (!oContainer) {
-        return;
-    }
+            if (!oContainer) {
+                return;
+            }
 
-    if (this._oResultTable) {
+            if (this._oResultTable) {
 
-        var oResultModel = new JSONModel({
-            results: []
-        });
+                var oResultModel = new JSONModel({
+                    results: []
+                });
 
-        this._oResultTable.setModel(
-            oResultModel,
-            "result"
-        );
+                this._oResultTable.setModel(
+                    oResultModel,
+                    "result"
+                );
 
-        this._oResultTable.clearSelection();
-    }
+                this._oResultTable.clearSelection();
+            }
 
-    oContainer.setVisible(false);
-},
+            oContainer.setVisible(false);
+        },
         _showSelectionFragment: function (sGroupId) {
 
             var oContainer = this.byId("selectionCriteriaContainer");
@@ -323,271 +326,265 @@ sap.ui.define([
 
         onNext: function () {
 
-    var oView =
-        this.getView();
+            var oView =
+                this.getView();
 
-    var oExecutionModel =
-        oView.getModel("ZGS_SRT_SRV");
+            var oExecutionModel =
+                oView.getModel("ZGS_SRT_SRV");
 
-    var oWizardModel =
-        oView.getModel("wizard");
+            var oWizardModel =
+                oView.getModel("wizard");
 
 
-    // -----------------------------------------------------
-    // MODEL CHECK
-    // -----------------------------------------------------
-
-    if (!oExecutionModel) {
-
-        MessageToast.show(
-            "Execution service is not available."
-        );
-
-        console.error(
-            "ZGS_SRT_SRV model not found."
-        );
-
-        return;
-    }
-
-
-    if (!oWizardModel) {
-
-        MessageToast.show(
-            "Wizard model is not available."
-        );
-
-        return;
-    }
-
-
-    // -----------------------------------------------------
-    // READ VALUES
-    // -----------------------------------------------------
-
-    var sGroupId =
-        oWizardModel.getProperty("/groupId");
-
-    var sRfcDestination =
-        oWizardModel.getProperty("/rfcDestination");
-
-    var bCopyAgain =
-        oWizardModel.getProperty("/copyAgain");
-
-    var oSelectedResult =
-        oWizardModel.getProperty("/selectedResult");
-
-
-    // -----------------------------------------------------
-    // BP ONLY FOR NOW
-    // -----------------------------------------------------
-
-    if (sGroupId !== "B") {
-
-        MessageToast.show(
-            "Execution is currently enabled only for Business Partner."
-        );
-
-        return;
-    }
-
-
-    if (!sRfcDestination) {
-
-        MessageToast.show(
-            "Please select RFC Destination."
-        );
-
-        return;
-    }
-
-
-    if (!oSelectedResult) {
-
-        MessageToast.show(
-            "Please select a Business Partner row."
-        );
-
-        return;
-    }
-
-
-    // -----------------------------------------------------
-    // BUSINESS PARTNER KEY
-    // -----------------------------------------------------
-
-    var sBusinessPartner =
-        oSelectedResult.bp_external;
-
-
-    if (
-        sBusinessPartner === null ||
-        sBusinessPartner === undefined ||
-        String(sBusinessPartner).trim() === ""
-    ) {
-
-        MessageToast.show(
-            "Selected row does not contain a Business Partner."
-        );
-
-        console.error(
-            "bp_external missing:",
-            oSelectedResult
-        );
-
-        return;
-    }
-
-
-    sBusinessPartner =
-        String(sBusinessPartner).trim();
-
-
-    // -----------------------------------------------------
-    // DEBUG
-    // -----------------------------------------------------
-
-    console.log(
-        "========== BP EXECUTION =========="
-    );
-
-    console.log(
-        "Group ID:",
-        sGroupId
-    );
-
-    console.log(
-        "RFC:",
-        sRfcDestination
-    );
-
-    console.log(
-        "Copy Again:",
-        bCopyAgain
-    );
-
-    console.log(
-        "Business Partner:",
-        sBusinessPartner
-    );
-
-    console.log(
-        "Selected row:",
-        oSelectedResult
-    );
-
-    console.log(
-        "=================================="
-    );
-
-
-    // -----------------------------------------------------
-    // BUILD SEGW FILTERS
-    // -----------------------------------------------------
-
-    var aFilters = [];
-
-
-    aFilters.push(
-        new Filter(
-            "iv_grp_id",
-            FilterOperator.EQ,
-            "B"
-        )
-    );
-
-
-    aFilters.push(
-        new Filter(
-            "iv_rfc",
-            FilterOperator.EQ,
-            sRfcDestination
-        )
-    );
-
-
-    aFilters.push(
-        new Filter(
-            "iv_copy_again",
-            FilterOperator.EQ,
-            bCopyAgain
-        )
-    );
-
-
-    // Existing backend parameter name,
-    // but BP number is passed here.
-    aFilters.push(
-        new Filter(
-            "iv_rip_from",
-            FilterOperator.EQ,
-            sBusinessPartner
-        )
-    );
-
-
-    // -----------------------------------------------------
-    // CALL SEGW SERVICE
-    // -----------------------------------------------------
-
-    this._oBusyDialog.open();
-
-
-    oExecutionModel.read(
-        "/RIPSet",
-        {
-
-            filters: aFilters,
-
-
-            success: function (oData) {
-
-                this._oBusyDialog.close();
-
-                console.log(
-                    "========== BP EXECUTION SUCCESS =========="
-                );
-
-                console.log(
-                    "Response:",
-                    oData
-                );
-
-                console.log(
-                    "=========================================="
-                );
+            if (!oExecutionModel) {
 
                 MessageToast.show(
-                    "Business Partner execution started successfully."
+                    "Execution service is not available."
                 );
 
-            }.bind(this),
+                return;
+            }
 
 
-            error: function (oError) {
-
-                this._oBusyDialog.close();
-
-                console.error(
-                    "========== BP EXECUTION ERROR =========="
-                );
-
-                console.error(
-                    oError
-                );
-
-                console.error(
-                    "========================================"
-                );
+            if (!oWizardModel) {
 
                 MessageToast.show(
-                    "Error while executing Business Partner."
+                    "Wizard model is not available."
                 );
 
-            }.bind(this)
-        }
-    );
-},
+                return;
+            }
+
+
+            var sGroupId =
+                oWizardModel.getProperty("/groupId");
+
+            var sRfcDestination =
+                oWizardModel.getProperty("/rfcDestination");
+
+            var bCopyAgain =
+                oWizardModel.getProperty("/copyAgain");
+
+            var oSelectedResult =
+                oWizardModel.getProperty("/selectedResult");
+
+
+            if (!sGroupId) {
+
+                MessageToast.show(
+                    "Please select an object."
+                );
+
+                return;
+            }
+
+
+            if (!sRfcDestination) {
+
+                MessageToast.show(
+                    "Please select RFC Destination."
+                );
+
+                return;
+            }
+
+
+            if (!oSelectedResult) {
+
+                MessageToast.show(
+                    "Please select a row before executing."
+                );
+
+                return;
+            }
+
+
+            var oConfig =
+                this._getResultTableConfig(sGroupId);
+
+
+            if (!oConfig || !oConfig.sourceProperty) {
+
+                MessageToast.show(
+                    "Source key is not configured for this object."
+                );
+
+                console.error(
+                    "Missing sourceProperty for:",
+                    sGroupId
+                );
+
+                return;
+            }
+
+
+            var vObjectKey =
+                oSelectedResult[
+                oConfig.sourceProperty
+                ];
+
+
+            if (
+                vObjectKey === null ||
+                vObjectKey === undefined ||
+                String(vObjectKey).trim() === ""
+            ) {
+
+                MessageToast.show(
+                    "Selected row does not contain a valid object key."
+                );
+
+                console.error(
+                    "Invalid object key:",
+                    {
+                        groupId: sGroupId,
+                        sourceProperty: oConfig.sourceProperty,
+                        selectedResult: oSelectedResult
+                    }
+                );
+
+                return;
+            }
+
+
+            var sObjectKey =
+                String(vObjectKey).trim();
+
+
+            console.log(
+                "========== EXECUTION =========="
+            );
+
+            console.log(
+                "Group ID:",
+                sGroupId
+            );
+
+            console.log(
+                "Source Property:",
+                oConfig.sourceProperty
+            );
+
+            console.log(
+                "Object Key:",
+                sObjectKey
+            );
+
+            console.log(
+                "RFC:",
+                sRfcDestination
+            );
+
+            console.log(
+                "Copy Again:",
+                bCopyAgain
+            );
+
+            console.log(
+                "Selected Row:",
+                oSelectedResult
+            );
+
+            console.log(
+                "==============================="
+            );
+
+
+            var aFilters = [];
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_grp_id",
+                    FilterOperator.EQ,
+                    sGroupId
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rfc",
+                    FilterOperator.EQ,
+                    sRfcDestination
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_copy_again",
+                    FilterOperator.EQ,
+                    bCopyAgain
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rip_from",
+                    FilterOperator.EQ,
+                    sObjectKey
+                )
+            );
+
+
+            this._oBusyDialog.open();
+
+
+            oExecutionModel.read(
+                "/RIPSet",
+                {
+
+                    filters: aFilters,
+
+                    success: function (oData) {
+
+                        this._oBusyDialog.close();
+
+                        console.log(
+                            "========== EXECUTION SUCCESS =========="
+                        );
+
+                        console.log(
+                            oData
+                        );
+
+                        console.log(
+                            "======================================="
+                        );
+
+                        MessageToast.show(
+                            "Execution started successfully."
+                        );
+
+                    }.bind(this),
+
+
+                    error: function (oError) {
+
+                        this._oBusyDialog.close();
+
+                        console.error(
+                            "========== EXECUTION ERROR =========="
+                        );
+
+                        console.error(
+                            oError
+                        );
+
+                        console.error(
+                            "====================================="
+                        );
+
+                        MessageToast.show(
+                            "Execution failed."
+                        );
+
+                    }.bind(this)
+                }
+            );
+        },
 
 
         onSaveAsVariant: function () {
@@ -1130,77 +1127,77 @@ sap.ui.define([
                 }
             );
         },
-       _showResultTable: function (aResults) {
+        _showResultTable: function (aResults) {
 
-    var oContainer = this.byId("resultTableContainer");
+            var oContainer = this.byId("resultTableContainer");
 
-    if (!oContainer) {
-        console.error("resultTableContainer was NOT found.");
-        return;
-    }
+            if (!oContainer) {
+                console.error("resultTableContainer was NOT found.");
+                return;
+            }
 
-    // If table already exists, reuse it
-    if (this._oResultTable) {
+            // If table already exists, reuse it
+            if (this._oResultTable) {
 
-        this._configureResultTable(
-            this._oResultTable,
-            aResults
-        );
+                this._configureResultTable(
+                    this._oResultTable,
+                    aResults
+                );
 
-        oContainer.setVisible(true);
-        return;
-    }
+                oContainer.setVisible(true);
+                return;
+            }
 
-    // If fragment is currently loading, wait for it
-    if (this._pResultTable) {
+            // If fragment is currently loading, wait for it
+            if (this._pResultTable) {
 
-        this._pResultTable.then(function (oTable) {
+                this._pResultTable.then(function (oTable) {
 
-            this._configureResultTable(
-                oTable,
-                aResults
-            );
+                    this._configureResultTable(
+                        oTable,
+                        aResults
+                    );
 
-            oContainer.setVisible(true);
+                    oContainer.setVisible(true);
 
-        }.bind(this));
+                }.bind(this));
 
-        return;
-    }
+                return;
+            }
 
-    // Load only once
-    this._pResultTable = this.loadFragment({
-        name: "srt.app.view.fragments.ResultTable",
-        id: this.getView().getId() + "--resultTableFragment"
-    }).then(function (oTable) {
+            // Load only once
+            this._pResultTable = this.loadFragment({
+                name: "srt.app.view.fragments.ResultTable",
+                id: this.getView().getId() + "--resultTableFragment"
+            }).then(function (oTable) {
 
-        this._oResultTable = oTable;
+                this._oResultTable = oTable;
 
-        oContainer.removeAllItems();
-        oContainer.addItem(oTable);
+                oContainer.removeAllItems();
+                oContainer.addItem(oTable);
 
-        this._configureResultTable(
-            oTable,
-            aResults
-        );
+                this._configureResultTable(
+                    oTable,
+                    aResults
+                );
 
-        oContainer.setVisible(true);
+                oContainer.setVisible(true);
 
-        return oTable;
+                return oTable;
 
-    }.bind(this)).catch(function (oError) {
+            }.bind(this)).catch(function (oError) {
 
-        console.error(
-            "Error loading result table:",
-            oError
-        );
+                console.error(
+                    "Error loading result table:",
+                    oError
+                );
 
-        this._pResultTable = null;
+                this._pResultTable = null;
 
-        throw oError;
+                throw oError;
 
-    }.bind(this));
-},
+            }.bind(this));
+        },
         _configureResultTable: function (oTable, aResults) {
 
             var sGroupId = this.getView()
@@ -1251,10 +1248,14 @@ sap.ui.define([
                 oResultModel,
                 "result"
             );
+            oTable.detachRowSelectionChange(
+                this._onResultRowSelectionChange,
+                this
+            );
+
             oTable.attachRowSelectionChange(
                 this._onResultRowSelectionChange,
                 this
-
             );
 
             // Bind rows
@@ -1273,78 +1274,76 @@ sap.ui.define([
             );
         },
 
-       _onResultRowSelectionChange: function (oEvent) {
+        _onResultRowSelectionChange: function (oEvent) {
 
-    var oTable = oEvent.getSource();
-    var oWizardModel = this.getView().getModel("wizard");
+            var oTable = oEvent.getSource();
 
-    var sGroupId =
-        oWizardModel.getProperty("/groupId");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
-    var aSelectedIndices =
-        oTable.getSelectedIndices();
+            var aSelectedIndices =
+                oTable.getSelectedIndices();
 
-    if (!aSelectedIndices || aSelectedIndices.length === 0) {
+            if (!aSelectedIndices || aSelectedIndices.length === 0) {
 
-        oWizardModel.setProperty(
-            "/selectedResult",
-            null
-        );
+                oWizardModel.setProperty(
+                    "/selectedResult",
+                    null
+                );
 
-        oWizardModel.setProperty(
-            "/copyAgainEnabled",
-            false
-        );
+                oWizardModel.setProperty(
+                    "/copyAgainEnabled",
+                    false
+                );
 
-        oWizardModel.setProperty(
-            "/copyAgain",
-            false
-        );
+                oWizardModel.setProperty(
+                    "/copyAgain",
+                    false
+                );
 
-        return;
-    }
+                return;
+            }
 
-    var iIndex = aSelectedIndices[0];
+            var iIndex =
+                aSelectedIndices[0];
 
-    var oContext =
-        oTable.getContextByIndex(iIndex);
+            var oContext =
+                oTable.getContextByIndex(iIndex);
 
-    if (!oContext) {
-        return;
-    }
+            if (!oContext) {
+                return;
+            }
 
-    var oSelectedObject =
-        oContext.getObject();
+            var oSelectedObject =
+                oContext.getObject();
 
-    console.log(
-        "========== SELECTED RESULT =========="
-    );
+            console.log(
+                "========== SELECTED OBJECT =========="
+            );
 
-    console.log(
-        "Group ID:",
-        sGroupId
-    );
+            console.log(
+                "Group ID:",
+                oWizardModel.getProperty("/groupId")
+            );
 
-    console.log(
-        "Selected row:",
-        oSelectedObject
-    );
+            console.log(
+                "Selected Row:",
+                oSelectedObject
+            );
 
-    console.log(
-        "====================================="
-    );
+            console.log(
+                "====================================="
+            );
 
-    // Save selected row centrally
-    oWizardModel.setProperty(
-        "/selectedResult",
-        oSelectedObject
-    );
+            oWizardModel.setProperty(
+                "/selectedResult",
+                oSelectedObject
+            );
 
-    // Existing copy-again logic
-    this._updateCopyAgainState(
-        oSelectedObject
-    );
-},
+            this._updateCopyAgainState(
+                oSelectedObject
+            );
+        },
         _getResultTableConfig: function (sGroupId) {
 
             switch (sGroupId) {
@@ -1385,6 +1384,7 @@ sap.ui.define([
                 case "A":
 
                     return {
+                        sourceProperty: "AccountNumber",
                         targetProperty: "CreatedAcc",
 
                         columns: [
@@ -1456,6 +1456,7 @@ sap.ui.define([
                     };
                 case "T":
                     return {
+                        sourceProperty: "vtgnr",
                         targetProperty: "CreatedTreaty",
 
                         columns: [
@@ -1672,358 +1673,358 @@ sap.ui.define([
             });
         },
 
-// =========================================================
-// ACCOUNT SEARCH
-// =========================================================
-onAccountGo: function () {
+        // =========================================================
+        // ACCOUNT SEARCH
+        // =========================================================
+        onAccountGo: function () {
 
-    var oWizardModel =
-        this.getView().getModel("wizard");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
-    var aFilters = [];
+            var aFilters = [];
 
-    // -----------------------------------------------------
-    // Read Account filter values
-    // -----------------------------------------------------
+            // -----------------------------------------------------
+            // Read Account filter values
+            // -----------------------------------------------------
 
-    var sAccountNumber =
-        oWizardModel.getProperty("/accountNumber");
+            var sAccountNumber =
+                oWizardModel.getProperty("/accountNumber");
 
-    var sFIPostingDate =
-        oWizardModel.getProperty("/accountFIPostingDate");
+            var sFIPostingDate =
+                oWizardModel.getProperty("/accountFIPostingDate");
 
-    var sSectionNumber =
-        oWizardModel.getProperty("/accountSectionNumber");
+            var sSectionNumber =
+                oWizardModel.getProperty("/accountSectionNumber");
 
-    var sUWYear =
-        oWizardModel.getProperty("/accountUWYear");
+            var sUWYear =
+                oWizardModel.getProperty("/accountUWYear");
 
-    var sLineOfBusiness =
-        oWizardModel.getProperty("/accountLineOfBusiness");
+            var sLineOfBusiness =
+                oWizardModel.getProperty("/accountLineOfBusiness");
 
-    var sClassOfBusiness =
-        oWizardModel.getProperty("/accountClassOfBusiness");
+            var sClassOfBusiness =
+                oWizardModel.getProperty("/accountClassOfBusiness");
 
-    var sBusinessType =
-        oWizardModel.getProperty("/accountBusinessType");
+            var sBusinessType =
+                oWizardModel.getProperty("/accountBusinessType");
 
-    var sStartPeriodDate =
-        oWizardModel.getProperty("/accountStartPeriodDate");
+            var sStartPeriodDate =
+                oWizardModel.getProperty("/accountStartPeriodDate");
 
-    var sEndPeriodDate =
-        oWizardModel.getProperty("/accountEndPeriodDate");
+            var sEndPeriodDate =
+                oWizardModel.getProperty("/accountEndPeriodDate");
 
-    var sAccountFunction =
-        oWizardModel.getProperty("/accountFunction");
+            var sAccountFunction =
+                oWizardModel.getProperty("/accountFunction");
 
-    var sCreatedBy =
-        oWizardModel.getProperty("/accountCreatedBy");
+            var sCreatedBy =
+                oWizardModel.getProperty("/accountCreatedBy");
 
-    var sCreationDate =
-        oWizardModel.getProperty("/accountCreationDate");
+            var sCreationDate =
+                oWizardModel.getProperty("/accountCreationDate");
 
-    var sProcessRefId =
-        oWizardModel.getProperty("/accountProcessRefId");
+            var sProcessRefId =
+                oWizardModel.getProperty("/accountProcessRefId");
 
 
-    console.log("========== ACCOUNT SEARCH ==========");
-    console.log("Account Number:", sAccountNumber);
-    console.log("FI Posting Date:", sFIPostingDate);
-    console.log("Section Number:", sSectionNumber);
-    console.log("UW Year:", sUWYear);
-    console.log("Line of Business:", sLineOfBusiness);
-    console.log("Class of Business:", sClassOfBusiness);
-    console.log("Business Type:", sBusinessType);
-    console.log("Period Start Date:", sStartPeriodDate);
-    console.log("Period End Date:", sEndPeriodDate);
-    console.log("Account Function:", sAccountFunction);
-    console.log("Created By:", sCreatedBy);
-    console.log("Creation Date:", sCreationDate);
-    console.log("Process Ref ID:", sProcessRefId);
-    console.log("====================================");
+            console.log("========== ACCOUNT SEARCH ==========");
+            console.log("Account Number:", sAccountNumber);
+            console.log("FI Posting Date:", sFIPostingDate);
+            console.log("Section Number:", sSectionNumber);
+            console.log("UW Year:", sUWYear);
+            console.log("Line of Business:", sLineOfBusiness);
+            console.log("Class of Business:", sClassOfBusiness);
+            console.log("Business Type:", sBusinessType);
+            console.log("Period Start Date:", sStartPeriodDate);
+            console.log("Period End Date:", sEndPeriodDate);
+            console.log("Account Function:", sAccountFunction);
+            console.log("Created By:", sCreatedBy);
+            console.log("Creation Date:", sCreationDate);
+            console.log("Process Ref ID:", sProcessRefId);
+            console.log("====================================");
 
 
-    // -----------------------------------------------------
-    // Build filters
-    // -----------------------------------------------------
+            // -----------------------------------------------------
+            // Build filters
+            // -----------------------------------------------------
 
-    if (sAccountNumber) {
+            if (sAccountNumber) {
 
-        aFilters.push(
-            new Filter(
-                "AccountNumber",
-                FilterOperator.EQ,
-                sAccountNumber
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "AccountNumber",
+                        FilterOperator.EQ,
+                        sAccountNumber
+                    )
+                );
+            }
 
 
-    if (sFIPostingDate) {
+            if (sFIPostingDate) {
 
-        aFilters.push(
-            new Filter(
-                "FIpostingdate",
-                FilterOperator.EQ,
-                new Date(sFIPostingDate + "T00:00:00")
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "FIpostingdate",
+                        FilterOperator.EQ,
+                        new Date(sFIPostingDate + "T00:00:00")
+                    )
+                );
+            }
 
 
-    if (sSectionNumber) {
+            if (sSectionNumber) {
 
-        aFilters.push(
-            new Filter(
-                "SectionNumber",
-                FilterOperator.EQ,
-                sSectionNumber
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "SectionNumber",
+                        FilterOperator.EQ,
+                        sSectionNumber
+                    )
+                );
+            }
 
 
-    if (sUWYear) {
+            if (sUWYear) {
 
-        aFilters.push(
-            new Filter(
-                "UWyear",
-                FilterOperator.EQ,
-                sUWYear
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "UWyear",
+                        FilterOperator.EQ,
+                        sUWYear
+                    )
+                );
+            }
 
 
-    if (sLineOfBusiness) {
+            if (sLineOfBusiness) {
 
-        aFilters.push(
-            new Filter(
-                "Lineofbusiness",
-                FilterOperator.EQ,
-                sLineOfBusiness
-            )
-        );
-    }
-
-
-    if (sClassOfBusiness) {
+                aFilters.push(
+                    new Filter(
+                        "Lineofbusiness",
+                        FilterOperator.EQ,
+                        sLineOfBusiness
+                    )
+                );
+            }
+
+
+            if (sClassOfBusiness) {
 
-        aFilters.push(
-            new Filter(
-                "Classofbusiness",
-                FilterOperator.EQ,
-                sClassOfBusiness
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "Classofbusiness",
+                        FilterOperator.EQ,
+                        sClassOfBusiness
+                    )
+                );
+            }
 
 
-    if (sBusinessType) {
+            if (sBusinessType) {
 
-        aFilters.push(
-            new Filter(
-                "Businesstype",
-                FilterOperator.EQ,
-                sBusinessType
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "Businesstype",
+                        FilterOperator.EQ,
+                        sBusinessType
+                    )
+                );
+            }
 
 
-    if (sStartPeriodDate) {
+            if (sStartPeriodDate) {
 
-        aFilters.push(
-            new Filter(
-                "Startofaccperiod",
-                FilterOperator.EQ,
-                new Date(sStartPeriodDate + "T00:00:00")
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "Startofaccperiod",
+                        FilterOperator.EQ,
+                        new Date(sStartPeriodDate + "T00:00:00")
+                    )
+                );
+            }
 
 
-    if (sEndPeriodDate) {
+            if (sEndPeriodDate) {
 
-        aFilters.push(
-            new Filter(
-                "Endofaccperiod",
-                FilterOperator.EQ,
-                new Date(sEndPeriodDate + "T00:00:00")
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "Endofaccperiod",
+                        FilterOperator.EQ,
+                        new Date(sEndPeriodDate + "T00:00:00")
+                    )
+                );
+            }
 
 
-    if (sAccountFunction) {
+            if (sAccountFunction) {
 
-        aFilters.push(
-            new Filter(
-                "AccFunction",
-                FilterOperator.EQ,
-                sAccountFunction
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "AccFunction",
+                        FilterOperator.EQ,
+                        sAccountFunction
+                    )
+                );
+            }
 
 
-    if (sCreatedBy) {
+            if (sCreatedBy) {
 
-        aFilters.push(
-            new Filter(
-                "CreatedBy",
-                FilterOperator.EQ,
-                sCreatedBy
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "CreatedBy",
+                        FilterOperator.EQ,
+                        sCreatedBy
+                    )
+                );
+            }
 
 
-    if (sCreationDate) {
+            if (sCreationDate) {
 
-        aFilters.push(
-            new Filter(
-                "CreationDate",
-                FilterOperator.EQ,
-                new Date(sCreationDate + "T00:00:00")
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "CreationDate",
+                        FilterOperator.EQ,
+                        new Date(sCreationDate + "T00:00:00")
+                    )
+                );
+            }
 
 
-    if (sProcessRefId) {
+            if (sProcessRefId) {
 
-        aFilters.push(
-            new Filter(
-                "processingID",
-                FilterOperator.EQ,
-                sProcessRefId
-            )
-        );
-    }
+                aFilters.push(
+                    new Filter(
+                        "processingID",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
 
 
-    // -----------------------------------------------------
-    // ACCOUNT ODATA MODEL
-    // -----------------------------------------------------
+            // -----------------------------------------------------
+            // ACCOUNT ODATA MODEL
+            // -----------------------------------------------------
 
-    /*
-     * Replace the model name below with the actual Account
-     * model name from manifest.json.
-     */
-    var oModel =
-        this.getView().getModel("ZRI_SB_ACC_DATA");
+            /*
+             * Replace the model name below with the actual Account
+             * model name from manifest.json.
+             */
+            var oModel =
+                this.getView().getModel("ZRI_SB_ACC_DATA");
 
 
-    if (!oModel) {
+            if (!oModel) {
 
-        MessageToast.show(
-            "Account service is not available."
-        );
+                MessageToast.show(
+                    "Account service is not available."
+                );
 
-        console.error(
-            "Account OData model is NOT available."
-        );
+                console.error(
+                    "Account OData model is NOT available."
+                );
 
-        return;
-    }
+                return;
+            }
 
 
-    // -----------------------------------------------------
-    // Read Account data
-    // -----------------------------------------------------
+            // -----------------------------------------------------
+            // Read Account data
+            // -----------------------------------------------------
 
-    
-    // Build filters first...
 
-if (aFilters.length === 0) {
-    MessageToast.show(
-        "Please enter at least one search criterion."
-    );
-    return;
-}
+            // Build filters first...
 
+            if (aFilters.length === 0) {
+                MessageToast.show(
+                    "Please enter at least one search criterion."
+                );
+                return;
+            }
 
 
-oModel.read("/Account", {
-    filters: aFilters,
 
-    urlParameters: {
-        "$top": "100"
-    },
+            // oModel.read("/Account", {
+            //     filters: aFilters,
 
-    success: function (oData) {
-        this._oBusyDialog.close();
+            //     urlParameters: {
+            //         "$top": "100"
+            //     },
 
-        this._showResultTable(
-            oData.results || []
-        );
-    }.bind(this),
+            //     success: function (oData) {
+            //         this._oBusyDialog.close();
 
-    error: function (oError) {
-        this._oBusyDialog.close();
+            //         this._showResultTable(
+            //             oData.results || []
+            //         );
+            //     }.bind(this),
 
-        console.error(
-            "ACCOUNT DATA ERROR:",
-            oError
-        );
+            //     error: function (oError) {
+            //         this._oBusyDialog.close();
 
-        MessageToast.show(
-            "Error while reading Account data."
-        );
-    }.bind(this)
-});
-this._oBusyDialog.open();
+            //         console.error(
+            //             "ACCOUNT DATA ERROR:",
+            //             oError
+            //         );
 
-    /*
-     * Replace /YOUR_ACCOUNT_ENTITY_SET with the actual
-     * Account EntitySet from metadata.
-     *
-     */
-    oModel.read("/Account", {
+            //         MessageToast.show(
+            //             "Error while reading Account data."
+            //         );
+            //     }.bind(this)
+            // });
+            this._oBusyDialog.open();
 
-        filters: aFilters,
+            /*
+             * Replace /YOUR_ACCOUNT_ENTITY_SET with the actual
+             * Account EntitySet from metadata.
+             *
+             */
+            oModel.read("/Account", {
 
-        urlParameters: {
-            "$top": "100"
+                filters: aFilters,
+
+                urlParameters: {
+                    "$top": "100"
+                },
+
+                success: function (oData) {
+
+                    console.log(
+                        "Account records:",
+                        oData.results.length
+                    );
+
+                    console.log(
+                        "Account result:",
+                        oData.results
+                    );
+
+                    this._showResultTable(
+                        oData.results
+                    );
+
+                    this._oBusyDialog.close();
+
+                }.bind(this),
+
+                error: function (oError) {
+
+                    console.error(
+                        "ACCOUNT DATA ERROR:",
+                        oError
+                    );
+
+                    MessageToast.show(
+                        "Error while reading Account data."
+                    );
+
+                    this._oBusyDialog.close();
+
+                }.bind(this)
+            });
         },
-
-        success: function (oData) {
-
-            console.log(
-                "Account records:",
-                oData.results.length
-            );
-
-            console.log(
-                "Account result:",
-                oData.results
-            );
-
-            this._showResultTable(
-                oData.results
-            );
-
-            this._oBusyDialog.close();
-
-        }.bind(this),
-
-        error: function (oError) {
-
-            console.error(
-                "ACCOUNT DATA ERROR:",
-                oError
-            );
-
-            MessageToast.show(
-                "Error while reading Account data."
-            );
-
-            this._oBusyDialog.close();
-
-        }.bind(this)
-    });
-},
 
     });
 
