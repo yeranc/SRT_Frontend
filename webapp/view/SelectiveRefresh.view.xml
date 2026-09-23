@@ -12,75 +12,7 @@
     >
         <content>
             <!-- ================= HEADER ================= -->
-            <Toolbar
-                class="srtHeaderBar"
-                height="4rem"
-            >
-                <HBox
-                    class="srtHeaderGroup"
-                    alignItems="Center"
-                >
-                    <Button
-                        icon="sap-icon://nav-back"
-                        type="Transparent"
-                        tooltip="Back"
-                        press="onNavBack"
-                        class="srtBackButton"
-                    />
-                </HBox>
-
-                <!-- MSG -->
-                <HBox
-                    class="srtHeaderGroup"
-                    alignItems="Center"
-                >
-                    <core:Icon
-                        src="sap-icon://circle-task"
-                        class="srtMsgIcon"
-                    />
-
-                    <Text
-                        text="msg"
-                        class="srtBrandMsg"
-                    />
-                </HBox>
-
-                <!-- Divider 1 -->
-                <Text
-                    text="|"
-                    class="srtHeaderDivider"
-                />
-
-                <!-- SRT -->
-                <Text
-                    text="SRT"
-                    class="srtBrandSrt"
-                />
-
-                <!-- Divider 2 -->
-                <Text
-                    text="|"
-                    class="srtHeaderDivider"
-                />
-
-                <!-- Application Name -->
-                <HBox
-                    class="srtAppGroup"
-                    alignItems="Center"
-                >
-                    <Text
-                        text="Selective Refresh Tool"
-                        class="srtAppNameHeader"
-                    />
-
-                    <core:Icon
-                        src="sap-icon://slim-arrow-down"
-                        class="srtHeaderArrow"
-                    />
-                </HBox>
-
-                <ToolbarSpacer />
-            </Toolbar>
+            
 
             <!-- ================= HERO ================= -->
             <VBox class="srtRefreshHero">
@@ -88,6 +20,13 @@
                     class="srtHeroContent"
                     alignItems="Center"
                 >
+                <Button
+                        icon="sap-icon://nav-back"
+                        type="Transparent"
+                        tooltip="Back"
+                        press="onNavBack"
+                        class="srtBackButton"
+                    />
                     <VBox class="srtHeroDocumentIcon">
                         <core:Icon
                             src="sap-icon://document-text"
@@ -107,10 +46,10 @@
                             class="srtHeroDescription"
                         /> -->
 
-                        <Text
+                        <!-- <Text
                             text="define selection criteria to refresh the required data."
                             class="srtHeroDescription"
-                        />
+                        /> -->
                     </VBox>
 
                     <ToolbarSpacer />
@@ -252,109 +191,9 @@
                     </VBox>
                 
            
-                    <!-- COPY AGAIN -->
-                    <VBox 
-                    id="copyAgainField"
-                    class="srtCopyField">
-                        <HBox alignItems="Center">
-                            <Label
-                                text="Copy Again"
-                                class="srtFieldLabel"
-                            />
+                   
 
-                            <core:Icon
-                                src="sap-icon://message-information"
-                                class="srtInfoIcon srtCopyInfo"
-                            />
-                        </HBox>
-
-                        <HBox
-                            alignItems="Center"
-                            class="srtSwitchRow"
-                        >
-                            <Switch
-                                id="copyAgainSwitch"
-                                state="{wizard>/copyAgain}"
-                                enabled="{wizard>/copyAgainEnabled}"
-                                customTextOn=""
-                                customTextOff=""
-                            />
-
-                            <Text
-                                text="{= ${wizard>/copyAgain} ? 'Yes' : 'No' }"
-                                class="srtSwitchText"
-                            />
-                        </HBox>
-                    </VBox>
-
-                    <!-- COPY LOSS -->
-                    <VBox
-                        id="copyLossField"
-                        class="srtCopyField"
-                    >
-                        <HBox alignItems="Center">
-                            <Label
-                                text="Copy Loss"
-                                class="srtFieldLabel"
-                            />
-
-                            <core:Icon
-                                src="sap-icon://message-information"
-                                class="srtInfoIcon srtCopyInfo"
-                            />
-                        </HBox>
-
-                        <HBox
-                            alignItems="Center"
-                            class="srtSwitchRow"
-                        >
-                            <Switch
-                                id="copyLossSwitch"
-                                state="{wizard>/copyLoss}"
-                                customTextOn=""
-                                customTextOff=""
-                            />
-
-                            <Text
-                                text="{= ${wizard>/copyLoss} ? 'Yes' : 'No' }"
-                                class="srtSwitchText"
-                            />
-                        </HBox>
-                    </VBox>
-                    <!-- COPY ACCOUNT -->
-                    <VBox
-                        id="copyAccountField"
-                        class="srtCopyField"
-                    >
-                        <HBox alignItems="Center">
-                            <Label
-                                text="Copy Account"
-                                class="srtFieldLabel"
-                            />
-
-                            <core:Icon
-                                src="sap-icon://message-information"
-                                class="srtInfoIcon srtCopyInfo"
-                            />
-                        </HBox>
-
-                        <HBox
-                            alignItems="Center"
-                            class="srtSwitchRow"
-                        >
-                            <Switch
-                                id="copyAccSwitch"
-                                state="{wizard>/copyAccount}"
-                                customTextOn=""
-                                customTextOff=""
-                            />
-
-                            <Text
-                                text="{= ${wizard>/copyAccount} ? 'Yes' : 'No' }"
-                                class="srtSwitchText"
-                            />
-                        </HBox>
-                    </VBox>
+                    
                 </HBox>
 
                 <HBox class="srtDashedLine" />
@@ -363,21 +202,60 @@
             <!-- ================= SELECTION CRITERIA ================= -->
             <!-- ================= SELECTION CRITERIA ================= -->
             <VBox class="srtContentCard">
-                <HBox
-                    class="srtSectionTitleRow"
-                    alignItems="Center"
-                >
-                    <core:Icon
-                        src="sap-icon://filter"
-                        class="srtSectionIcon"
-                    />
+               <HBox
+    class="srtSectionTitleRow"
+    alignItems="Center"
+    justifyContent="SpaceBetween"
+    width="100%"
+>
+    <!-- LEFT: TITLE -->
+    <HBox alignItems="Center">
+        <core:Icon
+            src="sap-icon://filter"
+            class="srtSectionIcon"
+        />
 
-                    <Title
-                        text="Selection Criteria"
-                        level="H2"
-                        class="srtSectionTitle"
-                    />
-                </HBox>
+        <Title
+            text="Selection Criteria"
+            level="H2"
+            class="srtSectionTitle"
+        />
+    </HBox>
+
+    <!-- RIGHT: COPY OPTIONS -->
+    <HBox alignItems="Center" class="srtCopyOptions">
+        <CheckBox
+            id="copyAgainSwitch"
+            text="Copy Again"
+            selected="{wizard>/copyAgain}"
+            enabled="{wizard>/copyAgainEnabled}"
+        />
+
+        <CheckBox
+            id="copyLossSwitch"
+            text="Copy Loss"
+            selected="{wizard>/copyLoss}"
+        />
+
+        <CheckBox
+            id="copyAccSwitch"
+            text="Copy Account"
+            selected="{wizard>/copyAccount}"
+        />
+
+        <CheckBox
+            id="copyTcrSwitch"
+            text="Copy TCR"
+            selected="{wizard>/copyTcr}"
+        />
+
+        <CheckBox
+            id="copyRipSwitch"
+            text="Copy RIP"
+            selected="{wizard>/copyRip}"
+        />
+    </HBox>
+</HBox>
 
                 <!-- Dynamic object-specific filters -->
                 <VBox
@@ -416,19 +294,11 @@
                     class="srtActionRow"
                 >
                     <Button
-                        text="Cancel"
+                        text="Clear"
                         icon="sap-icon://decline"
                         type="Transparent"
                         press="onCancel"
                         class="srtOutlineButton srtCancelButton"
-                    />
-
-                    <Button
-                        text="Save as Variant"
-                        icon="sap-icon://save"
-                        type="Transparent"
-                        press="onSaveAsVariant"
-                        class="srtOutlineButton srtVariantButton"
                     />
 
                     <Button

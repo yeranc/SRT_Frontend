@@ -125,6 +125,7 @@ sap.ui.define([
                 copyAgain: false,
                 copyLoss: false,
                 copyAccount: false,
+                selectedResult: null,
                 ranges: [
                     {
                         from: "",
@@ -138,26 +139,36 @@ sap.ui.define([
             this.byId("rfcDestinationSelect")
                 .setSelectedKey("T30CLNT700");
 
-            this.byId("copyAgainSwitch")
-                .setState(false);
+            // this.byId("copyAgainSwitch")
+            //     .setState(false);
 
-            this.byId("copyLossSwitch")
-                .setState(false);
+            // this.byId("copyLossSwitch")
+            //     .setState(false);
 
-            this.byId("copyAccSwitch")
-                .setState(false);
+            // this.byId("copyAccSwitch")
+            //     .setState(false);
 
-            this.byId("rangeFromInput")
-                .setValue("");
+            // this.byId("rangeFromInput")
+            //     .setValue("");
 
-            this.byId("rangeToInput")
-                .setValue("");
+            // this.byId("rangeToInput")
+            //     .setValue("");
         },
 
 
         onNavBack: function () {
 
             this._clearForm();
+            this._clearResultTable();
+
+            var oContainer = this.byId("selectionCriteriaContainer");
+
+            if (this._oSelectionFragment) {
+                this._oSelectionFragment.destroy();
+                this._oSelectionFragment = null;
+            }
+
+            oContainer.removeAllItems();
 
             this.getOwnerComponent()
                 .getRouter()
@@ -187,22 +198,27 @@ sap.ui.define([
 
             // Also reset the switches themselves
 
-            this.byId("copyAgainSwitch").setState(false);
-            this.byId("copyLossSwitch").setState(false);
-            this.byId("copyAccSwitch").setState(false);
+            this.byId("copyAgainSwitch").setSelected(false);
+            this.byId("copyLossSwitch").setSelected(false);
+            this.byId("copyAccSwitch").setSelected(false);
             // =====================================================
             // SHOW / HIDE COPY OPTIONS BASED ON GROUP ID
             // =====================================================
 
             var oCopyLossField =
-                this.byId("copyLossField");
+                this.byId("copyLossSwitch");
 
             var oCopyAccountField =
-                this.byId("copyAccountField");
+                this.byId("copyAccSwitch");
 
             var oCopyAgainField =
-                this.byId("copyAgainField");
+                this.byId("copyAgainSwitch");
 
+            var oCopyTcrField =
+                this.byId("copyTcrSwitch");
+
+            var oCopyRipField =
+                this.byId("copyRipSwitch");
 
             if (sGroupId === "B") {
 
@@ -210,6 +226,9 @@ sap.ui.define([
                 oCopyAgainField.setVisible(false);
                 oCopyLossField.setVisible(false);
                 oCopyAccountField.setVisible(false);
+                oCopyRipField.setVisible(false);
+                oCopyTcrField.setVisible(false);
+
 
                 // Reset values because these options are not applicable
                 oWizardModel.setProperty(
@@ -222,11 +241,19 @@ sap.ui.define([
                     false
                 );
 
-                this.byId("copyLossSwitch")
-                    .setState(false);
+                // this.byId("copyLossSwitch")
+                //     .setState(false);
 
-                this.byId("copyAccSwitch")
-                    .setState(false);
+                // this.byId("copyAccSwitch")
+                //     .setState(false);
+
+            }
+            else if (sGroupId === "A") {
+                oCopyAgainField.setVisible(true);
+                oCopyLossField.setVisible(false);
+                oCopyAccountField.setVisible(false);
+                oCopyRipField.setVisible(false);
+                oCopyTcrField.setVisible(false);
 
             }
 
@@ -236,6 +263,9 @@ sap.ui.define([
                 oCopyAgainField.setVisible(true);
                 oCopyLossField.setVisible(true);
                 oCopyAccountField.setVisible(true);
+                oCopyRipField.setVisible(true);
+                oCopyTcrField.setVisible(true);
+
 
                 // Initially disabled until a row with target is selected
                 oWizardModel.setProperty("/copyAgain", false);
@@ -529,7 +559,7 @@ sap.ui.define([
             );
 
 
-            this._oBusyDialog.open();
+
 
 
             oExecutionModel.read(
@@ -540,23 +570,26 @@ sap.ui.define([
 
                     success: function (oData) {
 
-                        this._oBusyDialog.close();
 
-                        console.log(
-                            "========== EXECUTION SUCCESS =========="
-                        );
-
-                        console.log(
-                            oData
-                        );
-
-                        console.log(
-                            "======================================="
-                        );
 
                         MessageToast.show(
                             "Execution started successfully."
                         );
+
+                        var sGroupId =
+                            this.getView()
+                                .getModel("wizard")
+                                .getProperty("/groupId");
+
+                        if (sGroupId === "B") {
+                            this.onBPGo();
+                        }
+                        else if (sGroupId === "A") {
+                            this.onAccountGo();
+                        }
+                        else if (sGroupId === "T") {
+                            this.onTreatyGo();
+                        }
 
                     }.bind(this),
 
@@ -1352,6 +1385,7 @@ sap.ui.define([
 
                     return {
                         targetProperty: "TargetBpNum",
+                        sourceProperty: "bp_external",
                         copyEnabledWhenNoTarget: true,
                         columns: [
                             {
@@ -1564,8 +1598,8 @@ sap.ui.define([
                     false
                 );
 
-                this.byId("copyAgainSwitch")
-                    .setState(false);
+                // this.byId("copyAgainSwitch")
+                //     .setState(false);
             }
         },
 
