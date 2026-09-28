@@ -28,14 +28,10 @@ server:
     - name: fiori-tools-proxy
       afterMiddleware: compression
       configuration:
-        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
+        ignoreCertErrors: false
         backend:
           - path: /sap
             url: http://mgss81a.aws.msg.de:44300
-            destination: T30onPrem
-          - path: /sap/opu/odata/sap/ZRI_SB_RIP_DATA/
-            url: http://mgss81a.aws.msg.de:44300
-            client: '800'
             destination: T30onPrem
           - path: /sap/opu/odata/sap/ZGS_SRT_SRV/
             url: http://mgss81a.aws.msg.de:44300
@@ -53,6 +49,10 @@ server:
             url: http://mgss81a.aws.msg.de:44300
             client: '800'
             destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZRI_SB_RIP_DATA/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
@@ -61,10 +61,6 @@ server:
           - urlPath: /sap/opu/odata/sap/ZRI_SB_DATA
             metadataPath: ./webapp/localService/mainService/metadata.xml
             mockdataPath: ./webapp/localService/mainService/data
-            generateMockData: true
-          - urlPath: /sap/opu/odata/sap/ZRI_SB_RIP_DATA
-            metadataPath: ./webapp/localService/ZRI_SB_RIP_DATA/metadata.xml
-            mockdataPath: ./webapp/localService/ZRI_SB_RIP_DATA/data
             generateMockData: true
           - urlPath: /sap/opu/odata/sap/ZGS_SRT_SRV
             metadataPath: ./webapp/localService/ZGS_SRT_SRV/metadata.xml
@@ -82,17 +78,21 @@ server:
             metadataPath: ./webapp/localService/ZRI_SB_ACC_DATA/metadata.xml
             mockdataPath: ./webapp/localService/ZRI_SB_ACC_DATA/data
             generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZRI_SB_RIP_DATA
+            metadataPath: ./webapp/localService/ZRI_SB_RIP_DATA/metadata.xml
+            mockdataPath: ./webapp/localService/ZRI_SB_RIP_DATA/data
+            generateMockData: true
         annotations:
           - localPath: ./webapp/localService/mainService/ZRI_SB_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_DATA_VAN',Version='0001')/$value/
-          - localPath: ./webapp/localService/ZRI_SB_RIP_DATA/ZRI_SB_RIP_DATA_VAN.xml
-            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_RIP_DATA_VAN',Version='0001')/$value/
           - localPath: ./webapp/localService/ZRI_S_BUSINESS_PARTNER/ZRI_S_BUSINESS_PARTNER_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_BUSINESS_PARTNER_VAN',Version='0001')/$value/
           - localPath: ./webapp/localService/ZRI_S_TTY_DATA/ZRI_S_TTY_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_TTY_DATA_VAN',Version='0001')/$value/
           - localPath: ./webapp/localService/ZRI_SB_ACC_DATA/ZRI_SB_ACC_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_ACC_DATA_VAN',Version='0001')/$value/
+          - localPath: ./webapp/localService/ZRI_SB_RIP_DATA/ZRI_SB_RIP_DATA_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_RIP_DATA_VAN',Version='0001')/$value/
 builder:
   resources:
     excludes:
