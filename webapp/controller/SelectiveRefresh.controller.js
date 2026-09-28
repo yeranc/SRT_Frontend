@@ -11,7 +11,12 @@ sap.ui.define([
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator",
     "sap/ui/table/Column",
-    "sap/m/BusyDialog"
+    "sap/m/BusyDialog",
+    "sap/m/Input",
+    "sap/ui/comp/filterbar/FilterBar",
+    "sap/ui/comp/filterbar/FilterGroupItem",
+    "sap/ui/comp/valuehelpdialog/ValueHelpDialog",
+    "sap/m/Token",
 ], function (
     Controller,
     JSONModel,
@@ -24,7 +29,12 @@ sap.ui.define([
     Filter,
     FilterOperator,
     TableColumn,
-    BusyDialog
+    BusyDialog,
+    Input,
+    FilterBar,
+    FilterGroupItem,
+    ValueHelpDialog,
+    Token
 ) {
     "use strict";
 
@@ -43,6 +53,8 @@ sap.ui.define([
                     copyLoss: false,
                     copyAccount: false,
                     copyAgainEnabled: false,
+                    selectedResults: [],
+                    accountNumbers: [],
                     ranges: [
                         {
                             from: "",
@@ -126,6 +138,8 @@ sap.ui.define([
                 copyLoss: false,
                 copyAccount: false,
                 selectedResult: null,
+                selectedResults: [],
+                accountNumbers: [],
                 ranges: [
                     {
                         from: "",
@@ -134,25 +148,13 @@ sap.ui.define([
                 ]
             });
 
-            this.byId("groupIdSelect").setSelectedKey("");
+            var oAccountInput =
+                this.byId("accountNumberInput");
 
-            this.byId("rfcDestinationSelect")
-                .setSelectedKey("T30CLNT700");
-
-            // this.byId("copyAgainSwitch")
-            //     .setState(false);
-
-            // this.byId("copyLossSwitch")
-            //     .setState(false);
-
-            // this.byId("copyAccSwitch")
-            //     .setState(false);
-
-            // this.byId("rangeFromInput")
-            //     .setValue("");
-
-            // this.byId("rangeToInput")
-            //     .setValue("");
+            if (oAccountInput) {
+                oAccountInput.removeAllTokens();
+            }
+            this._clearResultTable();
         },
 
 
@@ -187,6 +189,7 @@ sap.ui.define([
                 null
             );
             oWizardModel.setProperty(
+
                 "/groupId",
                 sGroupId
             );
@@ -198,79 +201,88 @@ sap.ui.define([
 
             // Also reset the switches themselves
 
-            this.byId("copyAgainSwitch").setSelected(false);
-            this.byId("copyLossSwitch").setSelected(false);
-            this.byId("copyAccSwitch").setSelected(false);
-            // =====================================================
+            // this.byId("copyAgainSwitch").setSelected(false);
+            // this.byId("copyLossSwitch").setSelected(false);
+            // this.byId("copyAccSwitch").setSelected(false);
+            // // =====================================================
             // SHOW / HIDE COPY OPTIONS BASED ON GROUP ID
             // =====================================================
 
-            var oCopyLossField =
-                this.byId("copyLossSwitch");
+            // var oCopyLossField =
+            //     this.byId("copyLossSwitch");
 
-            var oCopyAccountField =
-                this.byId("copyAccSwitch");
+            // var oCopyAccountField =
+            //     this.byId("copyAccSwitch");
 
-            var oCopyAgainField =
-                this.byId("copyAgainSwitch");
+            // var oCopyAgainField =
+            //     this.byId("copyAgainSwitch");
 
-            var oCopyTcrField =
-                this.byId("copyTcrSwitch");
+            // var oCopyTcrField =
+            //     this.byId("copyTcrSwitch");
 
-            var oCopyRipField =
-                this.byId("copyRipSwitch");
+            // var oCopyRipField =
+            //     this.byId("copyRipSwitch");
 
-            if (sGroupId === "B") {
+            // if (sGroupId === "B") {
 
-                // Business Partner
-                oCopyAgainField.setVisible(false);
-                oCopyLossField.setVisible(false);
-                oCopyAccountField.setVisible(false);
-                oCopyRipField.setVisible(false);
-                oCopyTcrField.setVisible(false);
-
-
-                // Reset values because these options are not applicable
-                oWizardModel.setProperty(
-                    "/copyLoss",
-                    false
-                );
-
-                oWizardModel.setProperty(
-                    "/copyAccount",
-                    false
-                );
-
-                // this.byId("copyLossSwitch")
-                //     .setState(false);
-
-                // this.byId("copyAccSwitch")
-                //     .setState(false);
-
-            }
-            else if (sGroupId === "A") {
-                oCopyAgainField.setVisible(true);
-                oCopyLossField.setVisible(false);
-                oCopyAccountField.setVisible(false);
-                oCopyRipField.setVisible(false);
-                oCopyTcrField.setVisible(false);
-
-            }
-
-            else {
-
-                // Treaty / other objects
-                oCopyAgainField.setVisible(true);
-                oCopyLossField.setVisible(true);
-                oCopyAccountField.setVisible(true);
-                oCopyRipField.setVisible(true);
-                oCopyTcrField.setVisible(true);
+            //     // Business Partner
+            //     oCopyAgainField.setVisible(false);
+            //     oCopyLossField.setVisible(false);
+            //     oCopyAccountField.setVisible(false);
+            //     oCopyRipField.setVisible(false);
+            //     oCopyTcrField.setVisible(false);
 
 
-                // Initially disabled until a row with target is selected
-                oWizardModel.setProperty("/copyAgain", false);
-                oWizardModel.setProperty("/copyAgainEnabled", false);
-            }
+            // Reset values because these options are not applicable
+            //     oWizardModel.setProperty(
+            //         "/copyLoss",
+            //         false
+            //     );
+
+            //     oWizardModel.setProperty(
+            //         "/copyAccount",
+            //         false
+            //     );
+
+            //     // this.byId("copyLossSwitch")
+            //     //     .setState(false);
+
+            //     // this.byId("copyAccSwitch")
+            //     //     .setState(false);
+
+            // }
+            // else if (sGroupId === "A") {
+            //     oCopyAgainField.setVisible(false);
+            //     oCopyLossField.setVisible(false);
+            //     oCopyAccountField.setVisible(false);
+            //     oCopyRipField.setVisible(false);
+            //     oCopyTcrField.setVisible(false);
+
+            // }
+
+            // else if (sGroupId === "RIP") {
+            //     oCopyAgainField.setVisible(true);
+            //     oCopyLossField.setVisible(true);
+            //     oCopyAccountField.setVisible(true);
+            //     oCopyRipField.setVisible(false);
+            //     oCopyTcrField.setVisible(false);
+
+            // }
+
+            // else {
+
+            //     // Treaty / other objects
+            //     oCopyAgainField.setVisible(true);
+            //     oCopyLossField.setVisible(true);
+            //     oCopyAccountField.setVisible(true);
+            //     oCopyRipField.setVisible(true);
+            //     oCopyTcrField.setVisible(true);
+
+
+            //     // Initially disabled until a row with target is selected
+            //     oWizardModel.setProperty("/copyAgain", false);
+            //     oWizardModel.setProperty("/copyAgainEnabled", false);
+            // }
 
             // Clear previous result table
             this._clearResultTable();
@@ -289,14 +301,8 @@ sap.ui.define([
 
             if (this._oResultTable) {
 
-                var oResultModel = new JSONModel({
-                    results: []
-                });
-
-                this._oResultTable.setModel(
-                    oResultModel,
-                    "result"
-                );
+                // IMPORTANT: remove old OData binding
+                this._oResultTable.unbindRows();
 
                 this._oResultTable.clearSelection();
             }
@@ -324,6 +330,10 @@ sap.ui.define([
                 sFragmentName = "srt.app.view.fragments.Treaty";
             } else if (sGroupId === "A") {
                 sFragmentName = "srt.app.view.fragments.Account";
+            } else if (sGroupId === "RIP") {
+                sFragmentName = "srt.app.view.fragments.Rip";
+            } else if (sGroupId === "TCR") {
+                sFragmentName = "srt.app.view.fragments.Tcr";
             } else {
                 console.log("No selection fragment configured for:", sGroupId);
                 return;
@@ -356,8 +366,7 @@ sap.ui.define([
 
         onNext: function () {
 
-            var oView =
-                this.getView();
+            var oView = this.getView();
 
             var oExecutionModel =
                 oView.getModel("ZGS_SRT_SRV");
@@ -367,21 +376,17 @@ sap.ui.define([
 
 
             if (!oExecutionModel) {
-
                 MessageToast.show(
                     "Execution service is not available."
                 );
-
                 return;
             }
 
 
             if (!oWizardModel) {
-
                 MessageToast.show(
                     "Wizard model is not available."
                 );
-
                 return;
             }
 
@@ -395,36 +400,30 @@ sap.ui.define([
             var bCopyAgain =
                 oWizardModel.getProperty("/copyAgain");
 
-            var oSelectedResult =
-                oWizardModel.getProperty("/selectedResult");
+            var aSelectedResults =
+                oWizardModel.getProperty("/selectedResults") || [];
 
 
             if (!sGroupId) {
-
                 MessageToast.show(
                     "Please select an object."
                 );
-
                 return;
             }
 
 
             if (!sRfcDestination) {
-
                 MessageToast.show(
                     "Please select RFC Destination."
                 );
-
                 return;
             }
 
 
-            if (!oSelectedResult) {
-
+            if (!aSelectedResults.length) {
                 MessageToast.show(
-                    "Please select a row before executing."
+                    "Please select at least one row before executing."
                 );
-
                 return;
             }
 
@@ -448,175 +447,286 @@ sap.ui.define([
             }
 
 
-            var vObjectKey =
-                oSelectedResult[
-                oConfig.sourceProperty
-                ];
+            var iIndex = 0;
+            var iSuccess = 0;
+            var iFailed = 0;
 
 
-            if (
-                vObjectKey === null ||
-                vObjectKey === undefined ||
-                String(vObjectKey).trim() === ""
-            ) {
+            console.log(
+                "TOTAL SELECTED:",
+                aSelectedResults.length,
+                aSelectedResults
+            );
 
-                MessageToast.show(
-                    "Selected row does not contain a valid object key."
+
+            this._oBusyDialog.open();
+
+
+            var fnExecuteNext = function () {
+
+                // ==========================================
+                // ALL SELECTED OBJECTS FINISHED
+                // ==========================================
+                if (iIndex >= aSelectedResults.length) {
+
+                    this._oBusyDialog.close();
+
+                    MessageToast.show(
+                        iSuccess +
+                        " succeeded, " +
+                        iFailed +
+                        " failed."
+                    );
+
+
+                    // ==========================================
+                    // REFRESH RESULT TABLE ONLY ONCE
+                    // ==========================================
+                    if (sGroupId === "B") {
+
+                        this.onBPGo();
+
+                    }
+                    else if (sGroupId === "A") {
+
+                        this.onAccountGo();
+
+                    }
+                    else if (sGroupId === "T") {
+
+                        this.onTreatyGo();
+
+                    }
+                    else if (sGroupId === "TCR") {
+
+                        this.onTCRGo();
+
+                    }
+                    else if (sGroupId === "RIP") {
+
+                        var oRipModel =
+                            this.getView()
+                                .getModel("ZRI_SB_RIP_DATA");
+
+                        if (oRipModel) {
+                            oRipModel.refresh(true);
+                        }
+
+                        this.onRIPGo();
+                    }
+
+                    return;
+                }
+
+
+                // ==========================================
+                // CURRENT SELECTED ROW
+                // ==========================================
+                var oSelectedResult =
+                    aSelectedResults[iIndex];
+
+
+                var vObjectKey =
+                    oSelectedResult[
+                    oConfig.sourceProperty
+                    ];
+
+
+                // ==========================================
+                // VALIDATE OBJECT KEY
+                // ==========================================
+                if (
+                    vObjectKey === null ||
+                    vObjectKey === undefined ||
+                    String(vObjectKey).trim() === ""
+                ) {
+
+                    console.error(
+                        "Invalid object key:",
+                        {
+                            groupId: sGroupId,
+                            sourceProperty:
+                                oConfig.sourceProperty,
+                            selectedResult:
+                                oSelectedResult
+                        }
+                    );
+
+                    iFailed++;
+                    iIndex++;
+
+                    fnExecuteNext.call(this);
+
+                    return;
+                }
+
+
+                var sObjectKey =
+                    String(vObjectKey).trim();
+
+
+                console.log(
+                    "====================================="
                 );
 
-                console.error(
-                    "Invalid object key:",
+                console.log(
+                    "Executing " +
+                    (iIndex + 1) +
+                    " of " +
+                    aSelectedResults.length
+                );
+
+                console.log(
+                    "Group ID:",
+                    sGroupId
+                );
+
+                console.log(
+                    "Source Property:",
+                    oConfig.sourceProperty
+                );
+
+                console.log(
+                    "Object Key:",
+                    sObjectKey
+                );
+
+                console.log(
+                    "RFC:",
+                    sRfcDestination
+                );
+
+                console.log(
+                    "Copy Again:",
+                    bCopyAgain
+                );
+
+                console.log(
+                    "Selected Row:",
+                    oSelectedResult
+                );
+
+                console.log(
+                    "====================================="
+                );
+
+
+                // ==========================================
+                // BUILD FILTERS FOR CURRENT OBJECT
+                // ==========================================
+                var aFilters = [];
+
+
+                aFilters.push(
+                    new Filter(
+                        "iv_grp_id",
+                        FilterOperator.EQ,
+                        sGroupId
+                    )
+                );
+
+
+                aFilters.push(
+                    new Filter(
+                        "iv_rfc",
+                        FilterOperator.EQ,
+                        sRfcDestination
+                    )
+                );
+
+
+                aFilters.push(
+                    new Filter(
+                        "iv_copy_again",
+                        FilterOperator.EQ,
+                        bCopyAgain
+                    )
+                );
+
+
+                aFilters.push(
+                    new Filter(
+                        "iv_rip_from",
+                        FilterOperator.EQ,
+                        sObjectKey
+                    )
+                );
+
+
+                // ==========================================
+                // EXECUTE CURRENT OBJECT
+                // ==========================================
+                oExecutionModel.read(
+                    "/RIPSet",
                     {
-                        groupId: sGroupId,
-                        sourceProperty: oConfig.sourceProperty,
-                        selectedResult: oSelectedResult
+                        filters: aFilters,
+
+                        success: function (oData) {
+
+                            console.log(
+                                "SUCCESS:",
+                                sObjectKey,
+                                oData
+                            );
+
+                            iSuccess++;
+                            iIndex++;
+
+
+                            // ==========================================
+                            // WAIT BEFORE NEXT EXECUTION
+                            // Treaty backend may still be processing
+                            // ==========================================
+                            var iDelay = 1000;
+
+                            if (sGroupId === "T") {
+                                iDelay = 1500;
+                            }
+                            else if (sGroupId === "TCR") {
+                                iDelay = 3500;
+                            }
+
+
+                            setTimeout(function () {
+
+                                fnExecuteNext.call(this);
+
+                            }.bind(this), iDelay);
+
+                        }.bind(this),
+
+
+                        error: function (oError) {
+
+                            console.error(
+                                "FAILED:",
+                                sObjectKey,
+                                oError
+                            );
+
+                            iFailed++;
+                            iIndex++;
+
+
+                            // Continue with next selected object
+                            setTimeout(function () {
+
+                                fnExecuteNext.call(this);
+
+                            }.bind(this), 2000);
+
+                        }.bind(this)
                     }
                 );
 
-                return;
-            }
+            }.bind(this);
 
 
-            var sObjectKey =
-                String(vObjectKey).trim();
+            // ==========================================
+            // START FIRST SELECTED OBJECT
+            // ==========================================
+            fnExecuteNext();
 
-
-            console.log(
-                "========== EXECUTION =========="
-            );
-
-            console.log(
-                "Group ID:",
-                sGroupId
-            );
-
-            console.log(
-                "Source Property:",
-                oConfig.sourceProperty
-            );
-
-            console.log(
-                "Object Key:",
-                sObjectKey
-            );
-
-            console.log(
-                "RFC:",
-                sRfcDestination
-            );
-
-            console.log(
-                "Copy Again:",
-                bCopyAgain
-            );
-
-            console.log(
-                "Selected Row:",
-                oSelectedResult
-            );
-
-            console.log(
-                "==============================="
-            );
-
-
-            var aFilters = [];
-
-
-            aFilters.push(
-                new Filter(
-                    "iv_grp_id",
-                    FilterOperator.EQ,
-                    sGroupId
-                )
-            );
-
-
-            aFilters.push(
-                new Filter(
-                    "iv_rfc",
-                    FilterOperator.EQ,
-                    sRfcDestination
-                )
-            );
-
-
-            aFilters.push(
-                new Filter(
-                    "iv_copy_again",
-                    FilterOperator.EQ,
-                    bCopyAgain
-                )
-            );
-
-
-            aFilters.push(
-                new Filter(
-                    "iv_rip_from",
-                    FilterOperator.EQ,
-                    sObjectKey
-                )
-            );
-
-
-
-
-
-            oExecutionModel.read(
-                "/RIPSet",
-                {
-
-                    filters: aFilters,
-
-                    success: function (oData) {
-
-
-
-                        MessageToast.show(
-                            "Execution started successfully."
-                        );
-
-                        var sGroupId =
-                            this.getView()
-                                .getModel("wizard")
-                                .getProperty("/groupId");
-
-                        if (sGroupId === "B") {
-                            this.onBPGo();
-                        }
-                        else if (sGroupId === "A") {
-                            this.onAccountGo();
-                        }
-                        else if (sGroupId === "T") {
-                            this.onTreatyGo();
-                        }
-
-                    }.bind(this),
-
-
-                    error: function (oError) {
-
-                        this._oBusyDialog.close();
-
-                        console.error(
-                            "========== EXECUTION ERROR =========="
-                        );
-
-                        console.error(
-                            oError
-                        );
-
-                        console.error(
-                            "====================================="
-                        );
-
-                        MessageToast.show(
-                            "Execution failed."
-                        );
-
-                    }.bind(this)
-                }
-            );
         },
 
 
@@ -1055,9 +1165,8 @@ sap.ui.define([
 
         onBPGo: function () {
 
-            console.log("========== BP GO CLICKED ==========");
-
-            var oWizardModel = this.getView().getModel("wizard");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
             var aFilters = [];
 
@@ -1070,11 +1179,9 @@ sap.ui.define([
             var sTargetSystem =
                 oWizardModel.getProperty("/targetSystem");
 
-            console.log("Business Partner:", sBusinessPartner);
-            console.log("Process Ref ID:", sProcessRefId);
-            console.log("Target System:", sTargetSystem);
 
             if (sBusinessPartner) {
+
                 aFilters.push(
                     new Filter(
                         "bp_external",
@@ -1085,6 +1192,7 @@ sap.ui.define([
             }
 
             if (sProcessRefId) {
+
                 aFilters.push(
                     new Filter(
                         "Process_id",
@@ -1095,6 +1203,7 @@ sap.ui.define([
             }
 
             if (sTargetSystem) {
+
                 aFilters.push(
                     new Filter(
                         "destination",
@@ -1104,91 +1213,221 @@ sap.ui.define([
                 );
             }
 
+
             var oModel =
-                this.getView().getModel("ZRI_S_BUSINESS_PARTNER");
+                this.getView()
+                    .getModel("ZRI_S_BUSINESS_PARTNER");
 
             if (!oModel) {
 
-                console.error(
-                    "businessPartner model is NOT available"
-                );
-
                 MessageToast.show(
-                    "Business Partner OData model is not available."
+                    "Business Partner service is not available."
                 );
 
                 return;
             }
 
-            console.log("Filters:", aFilters);
-            console.log("Calling BP OData service...");
-            this._oBusyDialog.open();
-            oModel.read(
+
+            this._showResultTable(
+                oModel,
                 "/ZRI_C_BUSINESS_PARTNER",
-                {
-                    filters: aFilters,
-
-                    urlParameters: {
-                        "$top": "5000"
-                    },
-
-                    success: function (oData) {
-
-                        console.log(
-                            "Returned records:",
-                            oData.results.length
-                        );
-
-                        this._showResultTable(
-                            oData.results
-                        );
-                        this._oBusyDialog.close();
-                    }.bind(this),
-
-                    error: function (oError) {
-
-                        console.error(
-                            "BP DATA ERROR:",
-                            oError
-                        );
-
-                        MessageToast.show(
-                            "Error while reading Business Partner data."
-                        );
-
-                    }.bind(this)
-                }
+                aFilters
             );
         },
-        _showResultTable: function (aResults) {
+        onBusinessPartnerValueHelp: function () {
 
-            var oContainer = this.byId("resultTableContainer");
+            var oView = this.getView();
 
-            if (!oContainer) {
-                console.error("resultTableContainer was NOT found.");
+            var oBPModel =
+                oView.getModel("ZRI_S_BUSINESS_PARTNER");
+
+            if (!oBPModel) {
+                MessageToast.show(
+                    "Business Partner service is not available."
+                );
                 return;
             }
 
-            // If table already exists, reuse it
+            var oDialog = new TableSelectDialog({
+
+                title: "Select Business Partner",
+                contentWidth: "60%",
+                contentHeight: "55%",
+
+                multiSelect: false,
+
+                noDataText: "No Business Partners found",
+
+                columns: [
+                    new Column({
+                        header: new Label({
+                            text: "Business Partner"
+                        })
+                    }),
+
+                    new Column({
+                        header: new Label({
+                            text: "External BP Number"
+                        })
+                    }),
+
+                    new Column({
+                        header: new Label({
+                            text: "BP Type"
+                        })
+                    }),
+
+
+                ],
+
+                search: function (oEvent) {
+
+                    var sValue =
+                        oEvent.getParameter("value");
+
+                    var oBinding =
+                        oEvent.getSource()
+                            .getBinding("items");
+
+                    var aFilters = [];
+
+                    if (sValue) {
+
+                        aFilters.push(
+                            new Filter({
+                                filters: [
+
+                                    new Filter(
+                                        "bp_external",
+                                        FilterOperator.Contains,
+                                        sValue
+                                    ),
+
+                                    new Filter(
+                                        "bpext",
+                                        FilterOperator.Contains,
+                                        sValue
+                                    )
+
+                                ],
+
+                                and: false
+                            })
+                        );
+                    }
+
+                    oBinding.filter(aFilters);
+                },
+
+                confirm: function (oEvent) {
+
+                    var oSelectedItem =
+                        oEvent.getParameter(
+                            "selectedItem"
+                        );
+
+                    if (!oSelectedItem) {
+                        return;
+                    }
+
+                    var oContext =
+                        oSelectedItem.getBindingContext(
+                            "bp"
+                        );
+
+                    if (!oContext) {
+                        return;
+                    }
+
+                    var oSelectedBP =
+                        oContext.getObject();
+
+                    oView.getModel("wizard")
+                        .setProperty(
+                            "/businessPartner",
+                            oSelectedBP.bp_external
+                        );
+
+                    oDialog.destroy();
+                },
+
+                cancel: function () {
+                    oDialog.destroy();
+                }
+
+            });
+
+
+            oDialog.setModel(
+                oBPModel,
+                "bp"
+            );
+
+
+            oDialog.bindAggregation(
+                "items",
+                {
+                    path: "bp>/ZRI_C_BUSINESS_PARTNER",
+
+                    template: new ColumnListItem({
+
+                        cells: [
+
+                            new Text({
+                                text: "{bp>bp_external}"
+                            }),
+
+                            new Text({
+                                text: "{bp>bpext}"
+                            }),
+
+                            new Text({
+                                text: "{bp>type}"
+                            }),
+
+
+                        ]
+
+                    })
+                }
+            );
+
+
+            oView.addDependent(oDialog);
+
+            oDialog.open();
+        },
+        _showResultTable: function (oModel, sPath, aFilters) {
+
+            var oContainer =
+                this.byId("resultTableContainer");
+
+            if (!oContainer) {
+                return;
+            }
+
             if (this._oResultTable) {
 
                 this._configureResultTable(
                     this._oResultTable,
-                    aResults
+                    oModel,
+                    sPath,
+                    aFilters
                 );
 
                 oContainer.setVisible(true);
                 return;
             }
 
-            // If fragment is currently loading, wait for it
             if (this._pResultTable) {
 
                 this._pResultTable.then(function (oTable) {
 
                     this._configureResultTable(
                         oTable,
-                        aResults
+                        oModel,
+                        sPath,
+                        aFilters
                     );
 
                     oContainer.setVisible(true);
@@ -1198,7 +1437,6 @@ sap.ui.define([
                 return;
             }
 
-            // Load only once
             this._pResultTable = this.loadFragment({
                 name: "srt.app.view.fragments.ResultTable",
                 id: this.getView().getId() + "--resultTableFragment"
@@ -1211,76 +1449,71 @@ sap.ui.define([
 
                 this._configureResultTable(
                     oTable,
-                    aResults
+                    oModel,
+                    sPath,
+                    aFilters
                 );
 
                 oContainer.setVisible(true);
 
                 return oTable;
 
-            }.bind(this)).catch(function (oError) {
-
-                console.error(
-                    "Error loading result table:",
-                    oError
-                );
-
-                this._pResultTable = null;
-
-                throw oError;
-
             }.bind(this));
         },
-        _configureResultTable: function (oTable, aResults) {
+        _configureResultTable: function (
+            oTable,
+            oModel,
+            sPath,
+            aFilters
+        ) {
 
-            var sGroupId = this.getView()
-                .getModel("wizard")
-                .getProperty("/groupId");
+            var sGroupId =
+                this.getView()
+                    .getModel("wizard")
+                    .getProperty("/groupId");
 
-            var oConfig = this._getResultTableConfig(sGroupId);
+            var oConfig =
+                this._getResultTableConfig(sGroupId);
 
             if (!oConfig) {
-                console.error(
-                    "No result table configuration for Group ID:",
-                    sGroupId
-                );
                 return;
             }
 
-            // Remove existing columns
+            // Remove previous object's binding FIRST
+            oTable.unbindRows();
+
             oTable.removeAllColumns();
 
-            // Create columns dynamically
             oConfig.columns.forEach(function (oColumn) {
 
                 oTable.addColumn(
                     new TableColumn({
-
                         label: new Label({
                             text: oColumn.label
                         }),
 
                         template: new Text({
-                            text: "{result>" + oColumn.property + "}"
+                            text:
+                                "{result>" +
+                                oColumn.property +
+                                "}"
                         }),
 
-                        width: "12rem"
-
+                        width: "11rem"
                     })
                 );
 
             });
+            oTable.setWidth(
+                (oConfig.columns.length * 11) + "rem"
+            );
 
-            // Create result model
-            var oResultModel = new JSONModel({
-                results: aResults
-            });
-
-            // Set result model
+            // Now set the correct object's model
             oTable.setModel(
-                oResultModel,
+                oModel,
                 "result"
             );
+
             oTable.detachRowSelectionChange(
                 this._onResultRowSelectionChange,
                 this
@@ -1291,20 +1524,12 @@ sap.ui.define([
                 this
             );
 
-            // Bind rows
-            oTable.bindRows(
-                "result>/results"
-            );
+            // Now bind the new entity
+            oTable.bindRows({
+                path: "result>" + sPath,
+                filters: aFilters
+            });
 
-            console.log(
-                "Result table configured for:",
-                sGroupId
-            );
-
-            console.log(
-                "Number of rows:",
-                aResults.length
-            );
         },
 
         _onResultRowSelectionChange: function (oEvent) {
@@ -1317,7 +1542,13 @@ sap.ui.define([
             var aSelectedIndices =
                 oTable.getSelectedIndices();
 
-            if (!aSelectedIndices || aSelectedIndices.length === 0) {
+            if (!aSelectedIndices ||
+                aSelectedIndices.length === 0) {
+
+                oWizardModel.setProperty(
+                    "/selectedResults",
+                    []
+                );
 
                 oWizardModel.setProperty(
                     "/selectedResult",
@@ -1337,44 +1568,39 @@ sap.ui.define([
                 return;
             }
 
-            var iIndex =
-                aSelectedIndices[0];
+            var aSelectedObjects = [];
 
-            var oContext =
-                oTable.getContextByIndex(iIndex);
+            aSelectedIndices.forEach(function (iIndex) {
 
-            if (!oContext) {
-                return;
-            }
+                var oContext =
+                    oTable.getContextByIndex(iIndex);
 
-            var oSelectedObject =
-                oContext.getObject();
+                if (oContext) {
+                    aSelectedObjects.push(
+                        oContext.getObject()
+                    );
+                }
 
-            console.log(
-                "========== SELECTED OBJECT =========="
-            );
+            });
 
             console.log(
-                "Group ID:",
-                oWizardModel.getProperty("/groupId")
-            );
-
-            console.log(
-                "Selected Row:",
-                oSelectedObject
-            );
-
-            console.log(
-                "====================================="
+                "SELECTED OBJECTS:",
+                aSelectedObjects
             );
 
             oWizardModel.setProperty(
+                "/selectedResults",
+                aSelectedObjects
+            );
+
+            // kept for copy-again logic
+            oWizardModel.setProperty(
                 "/selectedResult",
-                oSelectedObject
+                aSelectedObjects[0]
             );
 
             this._updateCopyAgainState(
-                oSelectedObject
+                aSelectedObjects[0]
             );
         },
         _getResultTableConfig: function (sGroupId) {
@@ -1484,8 +1710,42 @@ sap.ui.define([
                 case "RIP":
 
                     return {
+                        sourceProperty: "RIPNumber",
+                        targetProperty: "CreatedRIP",
+
                         columns: [
-                            // RIP columns will go here
+                            {
+                                label: "RIP Number",
+                                property: "RIPNumber"
+                            },
+                            {
+                                label: "RIP Name",
+                                property: "RIPName"
+                            },
+                            {
+                                label: "Cedent",
+                                property: "Cedent"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "ProcessingID"
+                            },
+                            {
+                                label: "Target System",
+                                property: "Syst"
+                            },
+                            {
+                                label: "Target RIP",
+                                property: "CreatedRIP"
+                            },
+                            {
+                                label: "Created By",
+                                property: "CreatedBy"
+                            },
+                            {
+                                label: "Creation Date",
+                                property: "Createdon"
+                            }
                         ]
                     };
                 case "T":
@@ -1532,6 +1792,55 @@ sap.ui.define([
                             }
                         ]
                     };
+                case "TCR":
+
+                    return {
+                        sourceProperty: "vtgrrnr",
+                        targetProperty: "CreatedTCR",
+
+                        columns: [
+                            {
+                                label: "TCR Number",
+                                property: "vtgrrnr"
+                            },
+                            {
+                                label: "Rank",
+                                property: "Rank"
+                            },
+                            {
+                                label: "Field Name",
+                                property: "FieldName"
+                            },
+                            {
+                                label: "Field Value",
+                                property: "Value"
+                            },
+                            {
+                                label: "Company Code",
+                                property: "CompanyCode"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "processingID"
+                            },
+                            {
+                                label: "Target System",
+                                property: "syst"
+                            },
+                            {
+                                label: "Target TCR Number",
+                                property: "CreatedTCR"
+                            },
+                            {
+                                label: "Created By",
+                                property: "CreatedBy"
+                            },
+                            {
+                                label: "Creation Date",
+                                property: "CreatedDate"
+                            }
+                        ]
+                    };
 
                 default:
                     return null;
@@ -1558,7 +1867,11 @@ sap.ui.define([
                     break;
 
                 case "RIP":
-                    sTargetProperty = "TargetRIP";
+                    sTargetProperty = "CreatedRIP";
+                    break;
+
+                case "TCR":
+                    sTargetProperty = "CreatedTCR";
                     break;
 
                 case "T":
@@ -1606,7 +1919,8 @@ sap.ui.define([
         //Treaty
         onTreatyGo: function () {
 
-            var oWizardModel = this.getView().getModel("wizard");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
             var aFilters = [];
 
@@ -1614,13 +1928,18 @@ sap.ui.define([
                 oWizardModel.getProperty("/treaty");
 
             var sProcessRefId =
-                oWizardModel.getProperty("/treatyProcessRefId");
+                oWizardModel.getProperty(
+                    "/treatyProcessRefId"
+                );
 
             var sTargetSystem =
-                oWizardModel.getProperty("/treatyTargetSystem");
+                oWizardModel.getProperty(
+                    "/treatyTargetSystem"
+                );
 
-            // Treaty Number
+
             if (sTreaty) {
+
                 aFilters.push(
                     new Filter(
                         "vtgnr",
@@ -1630,8 +1949,8 @@ sap.ui.define([
                 );
             }
 
-            // Process Ref ID
             if (sProcessRefId) {
+
                 aFilters.push(
                     new Filter(
                         "processingID",
@@ -1641,8 +1960,8 @@ sap.ui.define([
                 );
             }
 
-            // Target System
             if (sTargetSystem) {
+
                 aFilters.push(
                     new Filter(
                         "syst",
@@ -1652,8 +1971,10 @@ sap.ui.define([
                 );
             }
 
+
             var oModel =
-                this.getView().getModel("ZRI_S_TTY_DATA");
+                this.getView()
+                    .getModel("ZRI_S_TTY_DATA");
 
             if (!oModel) {
 
@@ -1664,48 +1985,25 @@ sap.ui.define([
                 return;
             }
 
-            this._oBusyDialog.open();
 
-            oModel.read("/Treaty", {
+            // if (aFilters.length === 0) {
 
-                filters: aFilters,
+            //     MessageToast.show(
+            //         "Please enter at least one search criterion."
+            //     );
 
-                urlParameters: {
-                    "$top": "5000"
-                },
+            //     return;
+            // }
 
-                success: function (oData) {
 
-                    this._oBusyDialog.close();
-
-                    var aResults =
-                        oData.results || [];
-
-                    console.log(
-                        "Treaty records:",
-                        aResults.length
-                    );
-
-                    this._showResultTable(aResults);
-
-                }.bind(this),
-
-                error: function (oError) {
-
-                    this._oBusyDialog.close();
-
-                    console.error(
-                        "Treaty read error:",
-                        oError
-                    );
-
-                    MessageToast.show(
-                        "Error while reading Treaty data."
-                    );
-
-                }.bind(this)
-            });
+            this._showResultTable(
+                oModel,
+                "/Treaty",
+                aFilters
+            );
         },
+
+
 
         // =========================================================
         // ACCOUNT SEARCH
@@ -1717,12 +2015,8 @@ sap.ui.define([
 
             var aFilters = [];
 
-            // -----------------------------------------------------
-            // Read Account filter values
-            // -----------------------------------------------------
-
-            var sAccountNumber =
-                oWizardModel.getProperty("/accountNumber");
+            var aAccountNumbers =
+                oWizardModel.getProperty("/accountNumbers") || [];
 
             var sFIPostingDate =
                 oWizardModel.getProperty("/accountFIPostingDate");
@@ -1761,35 +2055,24 @@ sap.ui.define([
                 oWizardModel.getProperty("/accountProcessRefId");
 
 
-            console.log("========== ACCOUNT SEARCH ==========");
-            console.log("Account Number:", sAccountNumber);
-            console.log("FI Posting Date:", sFIPostingDate);
-            console.log("Section Number:", sSectionNumber);
-            console.log("UW Year:", sUWYear);
-            console.log("Line of Business:", sLineOfBusiness);
-            console.log("Class of Business:", sClassOfBusiness);
-            console.log("Business Type:", sBusinessType);
-            console.log("Period Start Date:", sStartPeriodDate);
-            console.log("Period End Date:", sEndPeriodDate);
-            console.log("Account Function:", sAccountFunction);
-            console.log("Created By:", sCreatedBy);
-            console.log("Creation Date:", sCreationDate);
-            console.log("Process Ref ID:", sProcessRefId);
-            console.log("====================================");
+            if (aAccountNumbers.length > 0) {
 
+                var aAccountNumberFilters =
+                    aAccountNumbers.map(function (sAccountNumber) {
 
-            // -----------------------------------------------------
-            // Build filters
-            // -----------------------------------------------------
+                        return new Filter(
+                            "AccountNumber",
+                            FilterOperator.EQ,
+                            sAccountNumber
+                        );
 
-            if (sAccountNumber) {
+                    });
 
                 aFilters.push(
-                    new Filter(
-                        "AccountNumber",
-                        FilterOperator.EQ,
-                        sAccountNumber
-                    )
+                    new Filter({
+                        filters: aAccountNumberFilters,
+                        and: false
+                    })
                 );
             }
 
@@ -1800,7 +2083,10 @@ sap.ui.define([
                     new Filter(
                         "FIpostingdate",
                         FilterOperator.EQ,
-                        new Date(sFIPostingDate + "T00:00:00")
+                        new Date(
+                            sFIPostingDate +
+                            "T00:00:00"
+                        )
                     )
                 );
             }
@@ -1872,7 +2158,10 @@ sap.ui.define([
                     new Filter(
                         "Startofaccperiod",
                         FilterOperator.EQ,
-                        new Date(sStartPeriodDate + "T00:00:00")
+                        new Date(
+                            sStartPeriodDate +
+                            "T00:00:00"
+                        )
                     )
                 );
             }
@@ -1884,7 +2173,10 @@ sap.ui.define([
                     new Filter(
                         "Endofaccperiod",
                         FilterOperator.EQ,
-                        new Date(sEndPeriodDate + "T00:00:00")
+                        new Date(
+                            sEndPeriodDate +
+                            "T00:00:00"
+                        )
                     )
                 );
             }
@@ -1920,7 +2212,10 @@ sap.ui.define([
                     new Filter(
                         "CreationDate",
                         FilterOperator.EQ,
-                        new Date(sCreationDate + "T00:00:00")
+                        new Date(
+                            sCreationDate +
+                            "T00:00:00"
+                        )
                     )
                 );
             }
@@ -1938,16 +2233,19 @@ sap.ui.define([
             }
 
 
-            // -----------------------------------------------------
-            // ACCOUNT ODATA MODEL
-            // -----------------------------------------------------
+            if (aFilters.length === 0) {
 
-            /*
-             * Replace the model name below with the actual Account
-             * model name from manifest.json.
-             */
+                MessageToast.show(
+                    "Please enter at least one search criterion."
+                );
+
+                return;
+            }
+
+
             var oModel =
-                this.getView().getModel("ZRI_SB_ACC_DATA");
+                this.getView()
+                    .getModel("ZRI_SB_ACC_DATA");
 
 
             if (!oModel) {
@@ -1956,110 +2254,706 @@ sap.ui.define([
                     "Account service is not available."
                 );
 
-                console.error(
-                    "Account OData model is NOT available."
-                );
-
                 return;
             }
 
 
-            // -----------------------------------------------------
-            // Read Account data
-            // -----------------------------------------------------
+            this._showResultTable(
+                oModel,
+                "/Account",
+                aFilters
+            );
+        },
+        onAccountValHelp: function () {
 
+            var oView = this.getView();
 
-            // Build filters first...
+            if (!this._oAccountVHD) {
 
-            if (aFilters.length === 0) {
-                MessageToast.show(
-                    "Please enter at least one search criterion."
+                this._oAccountVHD = sap.ui.xmlfragment(
+                    oView.getId(),
+                    "srt.app.view.fragments.AccountValueHelp",
+                    this
                 );
-                return;
+
+                oView.addDependent(this._oAccountVHD);
+
+                this._prepareAccountValueHelpTable();
             }
 
+            this._oAccountVHD.open();
+        },
+        _prepareAccountValueHelpTable: function () {
 
+            var oModel =
+                this.getView().getModel("ZRI_SB_ACC_DATA");
 
-            // oModel.read("/Account", {
-            //     filters: aFilters,
+            this._oAccountVHD
+                .getTableAsync()
+                .then(function (oTable) {
 
-            //     urlParameters: {
-            //         "$top": "100"
-            //     },
-
-            //     success: function (oData) {
-            //         this._oBusyDialog.close();
-
-            //         this._showResultTable(
-            //             oData.results || []
-            //         );
-            //     }.bind(this),
-
-            //     error: function (oError) {
-            //         this._oBusyDialog.close();
-
-            //         console.error(
-            //             "ACCOUNT DATA ERROR:",
-            //             oError
-            //         );
-
-            //         MessageToast.show(
-            //             "Error while reading Account data."
-            //         );
-            //     }.bind(this)
-            // });
-            this._oBusyDialog.open();
-
-            /*
-             * Replace /YOUR_ACCOUNT_ENTITY_SET with the actual
-             * Account EntitySet from metadata.
-             *
-             */
-            oModel.read("/Account", {
-
-                filters: aFilters,
-
-                urlParameters: {
-                    "$top": "100"
-                },
-
-                success: function (oData) {
-
-                    console.log(
-                        "Account records:",
-                        oData.results.length
+                    oTable.setModel(
+                        oModel,
+                        "ZRI_SB_ACC_DATA"
                     );
 
-                    console.log(
-                        "Account result:",
-                        oData.results
-                    );
+                    // sap.ui.table.Table
+                    if (oTable.bindRows) {
 
-                    this._showResultTable(
-                        oData.results
-                    );
+                        oTable.addColumn(
+                            new TableColumn({
+                                label: new Label({
+                                    text: "Account Number"
+                                }),
+                                template: new Text({
+                                    text: "{ZRI_SB_ACC_DATA>Abrnr}"
+                                })
+                            })
+                        );
 
-                    this._oBusyDialog.close();
+                        oTable.addColumn(
+                            new TableColumn({
+                                label: new Label({
+                                    text: "Account Name"
+                                }),
+                                template: new Text({
+                                    text: "{ZRI_SB_ACC_DATA>Abrbez}"
+                                })
+                            })
+                        );
 
-                }.bind(this),
+                        oTable.addColumn(
+                            new TableColumn({
+                                label: new Label({
+                                    text: "Module"
+                                }),
+                                template: new Text({
+                                    text: "{ZRI_SB_ACC_DATA>Baustein}"
+                                })
+                            })
+                        );
 
-                error: function (oError) {
+                        oTable.addColumn(
+                            new TableColumn({
+                                label: new Label({
+                                    text: "Treaty Number"
+                                }),
+                                template: new Text({
+                                    text: "{ZRI_SB_ACC_DATA>Vtgnr}"
+                                })
+                            })
+                        );
 
-                    console.error(
-                        "ACCOUNT DATA ERROR:",
-                        oError
-                    );
+                        oTable.addColumn(
+                            new TableColumn({
+                                label: new Label({
+                                    text: "Company Code"
+                                }),
+                                template: new Text({
+                                    text: "{ZRI_SB_ACC_DATA>Bukrs}"
+                                })
+                            })
+                        );
 
-                    MessageToast.show(
-                        "Error while reading Account data."
-                    );
+                        oTable.bindRows({
+                            path:
+                                "ZRI_SB_ACC_DATA>/ZRI_I_ABRNR_VH"
+                        });
+                    }
 
-                    this._oBusyDialog.close();
+                    this._oAccountVHD.update();
 
-                }.bind(this)
-            });
+                }.bind(this));
         },
 
+        // error: function (oError) {
+
+        //                     console.error(
+        //                         "ACCOUNT DATA ERROR:",
+        //                         oError
+        //                     );
+
+        //                     MessageToast.show(
+        //                         "Error while reading Account data."
+        //                     );
+
+        //                     this._oBusyDialog.close();
+
+        //                 }.bind(this)
+        //             });
+        //         },
+        onRIPGo: function () {
+
+            var oWizardModel =
+                this.getView().getModel("wizard");
+
+            var aFilters = [];
+
+            var sRIPNumber =
+                oWizardModel.getProperty("/ripNumber");
+
+            var sCreatedBy =
+                oWizardModel.getProperty("/ripCreatedBy");
+
+            var sCreationDate =
+                oWizardModel.getProperty("/ripCreationDate");
+
+            var sProcessRefId =
+                oWizardModel.getProperty("/ripProcessRefId");
+
+
+            if (sRIPNumber) {
+                aFilters.push(
+                    new Filter(
+                        "RIPNumber",
+                        FilterOperator.EQ,
+                        sRIPNumber
+                    )
+                );
+            }
+
+            if (sCreatedBy) {
+                aFilters.push(
+                    new Filter(
+                        "CreatedBy",
+                        FilterOperator.EQ,
+                        sCreatedBy
+                    )
+                );
+            }
+
+            if (sCreationDate) {
+                aFilters.push(
+                    new Filter(
+                        "Createdon",
+                        FilterOperator.EQ,
+                        new Date(
+                            sCreationDate + "T00:00:00"
+                        )
+                    )
+                );
+            }
+
+            if (sProcessRefId) {
+                aFilters.push(
+                    new Filter(
+                        "ProcessingID",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
+
+
+            var oModel =
+                this.getView()
+                    .getModel("ZRI_SB_RIP_DATA");
+
+            if (!oModel) {
+
+                MessageToast.show(
+                    "RIP service is not available."
+                );
+
+                return;
+            }
+
+
+            this._showResultTable(
+                oModel,
+                "/RIP",
+                aFilters
+            );
+        },
+        onAccountVHSearch: function () {
+
+            var sPrefix =
+                this.getView().getId();
+
+            var oAccNo =
+                sap.ui.getCore().byId(
+                    sPrefix + "--accountVHNumber"
+                );
+
+            var oAccName =
+                sap.ui.getCore().byId(
+                    sPrefix + "--accountVHName"
+                );
+
+            var oModule =
+                sap.ui.getCore().byId(
+                    sPrefix + "--accountVHModule"
+                );
+
+            var oTreaty =
+                sap.ui.getCore().byId(
+                    sPrefix + "--accountVHTreaty"
+                );
+
+            var oCompany =
+                sap.ui.getCore().byId(
+                    sPrefix + "--accountVHCompany"
+                );
+
+
+            var sAbrnr =
+                oAccNo ? oAccNo.getValue().trim() : "";
+
+            var sAbrbez =
+                oAccName ? oAccName.getValue().trim() : "";
+
+            var sBaustein =
+                oModule ? oModule.getValue().trim() : "";
+
+            var sVtgnr =
+                oTreaty ? oTreaty.getValue().trim() : "";
+
+            var sBukrs =
+                oCompany ? oCompany.getValue().trim() : "";
+
+
+            var aFilters = [];
+
+
+            if (sAbrnr) {
+                aFilters.push(
+                    new Filter(
+                        "Abrnr",
+                        FilterOperator.EQ,
+                        sAbrnr
+                    )
+                );
+            }
+
+            if (sAbrbez) {
+                aFilters.push(
+                    new Filter(
+                        "Abrbez",
+                        FilterOperator.Contains,
+                        sAbrbez
+                    )
+                );
+            }
+
+            if (sBaustein) {
+                aFilters.push(
+                    new Filter(
+                        "Baustein",
+                        FilterOperator.EQ,
+                        sBaustein
+                    )
+                );
+            }
+
+            if (sVtgnr) {
+                aFilters.push(
+                    new Filter(
+                        "Vtgnr",
+                        FilterOperator.EQ,
+                        sVtgnr
+                    )
+                );
+            }
+
+            if (sBukrs) {
+                aFilters.push(
+                    new Filter(
+                        "Bukrs",
+                        FilterOperator.EQ,
+                        sBukrs
+                    )
+                );
+            }
+
+
+            console.log(
+                "ACCOUNT VH FILTERS:",
+                aFilters
+            );
+
+
+            this._oAccountVHD
+                .getTableAsync()
+                .then(function (oTable) {
+
+                    var oBinding =
+                        oTable.getBinding("rows") ||
+                        oTable.getBinding("items");
+
+                    if (oBinding) {
+                        oBinding.filter(aFilters);
+                    }
+
+                    this._oAccountVHD.update();
+
+                }.bind(this));
+        },
+        onAccountVHOk: function (oEvent) {
+
+            var aTokens =
+                oEvent.getParameter("tokens") || [];
+
+            var oMultiInput =
+                this.byId("accountNumberInput");
+
+            var aAccountNumbers =
+                aTokens.map(function (oToken) {
+                    return oToken.getKey();
+                });
+
+
+            if (oMultiInput) {
+
+                oMultiInput.removeAllTokens();
+
+                aAccountNumbers.forEach(function (sAccountNumber) {
+
+                    oMultiInput.addToken(
+                        new Token({
+                            key: sAccountNumber,
+                            text: sAccountNumber
+                        })
+                    );
+
+                });
+            }
+
+
+            this.getView()
+                .getModel("wizard")
+                .setProperty(
+                    "/accountNumbers",
+                    aAccountNumbers
+                );
+
+
+            this._oAccountVHD.close();
+        },
+
+
+        onAccountVHCancel: function () {
+
+            this._oAccountVHD.close();
+        },
+        onRIPValueHelp: function () {
+            console.log("RIP Value help");
+        },
+        onAccountCopyWithOpen: function () {
+
+            var oWizardModel =
+                this.getView().getModel("wizard");
+
+            var aSelectedResults =
+                oWizardModel.getProperty("/selectedResults") || [];
+
+            // if (!aSelectedResults.length) {
+
+            //     MessageToast.show(
+            //         "Please select at least one account."
+            //     );
+
+            //     return;
+            // }
+
+
+            if (!this._pAccountCopyWithDialog) {
+
+                this._pAccountCopyWithDialog =
+                    this.loadFragment({
+                        name:
+                            "srt.app.view.fragments.AccountCopyWith"
+                    });
+            }
+
+
+            this._pAccountCopyWithDialog
+                .then(function (oDialog) {
+
+                    oDialog.open();
+
+                });
+        },
+        onCopyAccountWithExecute: function () {
+
+            var oView =
+                this.getView();
+
+            var oModel =
+                oView.getModel("wizard");
+
+            var oExecutionModel =
+                oView.getModel("ZGS_SRT_SRV");
+
+
+            var sRfc =
+                oModel.getProperty(
+                    "/copyWithRfcDestination"
+                );
+
+            var sTreatyFrom =
+                oModel.getProperty(
+                    "/copyWithTreatyFrom"
+                );
+
+            var sTreatyTo =
+                oModel.getProperty(
+                    "/copyWithTreatyTo"
+                );
+
+            var bCopyAgain =
+                !!oModel.getProperty(
+                    "/copyWithCopyAgain"
+                );
+
+
+            if (!sRfc) {
+                MessageToast.show(
+                    "Please select RFC Destination."
+                );
+                return;
+            }
+
+
+            if (!sTreatyFrom) {
+                MessageToast.show(
+                    "Please enter Treaty From."
+                );
+                return;
+            }
+
+
+            var aFilters = [];
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_grp_id",
+                    FilterOperator.EQ,
+                    "A"
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rfc",
+                    FilterOperator.EQ,
+                    sRfc
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_copy_again",
+                    FilterOperator.EQ,
+                    bCopyAgain
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rip_from",
+                    FilterOperator.EQ,
+                    sTreatyFrom
+                )
+            );
+
+
+            // IMPORTANT:
+            // iv_rip_to is Nullable="false"
+            // so always send something
+            aFilters.push(
+                new Filter(
+                    "iv_rip_to",
+                    FilterOperator.EQ,
+                    sTreatyTo || ""
+                )
+            );
+
+
+            console.log(
+                "COPY ACCOUNT WITH FILTERS:",
+                aFilters
+            );
+
+
+            this._oBusyDialog.open();
+
+
+            oExecutionModel.read(
+                "/RIPSet",
+                {
+                    filters: aFilters,
+
+                    success: function (oData) {
+
+                        this._oBusyDialog.close();
+
+                        var sProcessId = "";
+
+                        if (
+                            oData.results &&
+                            oData.results.length > 0
+                        ) {
+                            sProcessId =
+                                oData.results[0].process_id;
+                        }
+
+                        MessageToast.show(
+                            "Execution started successfully. Process ID: " +
+                            sProcessId
+                        );
+
+                    }.bind(this),
+
+
+                    error: function (oError) {
+
+                        this._oBusyDialog.close();
+
+                        console.error(
+                            "COPY ACCOUNT WITH ERROR:",
+                            oError
+                        );
+
+                        MessageToast.show(
+                            "Account copy failed."
+                        );
+
+                    }.bind(this)
+                }
+            );
+        },
+        onCopyAccountWithCancel: function () {
+
+            var oModel =
+                this.getView().getModel("wizard");
+
+            oModel.setProperty(
+                "/copyWithTreatyFrom",
+                ""
+            );
+
+            oModel.setProperty(
+                "/copyWithTreatyTo",
+                ""
+            );
+
+            oModel.setProperty(
+                "/copyWithCopyAgain",
+                false
+            );
+
+            this._pAccountCopyWithDialog
+                .then(function (oDialog) {
+
+                    oDialog.close();
+
+                });
+        },
+        onTCRGo: function () {
+
+            var oWizardModel =
+                this.getView().getModel("wizard");
+
+            var aFilters = [];
+
+
+            var sTCRNumber =
+                oWizardModel.getProperty(
+                    "/tcrNumber"
+                );
+
+            var sCreatedBy =
+                oWizardModel.getProperty(
+                    "/tcrCreatedBy"
+                );
+
+            var sCreationDate =
+                oWizardModel.getProperty(
+                    "/tcrCreationDate"
+                );
+
+            var sProcessRefId =
+                oWizardModel.getProperty(
+                    "/tcrProcessRefId"
+                );
+
+
+            if (sTCRNumber) {
+
+                aFilters.push(
+                    new Filter(
+                        "vtgrrnr",
+                        FilterOperator.EQ,
+                        sTCRNumber
+                    )
+                );
+            }
+
+
+            if (sCreatedBy) {
+
+                aFilters.push(
+                    new Filter(
+                        "CreatedBy",
+                        FilterOperator.EQ,
+                        sCreatedBy
+                    )
+                );
+            }
+
+
+            if (sCreationDate) {
+
+                aFilters.push(
+                    new Filter(
+                        "CreatedDate",
+                        FilterOperator.EQ,
+                        new Date(
+                            sCreationDate +
+                            "T00:00:00"
+                        )
+                    )
+                );
+            }
+
+
+            if (sProcessRefId) {
+
+                aFilters.push(
+                    new Filter(
+                        "processingID",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
+
+
+            var oModel =
+                this.getView()
+                    .getModel("ZRI_SB_TCR_DATA");
+
+
+            if (!oModel) {
+
+                MessageToast.show(
+                    "TCR service is not available."
+                );
+
+                return;
+            }
+
+
+            this._showResultTable(
+                oModel,
+                "/TCR",
+                aFilters
+            );
+        },
     });
 
 });

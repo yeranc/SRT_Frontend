@@ -1,0 +1,116 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="srtFilterContainer">
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            class="sapUiTinyMarginBottom"
+        >
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon"
+                />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle"
+                />
+            </HBox>
+
+            <HBox
+                alignItems="Center"
+                wrap="Wrap"
+            >
+                <CheckBox
+                    text="Copy Again"
+                    selected="{wizard>/copyAgain}"
+                    enabled="{wizard>/copyAgainEnabled}"
+                    class="sapUiTinyMarginEnd"
+                />
+            </HBox>
+        </HBox>
+
+        <!-- TCR FILTER ROW -->
+        <HBox
+            class="srtFilterRow"
+            wrap="NoWrap"
+            alignItems="End"
+            justifyContent="Start"
+        >
+            <!-- TCR NUMBER -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="TCR Number"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    id="tcrNumberInput"
+                    value="{wizard>/tcrNumber}"
+                    placeholder="Enter TCR Number"
+                    showValueHelp="true"
+                    valueHelpRequest="onTCRValueHelp"
+                />
+            </VBox>
+
+            <!-- CREATED BY -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="Created By"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    id="tcrCreatedByInput"
+                    value="{wizard>/tcrCreatedBy}"
+                    placeholder="Enter Created By"
+                />
+            </VBox>
+
+            <!-- CREATION DATE -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="Creation Date"
+                    class="srtFieldLabel"
+                />
+
+                <DatePicker
+                    id="tcrCreationDate"
+                    value="{wizard>/tcrCreationDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date"
+                />
+            </VBox>
+
+            <!-- PROCESS REF ID -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="Process Ref ID"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    id="tcrProcessRefIdInput"
+                    value="{wizard>/tcrProcessRefId}"
+                    placeholder="Enter Process Ref ID"
+                />
+            </VBox>
+
+            <!-- GO -->
+            <Button
+                text="Go"
+                type="Emphasized"
+                press="onTCRGo"
+                class="srtGoButton"
+            />
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>

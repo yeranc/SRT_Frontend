@@ -39,6 +39,10 @@ server:
             url: http://mgss81a.aws.msg.de:44300
             client: '800'
             destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZRI_SB_TCR_DATA/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
     - name: fiori-tools-appreload
       afterMiddleware: compression
       configuration:
@@ -87,6 +91,10 @@ server:
             metadataPath: ./webapp/localService/ZRI_SB_RIP_DATA/metadata.xml
             mockdataPath: ./webapp/localService/ZRI_SB_RIP_DATA/data
             generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZRI_SB_TCR_DATA
+            metadataPath: ./webapp/localService/ZRI_SB_TCR_DATA/metadata.xml
+            mockdataPath: ./webapp/localService/ZRI_SB_TCR_DATA/data
+            generateMockData: true
         annotations:
           - localPath: ./webapp/localService/mainService/ZRI_SB_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_DATA_VAN',Version='0001')/$value/
@@ -98,6 +106,8 @@ server:
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_ACC_DATA_VAN',Version='0001')/$value/
           - localPath: ./webapp/localService/ZRI_SB_RIP_DATA/ZRI_SB_RIP_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_RIP_DATA_VAN',Version='0001')/$value/
+          - localPath: ./webapp/localService/ZRI_SB_TCR_DATA/ZRI_SB_TCR_DATA_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_TCR_DATA_VAN',Version='0001')/$value/
 builder:
   resources:
     excludes:
