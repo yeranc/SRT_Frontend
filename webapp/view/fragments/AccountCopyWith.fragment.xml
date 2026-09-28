@@ -1,0 +1,84 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <Dialog
+        id="accountCopyWithDialog"
+        title="Copy Account With"
+        contentWidth="28rem"
+        draggable="true"
+        resizable="false"
+        stretchOnPhone="true">
+
+        <content>
+            <VBox
+                class="sapUiMediumMargin"
+                width="100%">
+
+                <!-- RFC DESTINATION -->
+                <Label
+                    text="RFC Destination:"
+                    labelFor="copyWithRfcInput" />
+
+                <Input
+                    id="copyWithRfcInput"
+                    value="{wizard>/copyWithRfcDestination}"
+                    showValueHelp="true"
+                    valueHelpRequest="onCopyWithRfcValueHelp"
+                    width="100%"
+                    class="sapUiSmallMarginBottom" />
+
+
+                <!-- TREATY FROM -->
+                <Label
+                    text="Treaty From:"
+                    labelFor="copyWithTreatyFrom" />
+
+                <Input
+                    id="copyWithTreatyFrom"
+                    value="{wizard>/copyWithTreatyFrom}"
+                    width="100%"
+                    class="sapUiSmallMarginBottom" />
+
+
+                <!-- TREATY TO -->
+                <Label
+                    text="Treaty To:"
+                    labelFor="copyWithTreatyTo" />
+
+                <Input
+                    id="copyWithTreatyTo"
+                    value="{wizard>/copyWithTreatyTo}"
+                    width="100%"
+                    class="sapUiSmallMarginBottom" />
+
+
+                <!-- COPY AGAIN -->
+                <Label
+                    text="Copy Again:"
+                    labelFor="copyWithCopyAgain" />
+
+                <CheckBox
+                    id="copyWithCopyAgain"
+                    selected="{wizard>/copyWithCopyAgain}" />
+
+            </VBox>
+        </content>
+
+
+        <beginButton>
+            <Button
+                text="Copy Account With"
+                type="Emphasized"
+                press="onCopyAccountWithExecute" />
+        </beginButton>
+
+        <endButton>
+            <Button
+                text="Cancel"
+                press="onCopyAccountWithCancel" />
+        </endButton>
+
+    </Dialog>
+
+</core:FragmentDefinition>

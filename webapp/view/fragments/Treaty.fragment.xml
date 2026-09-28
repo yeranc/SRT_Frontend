@@ -1,120 +1,172 @@
-<core:FragmentDefinition
-    xmlns="sap.m"
-    xmlns:core="sap.ui.core"
->
-    <VBox class="srtFilterContainer">
-        <HBox
-            wrap="Wrap"
-            alignItems="End"
-            class="srtFilterRow"
-            justifyContent="Start"
-        >
-            <!-- Treaty Number -->
-            <VBox class="srtFilterField">
-                <Label text="Treaty Number" />
+<core:FragmentDefinition 
+    xmlns="sap.m" 
+    xmlns:core="sap.ui.core">
 
-                <Input
-                    id="treatyInput"
-                    value="{wizard>/treaty}"
-                    placeholder="Enter Treaty Number"
-                />
-            </VBox>
-            
+    <VBox class="srtFilterContainer">
+
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            class="sapUiTinyMarginBottom">
+
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon" />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3" 
+                    class="srtSectionTitle"/>
+            </HBox>
+
+            <HBox
+                alignItems="Center"
+                wrap="Wrap">
+
+                <CheckBox
+                    text="Copy Again"
+                    selected="{wizard>/copyAgain}"
+                    enabled="{wizard>/copyAgainEnabled}"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy Loss"
+                    selected="{wizard>/copyLoss}"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy Account"
+                    selected="{wizard>/copyAccount}"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy RIP"
+                    selected="{wizard>/copyRip}"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy TCR"
+                    selected="{wizard>/copyTcr}" />
+
+            </HBox>
+
+        </HBox>
+
+
+        <!-- FILTERS -->
+        <HBox 
+            wrap="Wrap" 
+            alignItems="End" 
+            class="srtFilterRow" 
+            justifyContent="Start">
+
+            <!-- Treaty Number -->
+            <VBox class="srtFilterField"> 
+                <Label text="Treaty Number" /> 
+
+                <Input 
+                    id="treatyInput" 
+                    value="{wizard>/treaty}" 
+                    placeholder="Enter Treaty Number" 
+                    showValueHelp="true" 
+                    valueHelpRequest="onTtyValueHelp" /> 
+            </VBox> 
+
 
             <!-- Period Start Date -->
-            <VBox class="srtFilterField">
-                <Label text="Period Start Date" />
+            <VBox class="srtFilterField"> 
+                <Label text="Period Start Date" /> 
 
-                <DatePicker
-                    id="treatyPeriodStartDate"
-                    value="{wizard>/treatyPeriodStartDate}"
-                    valueFormat="yyyy-MM-dd"
-                    displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date"
-                />
-            </VBox>
+                <DatePicker 
+                    id="treatyPeriodStartDate" 
+                    value="{wizard>/treatyPeriodStartDate}" 
+                    valueFormat="yyyy-MM-dd" 
+                    displayFormat="dd.MM.yyyy" 
+                    placeholder="Select Date" /> 
+            </VBox> 
 
-           
+
             <!-- Line of Business -->
-            <VBox class="srtFilterField">
-                <Label text="Line of Business" />
+            <VBox class="srtFilterField"> 
+                <Label text="Line of Business" /> 
 
-                <Input
-                    id="treatyLineOfBusiness"
-                    value="{wizard>/treatyLineOfBusiness}"
-                    placeholder="Enter Line of Business"
-                />
-            </VBox>
+                <Input 
+                    id="treatyLineOfBusiness" 
+                    value="{wizard>/treatyLineOfBusiness}" 
+                    placeholder="Enter Line of Business" /> 
+            </VBox> 
 
-          
+
             <!-- Class of Business -->
-            <VBox class="srtFilterField">
-                <Label text="Class of Business" />
+            <VBox class="srtFilterField"> 
+                <Label text="Class of Business" /> 
 
-                <Input
-                    id="treatyClassOfBusiness"
-                    value="{wizard>/treatyClassOfBusiness}"
-                    placeholder="Enter Class of Business"
-                />
-            </VBox>
+                <Input 
+                    id="treatyClassOfBusiness" 
+                    value="{wizard>/treatyClassOfBusiness}" 
+                    placeholder="Enter Class of Business" /> 
+            </VBox> 
 
-           
+
             <!-- Process Ref ID -->
-            <VBox class="srtFilterField">
-                <Label text="Process Ref ID" />
+            <VBox class="srtFilterField"> 
+                <Label text="Process Ref ID" /> 
 
-                <Input
-                    id="treatyProcessRefIdInput"
-                    value="{wizard>/treatyProcessRefId}"
-                    placeholder="Enter Process Ref ID"
-                />
-            </VBox>
-           
+                <Input 
+                    id="treatyProcessRefIdInput" 
+                    value="{wizard>/treatyProcessRefId}" 
+                    placeholder="Enter Process Ref ID" /> 
+            </VBox> 
+
 
             <!-- Area -->
-            <VBox class="srtFilterField">
-                <Label text="Area" />
+            <VBox class="srtFilterField"> 
+                <Label text="Area" /> 
 
-                <Input
-                    id="treatyArea"
-                    value="{wizard>/treatyArea}"
-                    placeholder="Enter Area"
-                />
-            </VBox>
+                <Input 
+                    id="treatyArea" 
+                    value="{wizard>/treatyArea}" 
+                    placeholder="Enter Area" /> 
+            </VBox> 
 
-           
+
             <!-- Created By -->
-            <VBox class="srtFilterField">
-                <Label text="Created By" />
+            <VBox class="srtFilterField"> 
+                <Label text="Created By" /> 
 
-                <Input
-                    id="treatyCreatedBy"
-                    value="{wizard>/treatyCreatedBy}"
-                    placeholder="Enter Created By"
-                />
-            </VBox>
-           
+                <Input 
+                    id="treatyCreatedBy" 
+                    value="{wizard>/treatyCreatedBy}" 
+                    placeholder="Enter Created By" /> 
+            </VBox> 
+
 
             <!-- Creation Date -->
-            <VBox class="srtFilterField">
-                <Label text="Creation Date" />
+            <VBox class="srtFilterField"> 
+                <Label text="Creation Date" /> 
 
-                <DatePicker
-                    id="treatyCreationDate"
-                    value="{wizard>/treatyCreationDate}"
-                    valueFormat="yyyy-MM-dd"
-                    displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date"
-                />
-            </VBox>
+                <DatePicker 
+                    id="treatyCreationDate" 
+                    value="{wizard>/treatyCreationDate}" 
+                    valueFormat="yyyy-MM-dd" 
+                    displayFormat="dd.MM.yyyy" 
+                    placeholder="Select Date" /> 
+            </VBox> 
 
-            
+
             <!-- Search -->
-            <Button
-                text="Go"
-                type="Emphasized"
-                press="onTreatyGo"
-            />
-        </HBox>
-    </VBox>
+            <Button 
+                text="Go" 
+                type="Emphasized" 
+                class="srtFilterGoButton"
+                press="onTreatyGo" /> 
+
+        </HBox> 
+
+    </VBox> 
+
 </core:FragmentDefinition>

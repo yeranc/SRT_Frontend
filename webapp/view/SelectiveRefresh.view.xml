@@ -12,7 +12,6 @@
     >
         <content>
             <!-- ================= HEADER ================= -->
-            
 
             <!-- ================= HERO ================= -->
             <VBox class="srtRefreshHero">
@@ -20,7 +19,7 @@
                     class="srtHeroContent"
                     alignItems="Center"
                 >
-                <Button
+                    <Button
                         icon="sap-icon://nav-back"
                         type="Transparent"
                         tooltip="Back"
@@ -176,24 +175,19 @@
                             class="srtFieldLabel"
                         />
 
-                        <Select
+                        <ComboBox
                             id="rfcDestinationSelect"
                             width="50%"
                             selectedKey="{wizard>/rfcDestination}"
+                            items="{ZRI_SB_RIP_DATA>/RFC}"
+                            showSecondaryValues="false"
                         >
-                            <items>
-                                <core:Item
-                                    key="T30CLNT700"
-                                    text="T30CLNT700"
-                                />
-                            </items>
-                        </Select>
+                            <core:Item
+                                key="{ZRI_SB_RIP_DATA>rfcdest}"
+                                text="{ZRI_SB_RIP_DATA>rfcdest}"
+                            />
+                        </ComboBox>
                     </VBox>
-                
-           
-                   
-
-                    
                 </HBox>
 
                 <HBox class="srtDashedLine" />
@@ -202,60 +196,63 @@
             <!-- ================= SELECTION CRITERIA ================= -->
             <!-- ================= SELECTION CRITERIA ================= -->
             <VBox class="srtContentCard">
-               <HBox
-    class="srtSectionTitleRow"
-    alignItems="Center"
-    justifyContent="SpaceBetween"
-    width="100%"
->
-    <!-- LEFT: TITLE -->
-    <HBox alignItems="Center">
-        <core:Icon
-            src="sap-icon://filter"
-            class="srtSectionIcon"
-        />
+                <!-- <HBox
+                    class="srtSectionTitleRow"
+                    alignItems="Center"
+                    justifyContent="SpaceBetween"
+                    width="100%"
+                > -->
+                    <!-- LEFT: TITLE -->
+                    <!-- <HBox alignItems="Center">
+                        <core:Icon
+                            src="sap-icon://filter"
+                            class="srtSectionIcon"
+                        />
 
-        <Title
-            text="Selection Criteria"
-            level="H2"
-            class="srtSectionTitle"
-        />
-    </HBox>
+                        <Title
+                            text="Selection Criteria"
+                            level="H2"
+                            class="srtSectionTitle"
+                        />
+                    </HBox> -->
 
-    <!-- RIGHT: COPY OPTIONS -->
-    <HBox alignItems="Center" class="srtCopyOptions">
-        <CheckBox
-            id="copyAgainSwitch"
-            text="Copy Again"
-            selected="{wizard>/copyAgain}"
-            enabled="{wizard>/copyAgainEnabled}"
-        />
+                    <!-- RIGHT: COPY OPTIONS -->
+                    <!-- <HBox
+                        alignItems="Center"
+                        class="srtCopyOptions"
+                    > -->
+                        <!-- <CheckBox
+                            id="copyAgainSwitch"
+                            text="Copy Again"
+                            selected="{wizard>/copyAgain}"
+                            enabled="{wizard>/copyAgainEnabled}"
+                        />
 
-        <CheckBox
-            id="copyLossSwitch"
-            text="Copy Loss"
-            selected="{wizard>/copyLoss}"
-        />
+                        <CheckBox
+                            id="copyLossSwitch"
+                            text="Copy Loss"
+                            selected="{wizard>/copyLoss}"
+                        />
 
-        <CheckBox
-            id="copyAccSwitch"
-            text="Copy Account"
-            selected="{wizard>/copyAccount}"
-        />
+                        <CheckBox
+                            id="copyAccSwitch"
+                            text="Copy Account"
+                            selected="{wizard>/copyAccount}"
+                        />
 
-        <CheckBox
-            id="copyTcrSwitch"
-            text="Copy TCR"
-            selected="{wizard>/copyTcr}"
-        />
+                        <CheckBox
+                            id="copyTcrSwitch"
+                            text="Copy TCR"
+                            selected="{wizard>/copyTcr}"
+                        />
 
-        <CheckBox
-            id="copyRipSwitch"
-            text="Copy RIP"
-            selected="{wizard>/copyRip}"
-        />
-    </HBox>
-</HBox>
+                        <CheckBox
+                            id="copyRipSwitch"
+                            text="Copy RIP"
+                            selected="{wizard>/copyRip}"
+                        />
+                    </HBox> -->
+                <!-- </HBox> -->
 
                 <!-- Dynamic object-specific filters -->
                 <VBox
@@ -267,6 +264,7 @@
                     id="resultTableContainer"
                     width="100%"
                     visible="false"
+                    class="sapUiMediumMarginTop"
                 />
 
                 <!-- INFO MESSAGE -->

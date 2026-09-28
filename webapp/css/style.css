@@ -793,13 +793,23 @@
    RESULT TABLE - COMPACT
    ========================================================= */
 
-.srtResultTable {
-    font-size: 0.75rem !important;
+/* .srtResultTable {
+    overflow-x: auto !important;
+/* Working table scroll area */
+.srtResultTable .sapUiTableCtrlScr,
+.srtResultTable .sapUiTableHSb {
+    overflow-x: hidden !important;
 }
 
-/* Compact data cells */
-.srtResultTable .sapUiTableCell {
-    padding: 0 0.35rem !important;
+.srtResultTable .sapUiTableHSb {
+    display: none !important;
+}
+
+/* outer container becomes the real horizontal scroller */
+[id$="resultTableContainer"] {
+    width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
 }
 
 /* Compact cell text */

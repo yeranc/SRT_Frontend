@@ -1,0 +1,106 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:vhd="sap.ui.comp.valuehelpdialog"
+    xmlns:fb="sap.ui.comp.filterbar"
+    xmlns:sfb="sap.ui.comp.smartfilterbar">
+
+    <vhd:ValueHelpDialog
+        id="accountValueHelpDialog"
+        title="Account Number"
+        key="Abrnr"
+        descriptionKey="Abrbez"
+        supportMultiselect="true"
+        supportRanges="true"
+        supportRangesOnly="false"
+        ok="onAccountVHOk"
+        cancel="onAccountVHCancel">
+
+        <vhd:filterBar>
+
+            <fb:FilterBar
+                id="accountVHFilterBar"
+                advancedMode="true"
+                showGoOnFB="true"
+                 search="onAccountVHSearch">
+
+                <fb:filterGroupItems>
+
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Abrnr"
+                        label="Account Number">
+
+                        <fb:control>
+                            <Input
+                                id="accountVHNumber"
+                                placeholder="Enter Account Number" />
+                        </fb:control>
+
+                    </fb:FilterGroupItem>
+
+
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Abrbez"
+                        label="Account Name">
+
+                        <fb:control>
+                            <Input
+                                id="accountVHName"
+                                placeholder="Enter Account Name" />
+                        </fb:control>
+
+                    </fb:FilterGroupItem>
+
+
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Baustein"
+                        label="Module">
+
+                        <fb:control>
+                            <Input
+                                id="accountVHModule"
+                                placeholder="Enter Module" />
+                        </fb:control>
+
+                    </fb:FilterGroupItem>
+
+
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Vtgnr"
+                        label="Treaty Number">
+
+                        <fb:control>
+                            <Input
+                                id="accountVHTreaty"
+                                placeholder="Enter Treaty Number" />
+                        </fb:control>
+
+                    </fb:FilterGroupItem>
+
+
+                    <fb:FilterGroupItem
+                        groupName="__$INTERNAL$"
+                        name="Bukrs"
+                        label="Company Code">
+
+                        <fb:control>
+                            <Input
+                                id="accountVHCompany"
+                                placeholder="Enter Company Code" />
+                        </fb:control>
+
+                    </fb:FilterGroupItem>
+
+                </fb:filterGroupItems>
+
+            </fb:FilterBar>
+
+        </vhd:filterBar>
+
+    </vhd:ValueHelpDialog>
+
+</core:FragmentDefinition>

@@ -10,7 +10,8 @@
         selectionMode="Multi"
         enableSelectAll="false"
         enableColumnReordering="true"
-        alternateRowColors="false">
+        alternateRowColors="false"
+        threshold="100">
 
         <rowMode>
             <rowm:Auto

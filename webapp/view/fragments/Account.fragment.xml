@@ -1,21 +1,60 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-
+    xmlns:core="sap.ui.core"
+>
     <VBox class="srtFilterContainer">
+        <!-- HEADER -->
+        <HBox
+            class="srtSectionTitleRow"
+            alignItems="Center"
+            justifyContent="SpaceBetween"
+            width="100%"
+        >
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon"
+                />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle"
+                />
+            </HBox>
+            <HBox alignItems="Center">
+                <Button
+                    id="accountCopywith"
+                    text="Copy with Treaty"
+                    type="Transparent"
+                    press="onAccountCopyWithOpen"
+                />
+
+                <CheckBox
+                    id="accountCopyAgain"
+                    text="Copy Again"
+                    selected="{wizard>/copyAgain}"
+                    enabled="{wizard>/copyAgainEnabled}"
+                />
+            </HBox>
+        </HBox>
 
         <!-- ROW 1 -->
         <HBox
             class="srtFilterRow"
             wrap="NoWrap"
-            alignItems="End">
-
+            alignItems="End"
+        >
             <VBox class="srtFilterField">
                 <Label text="Account Number" />
-                <Input
+                <MultiInput
                     id="accountNumberInput"
                     value="{wizard>/accountNumber}"
-                    placeholder="Enter Account Number" />
+                    placeholder="Enter Account Number"
+                    showValueHelp="true"
+                    valueHelpRequest="onAccountValHelp"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -25,7 +64,8 @@
                     value="{wizard>/accountFIPostingDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date" />
+                    placeholder="Select Date"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -33,7 +73,8 @@
                 <Input
                     id="accountSectionNumberInput"
                     value="{wizard>/accountSectionNumber}"
-                    placeholder="Enter Section Number" />
+                    placeholder="Enter Section Number"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -41,7 +82,8 @@
                 <Input
                     id="accountUWYearInput"
                     value="{wizard>/accountUWYear}"
-                    placeholder="Enter UW Year" />
+                    placeholder="Enter UW Year"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -49,24 +91,24 @@
                 <Input
                     id="accountLineOfBusinessInput"
                     value="{wizard>/accountLineOfBusiness}"
-                    placeholder="Enter Line of Business" />
+                    placeholder="Enter Line of Business"
+                />
             </VBox>
-
         </HBox>
-
 
         <!-- ROW 2 -->
         <HBox
             class="srtFilterRow"
             wrap="NoWrap"
-            alignItems="End">
-
+            alignItems="End"
+        >
             <VBox class="srtFilterField">
                 <Label text="Class of Business" />
                 <Input
                     id="accountClassOfBusinessInput"
                     value="{wizard>/accountClassOfBusiness}"
-                    placeholder="Enter Class of Business" />
+                    placeholder="Enter Class of Business"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -74,7 +116,8 @@
                 <Input
                     id="accountBusinessTypeInput"
                     value="{wizard>/accountBusinessType}"
-                    placeholder="Enter Business Type" />
+                    placeholder="Enter Business Type"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -84,7 +127,8 @@
                     value="{wizard>/accountStartPeriodDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date" />
+                    placeholder="Select Date"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -94,7 +138,8 @@
                     value="{wizard>/accountEndPeriodDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date" />
+                    placeholder="Select Date"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -102,24 +147,24 @@
                 <Input
                     id="accountFunctionInput"
                     value="{wizard>/accountFunction}"
-                    placeholder="Enter Account Function" />
+                    placeholder="Enter Account Function"
+                />
             </VBox>
-
         </HBox>
-
 
         <!-- ROW 3 -->
         <HBox
             class="srtFilterRow"
             wrap="NoWrap"
-            alignItems="End">
-
+            alignItems="End"
+        >
             <VBox class="srtFilterField">
                 <Label text="Created By" />
                 <Input
                     id="accountCreatedByInput"
                     value="{wizard>/accountCreatedBy}"
-                    placeholder="Enter Created By" />
+                    placeholder="Enter Created By"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -129,7 +174,8 @@
                     value="{wizard>/accountCreationDate}"
                     valueFormat="yyyy-MM-dd"
                     displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date" />
+                    placeholder="Select Date"
+                />
             </VBox>
 
             <VBox class="srtFilterField">
@@ -137,17 +183,16 @@
                 <Input
                     id="accountProcessRefIdInput"
                     value="{wizard>/accountProcessRefId}"
-                    placeholder="Enter Process Ref ID" />
+                    placeholder="Enter Process Ref ID"
+                />
             </VBox>
 
             <Button
                 text="Go"
                 type="Emphasized"
                 class="srtFilterGoButton"
-                press="onAccountGo" />
-
+                press="onAccountGo"
+            />
         </HBox>
-
     </VBox>
-
 </core:FragmentDefinition>

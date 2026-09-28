@@ -1,95 +1,116 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core"
->
+    xmlns:core="sap.ui.core">
 
-    <HBox
-        width="100%"
-        alignItems="End"
-        justifyContent="Start"
-    >
+    <VBox class="srtFilterContainer">
 
-        <!-- Business Partner -->
-        <VBox width="20rem">
-            <Label
-                text="Business Partner"
-                class="srtFieldLabel"
-            />
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            alignItems="Center"
+            justifyContent="Start"
+            class="sapUiTinyMarginBottom">
 
-            <Input
-                id="businessPartnerInput"
-                width="100%"
-                value="{wizard>/businessPartner}"
-                placeholder="Enter Business Partner"
-                showValueHelp="true"
-                valueHelpRequest="onBusinessPartnerValueHelp"
-            />
-        </VBox>
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon" />
 
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle" />
+            </HBox>
 
-        <!-- Space -->
-        <ToolbarSpacer width="2rem" />
+        </HBox>
 
 
-        <!-- Process Ref ID -->
-        <VBox width="20rem">
-            <Label
-                text="Process Ref ID"
-                class="srtFieldLabel"
-            />
+        <!-- FILTER ROW -->
+        <HBox
+            width="100%"
+            alignItems="End"
+            justifyContent="Start"
+            wrap="Wrap"
+            class="srtFilterRow">
 
-            <Input
-                id="processRefIdInput"
-                width="100%"
-                value="{wizard>/processRefId}"
-                placeholder="Enter Process Ref ID"
-                showValueHelp="false"
-                valueHelpRequest="onProcessRefIdValueHelp"
-            />
-        </VBox>
+            <!-- Business Partner -->
+            <VBox width="20rem">
+                <Label
+                    text="Business Partner"
+                    class="srtFieldLabel" />
 
-
-        <!-- Space -->
-        <ToolbarSpacer width="2rem" />
-
-
-        <!-- Target System -->
-        <VBox width="20rem">
-            <Label
-                text="Target System"
-                class="srtFieldLabel"
-            />
-
-            <Input
-                id="targetSystemInput"
-                width="100%"
-                value="{wizard>/targetSystem}"
-                placeholder="Enter Target System"
-                showValueHelp="true"
-                valueHelpRequest="onTargetSystemValueHelp"
-            />
-        </VBox>
+                <Input
+                    id="businessPartnerInput"
+                    width="100%"
+                    value="{wizard>/businessPartner}"
+                    placeholder="Enter Business Partner"
+                    showValueHelp="true"
+                    valueHelpRequest="onBusinessPartnerValueHelp" />
+            </VBox>
 
 
-        <!-- Space -->
-        <ToolbarSpacer width="2rem" />
+            <ToolbarSpacer width="2rem" />
 
 
-        <!-- Go Button -->
-        <VBox width="5rem">
-            <Label
-                text=" "
-                class="srtFieldLabel"
-            />
+            <!-- Process Ref ID -->
+            <VBox width="20rem">
+                <Label
+                    text="Process Ref ID"
+                    class="srtFieldLabel" />
 
-            <Button
-                text="Go"
-                type="Emphasized"
-                width="100%"
-                press="onBPGo"
-            />
-        </VBox>
+                <Input
+                    id="processRefIdInput"
+                    width="100%"
+                    value="{wizard>/processRefId}"
+                    placeholder="Enter Process Ref ID" />
+            </VBox>
 
-    </HBox>
+
+            <ToolbarSpacer width="2rem" />
+
+
+            <!-- Target System -->
+            <VBox width="20rem">
+                <Label
+                    text="Target System"
+                    class="srtFieldLabel" />
+
+                <ComboBox
+                    id="rfcDestination"
+                    width="100%"
+                    selectedKey="{wizard>/rfcDestination}"
+                    items="{ZRI_SB_RIP_DATA>/RFC}"
+                    showSecondaryValues="false">
+
+                    <core:Item
+                        key="{ZRI_SB_RIP_DATA>rfcdest}"
+                        text="{ZRI_SB_RIP_DATA>rfcdest}" />
+
+                </ComboBox>
+            </VBox>
+
+
+            <ToolbarSpacer width="2rem" />
+
+
+            <!-- Go Button -->
+            <VBox width="5rem">
+
+                <Label
+                    text=" "
+                    class="srtFieldLabel" />
+
+                <Button
+                    text="Go"
+                    type="Emphasized"
+                    width="100%"
+                    press="onBPGo" />
+
+            </VBox>
+
+        </HBox>
+
+    </VBox>
 
 </core:FragmentDefinition>
