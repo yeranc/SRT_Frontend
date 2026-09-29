@@ -28,6 +28,11 @@
                 alignItems="Center"
                 wrap="Wrap"
             >
+                <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onTreatyProcessLog"
+                />
                 <CheckBox
                     text="Copy Again"
                     selected="{wizard>/copyAgain}"
