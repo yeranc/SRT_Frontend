@@ -5,64 +5,92 @@
     <Dialog
         id="accountCopyWithDialog"
         title="Copy Account With"
-        contentWidth="28rem"
+        contentWidth="25rem"
         draggable="true"
         resizable="false"
-        stretchOnPhone="true">
+        >
 
         <content>
+
             <VBox
-                class="sapUiMediumMargin"
-                width="100%">
+                 width="auto"
+    class="sapUiSmallMargin">
 
-                <!-- RFC DESTINATION -->
-                <Label
-                    text="RFC Destination:"
-                    labelFor="copyWithRfcInput" />
-
-                <Input
-                    id="copyWithRfcInput"
-                    value="{wizard>/copyWithRfcDestination}"
-                    showValueHelp="true"
-                    valueHelpRequest="onCopyWithRfcValueHelp"
+                <!-- TARGET SYSTEM -->
+                <VBox
                     width="100%"
-                    class="sapUiSmallMarginBottom" />
+                    class="sapUiSmallMarginBottom">
+
+                    <Label
+                        text="Target System"
+                        labelFor="rfcDest" />
+
+                    <ComboBox
+                        id="rfcDest"
+                        width="100%"
+                        selectedKey="{wizard>/rfcDestination}"
+                        items="{ZRI_SB_RIP_DATA>/RFC}">
+
+                        <core:Item
+                            key="{ZRI_SB_RIP_DATA>rfcdest}"
+                            text="{ZRI_SB_RIP_DATA>rfcdest}" />
+
+                    </ComboBox>
+
+                </VBox>
 
 
                 <!-- TREATY FROM -->
-                <Label
-                    text="Treaty From:"
-                    labelFor="copyWithTreatyFrom" />
-
-                <Input
-                    id="copyWithTreatyFrom"
-                    value="{wizard>/copyWithTreatyFrom}"
+                <VBox
                     width="100%"
-                    class="sapUiSmallMarginBottom" />
+                    class="sapUiSmallMarginBottom">
+
+                    <Label
+                        text="Treaty From"
+                        labelFor="copyWithTreatyFrom" />
+
+                    <Input
+                        id="copyWithTreatyFrom"
+                        value="{wizard>/copyWithTreatyFrom}"
+                        width="100%" />
+
+                </VBox>
 
 
                 <!-- TREATY TO -->
-                <Label
-                    text="Treaty To:"
-                    labelFor="copyWithTreatyTo" />
-
-                <Input
-                    id="copyWithTreatyTo"
-                    value="{wizard>/copyWithTreatyTo}"
+                <VBox
                     width="100%"
-                    class="sapUiSmallMarginBottom" />
+                    class="sapUiSmallMarginBottom">
+
+                    <Label
+                        text="Treaty To"
+                        labelFor="copyWithTreatyTo" />
+
+                    <Input
+                        id="copyWithTreatyTo"
+                        value="{wizard>/copyWithTreatyTo}"
+                        width="100%" />
+
+                </VBox>
 
 
                 <!-- COPY AGAIN -->
-                <Label
-                    text="Copy Again:"
-                    labelFor="copyWithCopyAgain" />
+                <VBox
+                    width="100%"
+                    class="sapUiSmallMarginBottom">
 
-                <CheckBox
-                    id="copyWithCopyAgain"
-                    selected="{wizard>/copyWithCopyAgain}" />
+                    <Label
+                        text="Copy Again"
+                        labelFor="copyWithCopyAgain" />
+
+                    <CheckBox
+                        id="copyWithCopyAgain"
+                        selected="{wizard>/copyWithCopyAgain}" />
+
+                </VBox>
 
             </VBox>
+
         </content>
 
 

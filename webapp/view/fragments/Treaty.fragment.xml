@@ -26,6 +26,11 @@
             <HBox
                 alignItems="Center"
                 wrap="Wrap">
+                <Button
+    text="Process Log"
+    type="Transparent"
+    press="onProcessLogPress"
+/>
 
                 <CheckBox
                     text="Copy Again"

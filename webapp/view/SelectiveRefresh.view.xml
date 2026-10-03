@@ -135,7 +135,14 @@
                             selectedKey="{wizard>/groupId}"
                             change="onGroupIdChange"
                             items="{
-        path: '/ZRI_GRPID_VH'
+        path: '/ZRI_GRPID_VH',
+        filters: [{
+            filters: [
+                { path: 'GrpId', operator: 'NE', value1: 'CD' },
+                { path: 'GrpId', operator: 'NE', value1: 'INSOBJ' }
+            ],
+            and: true
+        }]
     }"
                         >
                             <core:Item

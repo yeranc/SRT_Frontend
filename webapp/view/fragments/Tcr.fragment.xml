@@ -31,7 +31,7 @@
                 <Button
                     text="Process Log"
                     type="Transparent"
-                    press="onTreatyProcessLog"
+                    press="onProcessLogPress"
                 />
                 <CheckBox
                     text="Copy Again"

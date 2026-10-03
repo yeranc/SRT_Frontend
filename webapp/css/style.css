@@ -933,3 +933,51 @@
 .srtCopyOptions {
     gap: 1.5rem;
 }
+.srtProcessLogDialog .sapMDialogSection {
+    background: #ffffff !important;
+}
+
+
+/* FULL RED PROCESS LOG HEADER */
+.srtProcessLogDialog .srtProcessLogHeader.sapMTB {
+    background: #6b1327 !important;
+    border: none !important;
+    box-shadow: none !important;
+    height: 3.25rem !important;
+    min-height: 3.25rem !important;
+    padding: 0 1rem !important;
+}
+
+
+/* WHITE TITLE */
+.srtProcessLogDialog .srtProcessLogHeader .sapMTitle {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    font-size: 1.3rem !important;
+}
+
+
+/* Table headings */
+.srtProcessLogDialog .sapMListTblHeaderCell {
+    background: #ffffff !important;
+    border-bottom: 1px solid rgba(107, 19, 39, 0.25) !important;
+}
+
+
+/* Table heading text */
+.srtProcessLogDialog .sapMListTblHeaderCell .sapMText {
+    color: #243447 !important;
+    font-weight: 600 !important;
+}
+
+
+/* Row line */
+.srtProcessLogDialog .sapMListTblCell {
+    border-bottom: 1px solid rgba(107, 19, 39, 0.15) !important;
+}
+
+
+/* Outer dialog border */
+.srtProcessLogDialog.sapMDialog {
+    border: 1px solid rgba(107, 19, 39, 0.20) !important;
+}

@@ -1,30 +1,37 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-
+    xmlns:core="sap.ui.core"
+>
     <VBox class="srtFilterContainer">
-
         <!-- HEADER -->
         <HBox
             width="100%"
             alignItems="Center"
             justifyContent="Start"
-            class="sapUiTinyMarginBottom">
-
+            class="sapUiTinyMarginBottom"
+        >
             <HBox alignItems="Center">
                 <core:Icon
                     src="sap-icon://filter"
                     size="1.4rem"
-                    class="srtSectionIcon" />
+                    class="srtSectionIcon"
+                />
 
                 <Title
                     text="Selection Criteria"
                     level="H3"
-                    class="srtSectionTitle" />
+                    class="srtSectionTitle"
+                />
+                <ToolbarSpacer width="65rem"></ToolbarSpacer>
+
+                <Button
+                    
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                />
             </HBox>
-
         </HBox>
-
 
         <!-- FILTER ROW -->
         <HBox
@@ -32,13 +39,14 @@
             alignItems="End"
             justifyContent="Start"
             wrap="Wrap"
-            class="srtFilterRow">
-
+            class="srtFilterRow"
+        >
             <!-- Business Partner -->
             <VBox width="20rem">
                 <Label
                     text="Business Partner"
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <Input
                     id="businessPartnerInput"
@@ -46,71 +54,66 @@
                     value="{wizard>/businessPartner}"
                     placeholder="Enter Business Partner"
                     showValueHelp="true"
-                    valueHelpRequest="onBusinessPartnerValueHelp" />
+                    valueHelpRequest="onBusinessPartnerValueHelp"
+                />
             </VBox>
 
-
             <ToolbarSpacer width="2rem" />
-
 
             <!-- Process Ref ID -->
             <VBox width="20rem">
                 <Label
                     text="Process Ref ID"
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <Input
                     id="processRefIdInput"
                     width="100%"
                     value="{wizard>/processRefId}"
-                    placeholder="Enter Process Ref ID" />
+                    placeholder="Enter Process Ref ID"
+                />
             </VBox>
 
-
             <ToolbarSpacer width="2rem" />
-
 
             <!-- Target System -->
             <VBox width="20rem">
                 <Label
                     text="Target System"
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <ComboBox
                     id="rfcDestination"
                     width="100%"
                     selectedKey="{wizard>/rfcDestination}"
                     items="{ZRI_SB_RIP_DATA>/RFC}"
-                    showSecondaryValues="false">
-
+                    showSecondaryValues="false"
+                >
                     <core:Item
                         key="{ZRI_SB_RIP_DATA>rfcdest}"
-                        text="{ZRI_SB_RIP_DATA>rfcdest}" />
-
+                        text="{ZRI_SB_RIP_DATA>rfcdest}"
+                    />
                 </ComboBox>
             </VBox>
 
-
             <ToolbarSpacer width="2rem" />
-
 
             <!-- Go Button -->
             <VBox width="5rem">
-
                 <Label
                     text=" "
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <Button
                     text="Go"
                     type="Emphasized"
                     width="100%"
-                    press="onBPGo" />
-
+                    press="onBPGo"
+                />
             </VBox>
-
         </HBox>
-
     </VBox>
-
 </core:FragmentDefinition>

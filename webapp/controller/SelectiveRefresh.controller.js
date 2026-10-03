@@ -63,7 +63,9 @@ sap.ui.define([
                     ]
                 }),
                 "wizard"
+                
             );
+
 
             /*
              * Debug OData requests from ZGS_SRT_SRV.
@@ -2760,6 +2762,14 @@ sap.ui.define([
                 )
             );
 
+            aFilters.push(
+    new Filter(
+        "iv_copy_with",
+        FilterOperator.EQ,
+        true
+    )
+);
+
 
             // IMPORTANT:
             // iv_rip_to is Nullable="false"
@@ -2787,26 +2797,40 @@ sap.ui.define([
                 {
                     filters: aFilters,
 
-                    success: function (oData) {
+  success: function (oData) {
 
-                        this._oBusyDialog.close();
+    this._oBusyDialog.close();
 
-                        var sProcessId = "";
+    var sProcessId = "";
 
-                        if (
-                            oData.results &&
-                            oData.results.length > 0
-                        ) {
-                            sProcessId =
-                                oData.results[0].process_id;
-                        }
+    if (
+        oData.results &&
+        oData.results.length > 0
+    ) {
+        sProcessId =
+            oData.results[0].process_id;
+    }
 
-                        MessageToast.show(
-                            "Execution started successfully. Process ID: " +
-                            sProcessId
-                        );
+    if (sProcessId) {
 
-                    }.bind(this),
+        oModel.setProperty(
+            "/accountProcessRefId",
+            sProcessId
+        );
+
+    }
+
+    MessageToast.show(
+        "Execution started successfully. Process ID: " +
+        sProcessId
+    );
+    if (this._pAccountCopyWithDialog) {
+        this._pAccountCopyWithDialog.then(function (oDialog) {
+            oDialog.close();
+        });
+    }
+
+}.bind(this),
 
 
                     error: function (oError) {
@@ -2954,6 +2978,796 @@ sap.ui.define([
                 aFilters
             );
         },
+//  onTreatyProcessLog: function () {
+
+//     var oWizardModel =
+//         this.getView().getModel("wizard");
+
+//     var aSelectedResults =
+//         oWizardModel.getProperty("/selectedResults") || [];
+
+//     if (!aSelectedResults.length) {
+
+//         MessageToast.show(
+//             "Please select at least one Treaty row."
+//         );
+
+//         return;
+//     }
+
+
+//     // ==========================================
+//     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
+//     // ==========================================
+//     var aProcessIds = [];
+
+//     aSelectedResults.forEach(function (oRow) {
+
+//         var sProcessId =
+//             oRow.processingID;
+
+//         if (
+//             sProcessId &&
+//             aProcessIds.indexOf(sProcessId) === -1
+//         ) {
+//             aProcessIds.push(sProcessId);
+//         }
+
+//     });
+
+
+//     if (!aProcessIds.length) {
+
+//         MessageToast.show(
+//             "No Process Ref ID available for the selected rows."
+//         );
+
+//         return;
+//     }
+
+
+//     console.log(
+//         "SELECTED PROCESS IDS:",
+//         aProcessIds
+//     );
+
+
+//     var oModel =
+//         this.getView()
+//             .getModel("ZRI_S_TTY_DATA");
+
+
+//     if (!oModel) {
+
+//         MessageToast.show(
+//             "Treaty service is not available."
+//         );
+
+//         return;
+//     }
+
+
+//     // ==========================================
+//     // CREATE OR FILTER:
+//     //
+//     // ProcessingId = X
+//     // OR
+//     // ProcessingId = Y
+//     // OR
+//     // ProcessingId = Z
+//     // ==========================================
+//     var aProcessFilters =
+//         aProcessIds.map(function (sProcessId) {
+
+//             return new Filter(
+//                 "ProcessingId",
+//                 FilterOperator.EQ,
+//                 sProcessId
+//             );
+
+//         });
+
+
+//     var oProcessFilter =
+//         new Filter({
+//             filters: aProcessFilters,
+//             and: false
+//         });
+
+
+//     this._oBusyDialog.open();
+
+
+//     oModel.read(
+//         "/ProcessLog",
+//         {
+//             filters: [oProcessFilter],
+
+//             success: function (oData) {
+
+//                 this._oBusyDialog.close();
+
+//                 console.log(
+//                     "TREATY PROCESS LOG:",
+//                     oData.results
+//                 );
+
+//                 this._openTreatyProcessLogDialog(
+//                     oData.results || []
+//                 );
+
+//             }.bind(this),
+
+//             error: function (oError) {
+
+//                 this._oBusyDialog.close();
+
+//                 console.error(
+//                     "PROCESS LOG ERROR:",
+//                     oError
+//                 );
+
+//                 MessageToast.show(
+//                     "Unable to load Process Log."
+//                 );
+
+//             }.bind(this)
+//         }
+//     );
+// },
+// _openTreatyProcessLogDialog: function (aLogs) {
+
+//     var oLogModel =
+//         new JSONModel({
+//             logs: aLogs
+//         });
+
+
+//     if (!this._oTreatyProcessLogDialog) {
+
+//         this._oTreatyProcessLogDialog =
+//             new sap.m.Dialog({
+
+//                 title: "Treaty Process Log",
+
+//                 contentWidth: "70rem",
+
+//                 contentHeight: "30rem",
+
+//                 content: [
+
+//                     new sap.m.Table({
+
+//                         columns: [
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Process Ref ID"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Message Type"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Message"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Source Number"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Target Number"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "System"
+//                                     })
+//                             })
+
+//                         ],
+
+//                         items: {
+//                             path: "log>/logs",
+
+//                             template:
+//                                 new sap.m.ColumnListItem({
+
+//                                     cells: [
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>ProcessingId}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Type}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Message}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>SourceNumber}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>TargetNumber}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Systemm}"
+//                                         })
+
+//                                     ]
+//                                 })
+//                         }
+
+//                     })
+
+//                 ],
+
+//                 endButton:
+//                     new sap.m.Button({
+
+//                         text: "Close",
+
+//                         press: function () {
+//                             this._oTreatyProcessLogDialog.close();
+//                         }.bind(this)
+
+//                     })
+
+//             });
+
+
+//         this.getView()
+//             .addDependent(
+//                 this._oTreatyProcessLogDialog
+//             );
+//     }
+
+
+//     this._oTreatyProcessLogDialog
+//         .setModel(
+//             oLogModel,
+//             "log"
+//         );
+
+
+//     this._oTreatyProcessLogDialog.open();
+// },
+// onRIPProcessLog: function () {
+
+//     var oWizardModel =
+//         this.getView().getModel("wizard");
+
+//     var aSelectedResults =
+//         oWizardModel.getProperty("/selectedResults") || [];
+
+//     if (!aSelectedResults.length) {
+
+//         MessageToast.show(
+//             "Please select at least one RIP row."
+//         );
+
+//         return;
+//     }
+
+
+//     // ==========================================
+//     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
+//     // ==========================================
+//     var aProcessIds = [];
+
+//     aSelectedResults.forEach(function (oRow) {
+
+//         var sProcessId =
+//             oRow.processingID;
+
+//         if (
+//             sProcessId &&
+//             aProcessIds.indexOf(sProcessId) === -1
+//         ) {
+//             aProcessIds.push(sProcessId);
+//         }
+
+//     });
+
+
+//     if (!aProcessIds.length) {
+
+//         MessageToast.show(
+//             "No Process Ref ID available for the selected rows."
+//         );
+
+//         return;
+//     }
+
+
+//     console.log(
+//         "SELECTED PROCESS IDS:",
+//         aProcessIds
+//     );
+
+
+//     var oModel =
+//         this.getView()
+//             .getModel("ZRI_SB_RIP_DATA");
+
+
+//     if (!oModel) {
+
+//         MessageToast.show(
+//             "RIP service is not available."
+//         );
+
+//         return;
+//     }
+
+
+//     // ==========================================
+//     // CREATE OR FILTER:
+//     //
+//     // ProcessingId = X
+//     // OR
+//     // ProcessingId = Y
+//     // OR
+//     // ProcessingId = Z
+//     // ==========================================
+//     var aProcessFilters =
+//         aProcessIds.map(function (sProcessId) {
+
+//             return new Filter(
+//                 "ProcessingId",
+//                 FilterOperator.EQ,
+//                 sProcessId
+//             );
+
+//         });
+
+
+//     var oProcessFilter =
+//         new Filter({
+//             filters: aProcessFilters,
+//             and: false
+//         });
+
+
+//     this._oBusyDialog.open();
+
+
+//     oModel.read(
+//         "/ProcessLog",
+//         {
+//             filters: [oProcessFilter],
+
+//             success: function (oData) {
+
+//                 this._oBusyDialog.close();
+
+//                 console.log(
+//                     "RIP PROCESS LOG:",
+//                     oData.results
+//                 );
+
+//                 this._openRIPProcessLogDialog(
+//                     oData.results || []
+//                 );
+
+//             }.bind(this),
+
+//             error: function (oError) {
+
+//                 this._oBusyDialog.close();
+
+//                 console.error(
+//                     "PROCESS LOG ERROR:",
+//                     oError
+//                 );
+
+//                 MessageToast.show(
+//                     "Unable to load Process Log."
+//                 );
+
+//             }.bind(this)
+//         }
+//     );
+// },
+// _openRIPProcessLogDialog: function (aLogs) {
+
+//     var oLogModel =
+//         new JSONModel({
+//             logs: aLogs
+//         });
+
+
+//     if (!this._oRIPProcessLogDialog) {
+
+//         this._oRIPProcessLogDialog =
+//             new sap.m.Dialog({
+
+//                 title: "RIP Process Log",
+
+//                 contentWidth: "70rem",
+
+//                 contentHeight: "30rem",
+
+//                 content: [
+
+//                     new sap.m.Table({
+
+//                         columns: [
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Process Ref ID"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Message Type"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Message"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Source Number"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "Target Number"
+//                                     })
+//                             }),
+
+//                             new sap.m.Column({
+//                                 header:
+//                                     new sap.m.Text({
+//                                         text: "System"
+//                                     })
+//                             })
+
+//                         ],
+
+//                         items: {
+//                             path: "log>/logs",
+
+//                             template:
+//                                 new sap.m.ColumnListItem({
+
+//                                     cells: [
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>ProcessingId}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Type}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Message}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>SourceNumber}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>TargetNumber}"
+//                                         }),
+
+//                                         new sap.m.Text({
+//                                             text:
+//                                                 "{log>Systemm}"
+//                                         })
+
+//                                     ]
+//                                 })
+//                         }
+
+//                     })
+
+//                 ],
+
+//                 endButton:
+//                     new sap.m.Button({
+
+//                         text: "Close",
+
+//                         press: function () {
+//                             this._oRIPProcessLogDialog.close();
+//                         }.bind(this)
+
+//                     })
+
+//             });
+
+
+//         this.getView()
+//             .addDependent(
+//                 this._oRIPProcessLogDialog
+//             );
+//     }
+
+
+//     this._oRIPProcessLogDialog
+//         .setModel(
+//             oLogModel,
+//             "log"
+//         );
+
+
+//     this._oRIPProcessLogDialog.open();
+// },
+onProcessLogPress: function () {
+
+    var oWizardModel =
+        this.getView().getModel("wizard");
+
+    var sGroupId =
+        oWizardModel.getProperty("/groupId");
+
+    var aSelectedRows =
+        oWizardModel.getProperty("/selectedResults") || [];
+
+    if (!aSelectedRows.length) {
+        MessageToast.show(
+            "Please select at least one row."
+        );
+        return;
+    }
+
+    var oResultConfig =
+        this._getResultTableConfig(sGroupId);
+
+    if (!oResultConfig) {
+        MessageToast.show(
+            "Process Log configuration not found."
+        );
+        return;
+    }
+
+    var sObjectType = "";
+
+    switch (sGroupId) {
+
+        case "A":
+            sObjectType = "ACCOUNT";
+            break;
+
+        case "T":
+            sObjectType = "TREATY";
+            break;
+
+        case "TCR":
+            sObjectType = "TCR";
+            break;
+
+        case "RIP":
+            sObjectType = "RIP";
+            break;
+
+        case "B":
+            sObjectType = "BP";
+            break;
+
+        case "L":
+            sObjectType = "LOSS";
+            break;
+
+        default:
+            MessageToast.show(
+                "Process Log not configured for this object."
+            );
+            return;
+    }
+
+
+    // =============================================
+    // Build RootSourceNumber filters
+    // =============================================
+    var aRootFilters = [];
+
+    aSelectedRows.forEach(function (oRow) {
+
+        var sRoot =
+            oRow[oResultConfig.sourceProperty];
+
+        if (sRoot) {
+
+            aRootFilters.push(
+                new Filter(
+                    "RootSourceNumber",
+                    FilterOperator.EQ,
+                    String(sRoot)
+                )
+            );
+        }
+
+    });
+
+
+    if (!aRootFilters.length) {
+        MessageToast.show(
+            "No source object found."
+        );
+        return;
+    }
+
+
+    // =============================================
+    // Object type filter
+    // =============================================
+    var oObjectTypeFilter =
+        new Filter(
+            "ObjectType",
+            FilterOperator.EQ,
+            sObjectType
+        );
+
+
+    // =============================================
+    // Root 1 OR Root 2 OR Root 3
+    // =============================================
+    var oRootFilter =
+        new Filter({
+            filters: aRootFilters,
+            and: false
+        });
+
+
+    // =============================================
+    // Final:
+    // ObjectType AND (Root1 OR Root2 OR Root3)
+    // =============================================
+    var oFinalFilter =
+        new Filter({
+            filters: [
+                oObjectTypeFilter,
+                oRootFilter
+            ],
+            and: true
+        });
+
+
+    var oModel =
+        this.getView().getModel(
+            "ZGS_SRT_SRV"
+        );
+
+
+    if (!oModel) {
+        MessageToast.show(
+            "Process Log service is not available."
+        );
+        return;
+    }
+
+
+    this._oBusyDialog.open();
+
+
+    oModel.read(
+        "/ProcessLogSet",
+        {
+            filters: [
+                oFinalFilter
+            ],
+
+            success: function (oData) {
+
+                this._oBusyDialog.close();
+
+                console.log(
+                    "PROCESS LOG RESULT:",
+                    oData.results
+                );
+
+                this._openProcessLogDialog(
+    "Process Log",
+    oData.results || []
+);
+
+            }.bind(this),
+
+            error: function (oError) {
+
+                this._oBusyDialog.close();
+
+                console.error(
+                    "PROCESS LOG ERROR:",
+                    oError
+                );
+
+                MessageToast.show(
+                    "Unable to load Process Log."
+                );
+
+            }.bind(this)
+        }
+    );
+},
+_openProcessLogDialog: function (sTitle, aLogs) {
+
+    if (!this._pProcessLogDialog) {
+
+        this._pProcessLogDialog =
+            this.loadFragment({
+                name: "srt.app.view.fragments.ProcessLog"
+            });
+    }
+
+    this._pProcessLogDialog.then(function (oDialog) {
+
+        var oLogModel = new JSONModel({
+            logs: aLogs
+        });
+
+        oDialog.setModel(
+            oLogModel,
+            "processLog"
+        );
+
+        oDialog.setTitle(sTitle);
+
+        oDialog.open();
+
+    });
+},
+onProcessLogClose: function () {
+
+    if (this._pProcessLogDialog) {
+
+        this._pProcessLogDialog.then(function (oDialog) {
+            oDialog.close();
+        });
+
+    }
+}
+
     });
 
 });

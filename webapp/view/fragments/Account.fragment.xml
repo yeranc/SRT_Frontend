@@ -25,6 +25,11 @@
             </HBox>
             <HBox alignItems="Center">
                 <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                />
+                <Button
                     id="accountCopywith"
                     text="Copy with Treaty"
                     type="Transparent"
