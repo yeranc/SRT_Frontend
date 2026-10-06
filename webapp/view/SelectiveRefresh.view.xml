@@ -123,34 +123,46 @@
                 >
                     <!-- GROUP ID -->
                     <VBox class="srtField srtFieldGroup">
-                        <Label
-                            text="Group Id"
-                            required="true"
-                            class="srtFieldLabel"
-                        />
 
-                        <Select
-                            id="groupIdSelect"
-                            width="50%"
-                            selectedKey="{wizard>/groupId}"
-                            change="onGroupIdChange"
-                            items="{
-        path: '/ZRI_GRPID_VH',
-        filters: [{
-            filters: [
-                { path: 'GrpId', operator: 'NE', value1: 'CD' },
-                { path: 'GrpId', operator: 'NE', value1: 'INSOBJ' }
-            ],
-            and: true
-        }]
-    }"
-                        >
-                            <core:Item
-                                key="{GrpId}"
-                                text="{GrpId} - {Description}"
-                            />
-                        </Select>
-                    </VBox>
+        <Label
+            text="Group Id"
+            required="true"
+            class="srtFieldLabel"
+        />
+
+        <ComboBox
+            id="groupIdSelect"
+            width="100%"
+            selectedKey="{wizard>/groupId}"
+            placeholder="Please select an object"
+            change="onGroupIdChange"
+            items="{
+                path: '/ZRI_GRPID_VH',
+                filters: [{
+                    filters: [
+                        {
+                            path: 'GrpId',
+                            operator: 'NE',
+                            value1: 'CD'
+                        },
+                        {
+                            path: 'GrpId',
+                            operator: 'NE',
+                            value1: 'INSOBJ'
+                        }
+                    ],
+                    and: true
+                }]
+            }">
+
+            <core:Item
+                key="{GrpId}"
+                text="{GrpId} - {Description}"
+            />
+
+        </ComboBox>
+
+    </VBox>
 
                     <!-- PROCESS ID -->
                     <!-- <VBox class="srtField">

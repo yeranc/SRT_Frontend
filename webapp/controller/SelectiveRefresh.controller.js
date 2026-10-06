@@ -450,287 +450,218 @@ sap.ui.define([
                 return;
             }
 
+var iSuccess = 0;
+var iFailed = 0;
 
-            var iIndex = 0;
-            var iSuccess = 0;
-            var iFailed = 0;
+console.log(
+    "TOTAL SELECTED:",
+    aSelectedResults.length,
+    aSelectedResults
+);
 
 
-            console.log(
-                "TOTAL SELECTED:",
-                aSelectedResults.length,
-                aSelectedResults
+// ==========================================
+// COLLECT ALL SELECTED OBJECT KEYS
+// ==========================================
+var aObjectKeys = aSelectedResults
+    .map(function (oItem) {
+        return oItem[oConfig.sourceProperty];
+    })
+    .filter(function (vKey) {
+        return vKey !== null &&
+               vKey !== undefined &&
+               String(vKey).trim() !== "";
+    })
+    .map(function (vKey) {
+        return String(vKey).trim();
+    });
+this._oBusyDialog.setText(
+        "Processing objects..."
+    );
+
+    this._oBusyDialog.open();
+
+    console.log("Busy dialog opened");
+
+// ==========================================
+// VALIDATE
+// ==========================================
+if (!aObjectKeys.length) {
+
+    this._oBusyDialog.close();
+
+    MessageToast.show(
+        "No valid objects selected."
+    );
+
+    return;
+}
+
+
+console.log(
+    "ALL OBJECT KEYS:",
+    aObjectKeys
+);
+
+
+// ==========================================
+// SEND ALL OBJECTS IN ONE RIPSet REQUEST
+// ==========================================
+var sObjectKeys = aObjectKeys.join(",");
+
+console.log(
+    "OBJECT KEYS SENT TO RIPSet:",
+    sObjectKeys
+);
+
+
+var aFilters = [];
+
+
+aFilters.push(
+    new Filter(
+        "iv_grp_id",
+        FilterOperator.EQ,
+        sGroupId
+    )
+);
+
+
+aFilters.push(
+    new Filter(
+        "iv_rfc",
+        FilterOperator.EQ,
+        sRfcDestination
+    )
+);
+
+
+aFilters.push(
+    new Filter(
+        "iv_copy_again",
+        FilterOperator.EQ,
+        bCopyAgain
+    )
+);
+
+
+aFilters.push(
+    new Filter(
+        "iv_rip_from",
+        FilterOperator.EQ,
+        sObjectKeys
+    )
+);
+
+
+// ==========================================
+// ONE RIPSet CALL ONLY
+// ==========================================
+oExecutionModel.read(
+    "/RIPSet",
+    {
+        filters: aFilters,
+
+        success: function (oData) {
+
+    console.log("RIPSet SUCCESS");
+    console.log("Objects:", sObjectKeys);
+    console.log("Response:", oData);
+
+    var sProcessId =
+        oData.results &&
+        oData.results.length > 0
+            ? oData.results[0].process_id
+            : "NO PROCESS ID";
+
+    console.log("ONE PROCESS ID:", sProcessId);
+
+    iSuccess = aObjectKeys.length;
+
+    // ==========================================
+    // KEEP BUSY DIALOG OPEN WHILE PROCESSING
+    // ==========================================
+    this._oBusyDialog.setText(
+        "Processing " +
+        iSuccess +
+        " object(s)..."
+    );
+
+    // ==========================================
+    // REFRESH RESULT TABLE AFTER PROCESSING
+    // ==========================================
+
+    var oController = this;
+
+    setTimeout(function () {
+
+        console.log(
+            "Refreshing result table after execution..."
+        );
+
+        if (sGroupId === "B") {
+            oController.onBPGo();
+        }
+        else if (sGroupId === "A") {
+            oController.onAccountGo();
+        }
+        else if (sGroupId === "T") {
+            oController.onTreatyGo();
+        }
+        else if (sGroupId === "TCR") {
+            oController.onTCRGo();
+        }
+        else if (sGroupId === "RIP") {
+
+            var oRipModel =
+                oController.getView()
+                    .getModel("ZRI_SB_RIP_DATA");
+
+            if (oRipModel) {
+                oRipModel.refresh(true);
+            }
+
+            oController.onRIPGo();
+        }
+
+        // ==========================================
+        // PROCESSING COMPLETED
+        // ==========================================
+
+        oController._oBusyDialog.close();
+
+        MessageToast.show(
+            iSuccess +
+            " object(s) processed successfully under Processing ID: " +
+            sProcessId
+        );
+
+        console.log(
+            "Result table refresh completed."
+        );
+
+    }, 5000);
+
+}.bind(this),
+
+        error: function (oError) {
+
+            console.error(
+                "RIPSet FAILED:",
+                oError
             );
 
 
-            this._oBusyDialog.open();
+            this._oBusyDialog.close();
 
 
-            var fnExecuteNext = function () {
+            MessageToast.show(
+                "Execution failed."
+            );
 
-                // ==========================================
-                // ALL SELECTED OBJECTS FINISHED
-                // ==========================================
-                if (iIndex >= aSelectedResults.length) {
-
-                    this._oBusyDialog.close();
-
-                    MessageToast.show(
-                        iSuccess +
-                        " succeeded, " +
-                        iFailed +
-                        " failed."
-                    );
-
-
-                    // ==========================================
-                    // REFRESH RESULT TABLE ONLY ONCE
-                    // ==========================================
-                    if (sGroupId === "B") {
-
-                        this.onBPGo();
-
-                    }
-                    else if (sGroupId === "A") {
-
-                        this.onAccountGo();
-
-                    }
-                    else if (sGroupId === "T") {
-
-                        this.onTreatyGo();
-
-                    }
-                    else if (sGroupId === "TCR") {
-
-                        this.onTCRGo();
-
-                    }
-                    else if (sGroupId === "RIP") {
-
-                        var oRipModel =
-                            this.getView()
-                                .getModel("ZRI_SB_RIP_DATA");
-
-                        if (oRipModel) {
-                            oRipModel.refresh(true);
-                        }
-
-                        this.onRIPGo();
-                    }
-
-                    return;
-                }
-
-
-                // ==========================================
-                // CURRENT SELECTED ROW
-                // ==========================================
-                var oSelectedResult =
-                    aSelectedResults[iIndex];
-
-
-                var vObjectKey =
-                    oSelectedResult[
-                    oConfig.sourceProperty
-                    ];
-
-
-                // ==========================================
-                // VALIDATE OBJECT KEY
-                // ==========================================
-                if (
-                    vObjectKey === null ||
-                    vObjectKey === undefined ||
-                    String(vObjectKey).trim() === ""
-                ) {
-
-                    console.error(
-                        "Invalid object key:",
-                        {
-                            groupId: sGroupId,
-                            sourceProperty:
-                                oConfig.sourceProperty,
-                            selectedResult:
-                                oSelectedResult
-                        }
-                    );
-
-                    iFailed++;
-                    iIndex++;
-
-                    fnExecuteNext.call(this);
-
-                    return;
-                }
-
-
-                var sObjectKey =
-                    String(vObjectKey).trim();
-
-
-                console.log(
-                    "====================================="
-                );
-
-                console.log(
-                    "Executing " +
-                    (iIndex + 1) +
-                    " of " +
-                    aSelectedResults.length
-                );
-
-                console.log(
-                    "Group ID:",
-                    sGroupId
-                );
-
-                console.log(
-                    "Source Property:",
-                    oConfig.sourceProperty
-                );
-
-                console.log(
-                    "Object Key:",
-                    sObjectKey
-                );
-
-                console.log(
-                    "RFC:",
-                    sRfcDestination
-                );
-
-                console.log(
-                    "Copy Again:",
-                    bCopyAgain
-                );
-
-                console.log(
-                    "Selected Row:",
-                    oSelectedResult
-                );
-
-                console.log(
-                    "====================================="
-                );
-
-
-                // ==========================================
-                // BUILD FILTERS FOR CURRENT OBJECT
-                // ==========================================
-                var aFilters = [];
-
-
-                aFilters.push(
-                    new Filter(
-                        "iv_grp_id",
-                        FilterOperator.EQ,
-                        sGroupId
-                    )
-                );
-
-
-                aFilters.push(
-                    new Filter(
-                        "iv_rfc",
-                        FilterOperator.EQ,
-                        sRfcDestination
-                    )
-                );
-
-
-                aFilters.push(
-                    new Filter(
-                        "iv_copy_again",
-                        FilterOperator.EQ,
-                        bCopyAgain
-                    )
-                );
-
-
-                aFilters.push(
-                    new Filter(
-                        "iv_rip_from",
-                        FilterOperator.EQ,
-                        sObjectKey
-                    )
-                );
-
-
-                // ==========================================
-                // EXECUTE CURRENT OBJECT
-                // ==========================================
-                oExecutionModel.read(
-                    "/RIPSet",
-                    {
-                        filters: aFilters,
-
-                        success: function (oData) {
-
-                            console.log(
-                                "SUCCESS:",
-                                sObjectKey,
-                                oData
-                            );
-
-                            iSuccess++;
-                            iIndex++;
-
-
-                            // ==========================================
-                            // WAIT BEFORE NEXT EXECUTION
-                            // Treaty backend may still be processing
-                            // ==========================================
-                            var iDelay = 1000;
-
-                            if (sGroupId === "T") {
-                                iDelay = 1500;
-                            }
-                            else if (sGroupId === "TCR") {
-                                iDelay = 3500;
-                            }
-
-
-                            setTimeout(function () {
-
-                                fnExecuteNext.call(this);
-
-                            }.bind(this), iDelay);
-
-                        }.bind(this),
-
-
-                        error: function (oError) {
-
-                            console.error(
-                                "FAILED:",
-                                sObjectKey,
-                                oError
-                            );
-
-                            iFailed++;
-                            iIndex++;
-
-
-                            // Continue with next selected object
-                            setTimeout(function () {
-
-                                fnExecuteNext.call(this);
-
-                            }.bind(this), 2000);
-
-                        }.bind(this)
-                    }
-                );
-
-            }.bind(this);
-
-
-            // ==========================================
-            // START FIRST SELECTED OBJECT
-            // ==========================================
-            fnExecuteNext();
-
+        }.bind(this)
+    }
+);
         },
 
 
@@ -2797,6 +2728,8 @@ sap.ui.define([
             oExecutionModel.read(
                 "/RIPSet",
                 {
+         
+         
                     filters: aFilters,
 
   success: function (oData) {
