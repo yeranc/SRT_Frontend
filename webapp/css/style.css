@@ -844,45 +844,54 @@
    FILTERS - MATCH COMPACT SECOND SCREENSHOT
    ========================================================= */
 
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
 .srtFilterContainer {
     width: 100%;
     box-sizing: border-box;
 }
 
-/* The wrapping row */
 .srtFilterRow {
-    width: 100%;
-    column-gap: 2rem;
-    row-gap: 0.35rem;   /* THIS controls Treaty row-to-row spacing */
+    width: 100% !important;
+
+    display: flex !important;
+    flex-wrap: wrap !important;
+
+    column-gap: 2rem !important;
+    row-gap: 1.25rem !important;
+
     box-sizing: border-box;
+    align-items: flex-start !important;
 }
 
-/* 5 fields per row */
 .srtFilterField {
     width: calc((100% - 8rem) / 5) !important;
     min-width: 0 !important;
+
+    flex: 0 0 calc((100% - 8rem) / 5) !important;
+
     box-sizing: border-box;
+
+    margin-bottom: 0.5rem !important;
 }
 
-/* Labels */
 .srtFilterField .sapMLabel {
     color: #40566f !important;
     font-size: 0.9rem !important;
     margin-bottom: 0.18rem !important;
 }
 
-/* Input + DatePicker */
 .srtFilterField .sapMInputBase {
     width: 100% !important;
 }
 
-/* Compact control height */
 .srtFilterField .sapMInputBaseContentWrapper {
     height: 2.1rem !important;
     min-height: 2.1rem !important;
 }
 
-/* Input text area */
 .srtFilterField .sapMInputBaseInner {
     height: 2rem !important;
     line-height: 2rem !important;
