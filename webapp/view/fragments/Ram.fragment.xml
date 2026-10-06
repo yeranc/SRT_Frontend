@@ -1,0 +1,126 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="srtFilterContainer">
+
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            class="sapUiTinyMarginBottom">
+
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon" />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle" />
+            </HBox>
+
+            <HBox
+                alignItems="Center"
+                wrap="Wrap">
+
+                <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy Again"
+                    selected="{wizard>/copyAgain}"
+                    enabled="{wizard>/copyAgainEnabled}"
+                    class="sapUiTinyMarginEnd" />
+
+
+            </HBox>
+
+        </HBox>
+
+
+        <!-- RIP FILTER ROW -->
+        <HBox
+            class="srtFilterRow"
+            wrap="Wrap"
+            alignItems="End"
+            justifyContent="Start">
+
+
+            <!-- RIP NUMBER -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="External System ID"
+                    class="srtFieldLabel" 
+                    />
+
+                <Input
+                    id="ExtNumberInput"
+                    value="{wizard>/extNumber}"
+                    placeholder="Enter External Sys ID"
+                    showValueHelp="true"
+                    valueHelpRequest="onRIPValueHelp" />
+
+            </VBox>
+
+
+            <!-- CREATED BY -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="External ID"
+                    class="srtFieldLabel" />
+
+                <Input
+                    value="{wizard>/ripCreatedBy}"
+                    placeholder="External ID" />
+
+            </VBox>
+
+
+            <!-- CREATION DATE -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="Target RAM"
+                    class="srtFieldLabel" />
+
+                <Input
+                    value="{wizard>/ripCreationDate}"
+                    placeholder="Target RAM" />
+
+            </VBox>
+
+
+            <!-- PROCESS REF ID -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="Process Ref ID"
+                    class="srtFieldLabel" />
+
+                <Input
+                    value="{wizard>/ripProcessRefId}"
+                    placeholder="Enter Process Ref ID" />
+
+            </VBox>
+
+
+            <Button
+                text="Go"
+                type="Emphasized"
+                press="onRIPGo"
+                class="srtGoButton" />
+
+        </HBox>
+
+    </VBox>
+
+</core:FragmentDefinition>

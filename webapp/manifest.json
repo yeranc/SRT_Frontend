@@ -120,6 +120,24 @@
           "localUri": "localService/ZRI_SB_TCR_DATA/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZRI_S_RAM_DATA_V2_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_RAM_DATA_V2_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZRI_S_RAM_DATA_V2/ZRI_S_RAM_DATA_V2_VAN.xml"
+        }
+      },
+      "ZRI_S_RAM_DATA_V2": {
+        "uri": "/sap/opu/odata/sap/ZRI_S_RAM_DATA_V2/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZRI_S_RAM_DATA_V2_VAN"
+          ],
+          "localUri": "localService/ZRI_S_RAM_DATA_V2/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -200,6 +218,11 @@
       },
       "ZRI_SB_TCR_DATA": {
         "dataSource": "ZRI_SB_TCR_DATA",
+        "preload": true,
+        "settings": {}
+      },
+      "ZRI_S_RAM_DATA_V2": {
+        "dataSource": "ZRI_S_RAM_DATA_V2",
         "preload": true,
         "settings": {}
       }

@@ -336,6 +336,8 @@ sap.ui.define([
                 sFragmentName = "srt.app.view.fragments.Rip";
             } else if (sGroupId === "TCR") {
                 sFragmentName = "srt.app.view.fragments.Tcr";
+            } else if (sGroupId === "RAM") {
+                sFragmentName = "srt.app.view.fragments.Ram";
             } else {
                 console.log("No selection fragment configured for:", sGroupId);
                 return;

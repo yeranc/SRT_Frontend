@@ -57,6 +57,10 @@ server:
             url: http://mgss81a.aws.msg.de:44300
             client: '800'
             destination: T30onPrem
+          - path: /sap/opu/odata/sap/ZRI_S_RAM_DATA_V2/
+            url: http://mgss81a.aws.msg.de:44300
+            client: '800'
+            destination: T30onPrem
     - name: sap-fe-mockserver
       beforeMiddleware: csp
       configuration:
@@ -90,6 +94,10 @@ server:
             metadataPath: ./webapp/localService/ZRI_SB_TCR_DATA/metadata.xml
             mockdataPath: ./webapp/localService/ZRI_SB_TCR_DATA/data
             generateMockData: true
+          - urlPath: /sap/opu/odata/sap/ZRI_S_RAM_DATA_V2
+            metadataPath: ./webapp/localService/ZRI_S_RAM_DATA_V2/metadata.xml
+            mockdataPath: ./webapp/localService/ZRI_S_RAM_DATA_V2/data
+            generateMockData: true
         annotations:
           - localPath: ./webapp/localService/mainService/ZRI_SB_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_DATA_VAN',Version='0001')/$value/
@@ -103,6 +111,8 @@ server:
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_RIP_DATA_VAN',Version='0001')/$value/
           - localPath: ./webapp/localService/ZRI_SB_TCR_DATA/ZRI_SB_TCR_DATA_VAN.xml
             urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_SB_TCR_DATA_VAN',Version='0001')/$value/
+          - localPath: ./webapp/localService/ZRI_S_RAM_DATA_V2/ZRI_S_RAM_DATA_V2_VAN.xml
+            urlPath: /sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_RAM_DATA_V2_VAN',Version='0001')/$value/
 builder:
   resources:
     excludes:
