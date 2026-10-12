@@ -53,6 +53,10 @@ sap.ui.define([
                     copyLoss: false,
                     copyAccount: false,
                     copyAgainEnabled: false,
+                    copyLossEventAgain: false,
+                    copyLossEventAgainEnabled: false,
+                    copyLossAgain: false,
+                    copyLossAgainEnabled: false,
                     selectedResults: [],
                     accountNumbers: [],
                     ranges: [
@@ -63,7 +67,7 @@ sap.ui.define([
                     ]
                 }),
                 "wizard"
-                
+
             );
 
 
@@ -338,6 +342,8 @@ sap.ui.define([
                 sFragmentName = "srt.app.view.fragments.Tcr";
             } else if (sGroupId === "RAM") {
                 sFragmentName = "srt.app.view.fragments.Ram";
+            } else if (sGroupId === "L") {
+                sFragmentName = "srt.app.view.fragments.Loss";
             } else {
                 console.log("No selection fragment configured for:", sGroupId);
                 return;
@@ -450,218 +456,221 @@ sap.ui.define([
                 return;
             }
 
-var iSuccess = 0;
-var iFailed = 0;
+            var iSuccess = 0;
+            var iFailed = 0;
 
-console.log(
-    "TOTAL SELECTED:",
-    aSelectedResults.length,
-    aSelectedResults
-);
-
-
-// ==========================================
-// COLLECT ALL SELECTED OBJECT KEYS
-// ==========================================
-var aObjectKeys = aSelectedResults
-    .map(function (oItem) {
-        return oItem[oConfig.sourceProperty];
-    })
-    .filter(function (vKey) {
-        return vKey !== null &&
-               vKey !== undefined &&
-               String(vKey).trim() !== "";
-    })
-    .map(function (vKey) {
-        return String(vKey).trim();
-    });
-this._oBusyDialog.setText(
-        "Processing objects..."
-    );
-
-    this._oBusyDialog.open();
-
-    console.log("Busy dialog opened");
-
-// ==========================================
-// VALIDATE
-// ==========================================
-if (!aObjectKeys.length) {
-
-    this._oBusyDialog.close();
-
-    MessageToast.show(
-        "No valid objects selected."
-    );
-
-    return;
-}
+            console.log(
+                "TOTAL SELECTED:",
+                aSelectedResults.length,
+                aSelectedResults
+            );
 
 
-console.log(
-    "ALL OBJECT KEYS:",
-    aObjectKeys
-);
+            // ==========================================
+            // COLLECT ALL SELECTED OBJECT KEYS
+            // ==========================================
+            var aObjectKeys = aSelectedResults
+                .map(function (oItem) {
+                    return oItem[oConfig.sourceProperty];
+                })
+                .filter(function (vKey) {
+                    return vKey !== null &&
+                        vKey !== undefined &&
+                        String(vKey).trim() !== "";
+                })
+                .map(function (vKey) {
+                    return String(vKey).trim();
+                });
+            this._oBusyDialog.setText(
+                "Processing objects..."
+            );
 
+            this._oBusyDialog.open();
 
-// ==========================================
-// SEND ALL OBJECTS IN ONE RIPSet REQUEST
-// ==========================================
-var sObjectKeys = aObjectKeys.join(",");
+            console.log("Busy dialog opened");
 
-console.log(
-    "OBJECT KEYS SENT TO RIPSet:",
-    sObjectKeys
-);
+            // ==========================================
+            // VALIDATE
+            // ==========================================
+            if (!aObjectKeys.length) {
 
+                this._oBusyDialog.close();
 
-var aFilters = [];
+                MessageToast.show(
+                    "No valid objects selected."
+                );
 
-
-aFilters.push(
-    new Filter(
-        "iv_grp_id",
-        FilterOperator.EQ,
-        sGroupId
-    )
-);
-
-
-aFilters.push(
-    new Filter(
-        "iv_rfc",
-        FilterOperator.EQ,
-        sRfcDestination
-    )
-);
-
-
-aFilters.push(
-    new Filter(
-        "iv_copy_again",
-        FilterOperator.EQ,
-        bCopyAgain
-    )
-);
-
-
-aFilters.push(
-    new Filter(
-        "iv_rip_from",
-        FilterOperator.EQ,
-        sObjectKeys
-    )
-);
-
-
-// ==========================================
-// ONE RIPSet CALL ONLY
-// ==========================================
-oExecutionModel.read(
-    "/RIPSet",
-    {
-        filters: aFilters,
-
-        success: function (oData) {
-
-    console.log("RIPSet SUCCESS");
-    console.log("Objects:", sObjectKeys);
-    console.log("Response:", oData);
-
-    var sProcessId =
-        oData.results &&
-        oData.results.length > 0
-            ? oData.results[0].process_id
-            : "NO PROCESS ID";
-
-    console.log("ONE PROCESS ID:", sProcessId);
-
-    iSuccess = aObjectKeys.length;
-
-    // ==========================================
-    // KEEP BUSY DIALOG OPEN WHILE PROCESSING
-    // ==========================================
-    this._oBusyDialog.setText(
-        "Processing " +
-        iSuccess +
-        " object(s)..."
-    );
-
-    // ==========================================
-    // REFRESH RESULT TABLE AFTER PROCESSING
-    // ==========================================
-
-    var oController = this;
-
-    setTimeout(function () {
-
-        console.log(
-            "Refreshing result table after execution..."
-        );
-
-        if (sGroupId === "B") {
-            oController.onBPGo();
-        }
-        else if (sGroupId === "A") {
-            oController.onAccountGo();
-        }
-        else if (sGroupId === "T") {
-            oController.onTreatyGo();
-        }
-        else if (sGroupId === "TCR") {
-            oController.onTCRGo();
-        }
-        else if (sGroupId === "RIP") {
-
-            var oRipModel =
-                oController.getView()
-                    .getModel("ZRI_SB_RIP_DATA");
-
-            if (oRipModel) {
-                oRipModel.refresh(true);
+                return;
             }
 
-            oController.onRIPGo();
-        }
 
-        // ==========================================
-        // PROCESSING COMPLETED
-        // ==========================================
-
-        oController._oBusyDialog.close();
-
-        MessageToast.show(
-            iSuccess +
-            " object(s) processed successfully under Processing ID: " +
-            sProcessId
-        );
-
-        console.log(
-            "Result table refresh completed."
-        );
-
-    }, 5000);
-
-}.bind(this),
-
-        error: function (oError) {
-
-            console.error(
-                "RIPSet FAILED:",
-                oError
+            console.log(
+                "ALL OBJECT KEYS:",
+                aObjectKeys
             );
 
 
-            this._oBusyDialog.close();
+            // ==========================================
+            // SEND ALL OBJECTS IN ONE RIPSet REQUEST
+            // ==========================================
+            var sObjectKeys = aObjectKeys.join(",");
 
-
-            MessageToast.show(
-                "Execution failed."
+            console.log(
+                "OBJECT KEYS SENT TO RIPSet:",
+                sObjectKeys
             );
 
-        }.bind(this)
-    }
-);
+
+            var aFilters = [];
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_grp_id",
+                    FilterOperator.EQ,
+                    sGroupId
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rfc",
+                    FilterOperator.EQ,
+                    sRfcDestination
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_copy_again",
+                    FilterOperator.EQ,
+                    bCopyAgain
+                )
+            );
+
+
+            aFilters.push(
+                new Filter(
+                    "iv_rip_from",
+                    FilterOperator.EQ,
+                    sObjectKeys
+                )
+            );
+
+
+            // ==========================================
+            // ONE RIPSet CALL ONLY
+            // ==========================================
+            oExecutionModel.read(
+                "/RIPSet",
+                {
+                    filters: aFilters,
+
+                    success: function (oData) {
+
+                        console.log("RIPSet SUCCESS");
+                        console.log("Objects:", sObjectKeys);
+                        console.log("Response:", oData);
+
+                        var sProcessId =
+                            oData.results &&
+                                oData.results.length > 0
+                                ? oData.results[0].process_id
+                                : "NO PROCESS ID";
+
+                        console.log("ONE PROCESS ID:", sProcessId);
+
+                        iSuccess = aObjectKeys.length;
+
+                        // ==========================================
+                        // KEEP BUSY DIALOG OPEN WHILE PROCESSING
+                        // ==========================================
+                        this._oBusyDialog.setText(
+                            "Processing " +
+                            iSuccess +
+                            " object(s)..."
+                        );
+
+                        // ==========================================
+                        // REFRESH RESULT TABLE AFTER PROCESSING
+                        // ==========================================
+
+                        var oController = this;
+
+                        setTimeout(function () {
+
+                            console.log(
+                                "Refreshing result table after execution..."
+                            );
+
+                            if (sGroupId === "B") {
+                                oController.onBPGo();
+                            }
+                            else if (sGroupId === "A") {
+                                oController.onAccountGo();
+                            }
+                            else if (sGroupId === "L") {
+                                oController.onLossGo();
+                            }
+                            else if (sGroupId === "T") {
+                                oController.onTreatyGo();
+                            }
+                            else if (sGroupId === "TCR") {
+                                oController.onTCRGo();
+                            }
+                            else if (sGroupId === "RIP") {
+
+                                var oRipModel =
+                                    oController.getView()
+                                        .getModel("ZRI_SB_RIP_DATA");
+
+                                if (oRipModel) {
+                                    oRipModel.refresh(true);
+                                }
+
+                                oController.onRIPGo();
+                            }
+
+                            // ==========================================
+                            // PROCESSING COMPLETED
+                            // ==========================================
+
+                            oController._oBusyDialog.close();
+
+                            MessageToast.show(
+                                iSuccess +
+                                " object(s) processed successfully under Processing ID: " +
+                                sProcessId
+                            );
+
+                            console.log(
+                                "Result table refresh completed."
+                            );
+
+                        }, 5000);
+
+                    }.bind(this),
+
+                    error: function (oError) {
+
+                        console.error(
+                            "RIPSet FAILED:",
+                            oError
+                        );
+
+
+                        this._oBusyDialog.close();
+
+
+                        MessageToast.show(
+                            "Execution failed."
+                        );
+
+                    }.bind(this)
+                }
+            );
         },
 
 
@@ -1421,23 +1430,62 @@ oExecutionModel.read(
 
             oConfig.columns.forEach(function (oColumn) {
 
+                var oTemplate;
+
+                var aDateProperties = [
+                    "FIpostingdate",
+                    "Startofaccperiod",
+                    "Endofaccperiod",
+                    "CreationDate",
+                    "Createdon",
+                    "PeriodStartDate",
+                    "CreatedDate"
+                ];
+
+                if (aDateProperties.indexOf(oColumn.property) !== -1) {
+
+                    oTemplate = new Text({
+                        text: {
+                            path: "result>" + oColumn.property,
+                            formatter: function (vValue) {
+
+                                if (!vValue) {
+                                    return "";
+                                }
+
+                                var oDate = vValue instanceof Date
+                                    ? vValue
+                                    : new Date(vValue);
+
+                                if (isNaN(oDate.getTime())) {
+                                    return String(vValue);
+                                }
+
+                                return sap.ui.core.format.DateFormat
+                                    .getDateInstance({
+                                        pattern: "dd.MM.yyyy"
+                                    })
+                                    .format(oDate);
+                            }
+                        }
+                    });
+
+                } else {
+
+                    oTemplate = new Text({
+                        text: "{result>" + oColumn.property + "}"
+                    });
+                }
+
                 oTable.addColumn(
                     new TableColumn({
                         label: new Label({
                             text: oColumn.label
                         }),
-
-                        template: new Text({
-                            text:
-                                "{result>" +
-                                oColumn.property +
-                                "}"
-                        }),
-
+                        template: oTemplate,
                         width: "11rem"
                     })
                 );
-
             });
             oTable.setWidth(
                 (oConfig.columns.length * 11) + "rem"
@@ -1474,11 +1522,21 @@ oExecutionModel.read(
             var oWizardModel =
                 this.getView().getModel("wizard");
 
+            var sGroupId =
+                oWizardModel.getProperty("/groupId");
+
             var aSelectedIndices =
                 oTable.getSelectedIndices();
 
-            if (!aSelectedIndices ||
-                aSelectedIndices.length === 0) {
+
+            // =========================================================
+            // NO ROW SELECTED
+            // =========================================================
+
+            if (
+                !aSelectedIndices ||
+                aSelectedIndices.length === 0
+            ) {
 
                 oWizardModel.setProperty(
                     "/selectedResults",
@@ -1490,6 +1548,7 @@ oExecutionModel.read(
                     null
                 );
 
+                // Generic Copy Again
                 oWizardModel.setProperty(
                     "/copyAgainEnabled",
                     false
@@ -1500,8 +1559,35 @@ oExecutionModel.read(
                     false
                 );
 
+                // Loss Event
+                oWizardModel.setProperty(
+                    "/copyLossEventAgainEnabled",
+                    false
+                );
+
+                oWizardModel.setProperty(
+                    "/copyLossEventAgain",
+                    false
+                );
+
+                // Loss
+                oWizardModel.setProperty(
+                    "/copyLossAgainEnabled",
+                    false
+                );
+
+                oWizardModel.setProperty(
+                    "/copyLossAgain",
+                    false
+                );
+
                 return;
             }
+
+
+            // =========================================================
+            // GET SELECTED OBJECTS
+            // =========================================================
 
             var aSelectedObjects = [];
 
@@ -1511,31 +1597,208 @@ oExecutionModel.read(
                     oTable.getContextByIndex(iIndex);
 
                 if (oContext) {
+
                     aSelectedObjects.push(
                         oContext.getObject()
                     );
+
                 }
 
             });
+
 
             console.log(
                 "SELECTED OBJECTS:",
                 aSelectedObjects
             );
 
+
+            // =========================================================
+            // SAVE SELECTED OBJECTS
+            // =========================================================
+
             oWizardModel.setProperty(
                 "/selectedResults",
                 aSelectedObjects
             );
 
-            // kept for copy-again logic
             oWizardModel.setProperty(
                 "/selectedResult",
                 aSelectedObjects[0]
             );
 
-            this._updateCopyAgainState(
-                aSelectedObjects[0]
+
+            var oSelectedObject =
+                aSelectedObjects[0];
+
+
+            // =========================================================
+            // LOSS
+            // =========================================================
+
+            if (sGroupId === "L") {
+
+    var bHasLossEvent =
+        oSelectedObject &&
+        oSelectedObject.g_schadkz !== null &&
+        oSelectedObject.g_schadkz !== undefined &&
+        String(oSelectedObject.g_schadkz).trim() !== "";
+
+    var bHasTargetLoss =
+        oSelectedObject &&
+        oSelectedObject.target_number !== null &&
+        oSelectedObject.target_number !== undefined &&
+        String(oSelectedObject.target_number).trim() !== "";
+
+    // -------------------------------------------------
+    // COPY LOSS EVENT AGAIN
+    // Enabled ONLY when:
+    // Loss Event exists AND Target Loss exists
+    // -------------------------------------------------
+    var bCanCopyLossEventAgain =
+        bHasLossEvent &&
+        bHasTargetLoss;
+
+    oWizardModel.setProperty(
+        "/copyLossEventAgainEnabled",
+        bCanCopyLossEventAgain
+    );
+
+    if (!bCanCopyLossEventAgain) {
+        oWizardModel.setProperty(
+            "/copyLossEventAgain",
+            false
+        );
+    }
+
+    // -------------------------------------------------
+    // COPY LOSS AGAIN
+    // Enabled ONLY when:
+    // Target Loss exists AND Loss Event does NOT exist
+    // -------------------------------------------------
+    var bCanCopyLossAgain =
+        bHasTargetLoss &&
+        !bHasLossEvent;
+
+    oWizardModel.setProperty(
+        "/copyLossAgainEnabled",
+        bCanCopyLossAgain
+    );
+
+    if (!bCanCopyLossAgain) {
+        oWizardModel.setProperty(
+            "/copyLossAgain",
+            false
+        );
+    }
+
+    console.log("========== LOSS COPY STATE ==========");
+    console.log("Loss:", oSelectedObject.schadnr);
+    console.log("Loss Event:", oSelectedObject.g_schadkz);
+    console.log("Target Loss:", oSelectedObject.target_number);
+
+    console.log("Has Loss Event:", bHasLossEvent);
+    console.log("Has Target Loss:", bHasTargetLoss);
+
+    console.log(
+        "Copy Loss Event Again Enabled:",
+        bCanCopyLossEventAgain
+    );
+
+    console.log(
+        "Copy Loss Again Enabled:",
+        bCanCopyLossAgain
+    );
+
+    console.log("=====================================");
+
+    return;
+}
+
+
+            // =========================================================
+            // OTHER GROUPS
+            // =========================================================
+
+            var sTargetProperty = null;
+
+            switch (sGroupId) {
+
+                case "B":
+                    sTargetProperty = "TargetBpNum";
+                    break;
+
+                case "A":
+                    sTargetProperty = "CreatedAcc";
+                    break;
+
+                case "RIP":
+                    sTargetProperty = "CreatedRIP";
+                    break;
+
+                case "TCR":
+                    sTargetProperty = "CreatedTCR";
+                    break;
+
+                case "T":
+                    sTargetProperty = "CreatedTreaty";
+                    break;
+
+                default:
+                    break;
+            }
+
+
+            // =========================================================
+            // CHECK TARGET FOR OTHER GROUPS
+            // =========================================================
+
+            var bHasTarget = false;
+
+            if (
+                sTargetProperty &&
+                oSelectedObject &&
+                oSelectedObject[sTargetProperty] !== null &&
+                oSelectedObject[sTargetProperty] !== undefined &&
+                String(
+                    oSelectedObject[sTargetProperty]
+                ).trim() !== ""
+            ) {
+
+                bHasTarget = true;
+
+            }
+
+
+            oWizardModel.setProperty(
+                "/copyAgainEnabled",
+                bHasTarget
+            );
+
+
+            if (!bHasTarget) {
+
+                oWizardModel.setProperty(
+                    "/copyAgain",
+                    false
+                );
+
+            }
+
+
+            console.log(
+                "Selected Group:",
+                sGroupId
+            );
+
+            console.log(
+                "Target Property:",
+                sTargetProperty
+            );
+
+            console.log(
+                "Copy Again Enabled:",
+                bHasTarget
             );
         },
         _getResultTableConfig: function (sGroupId) {
@@ -1727,6 +1990,40 @@ oExecutionModel.read(
                             }
                         ]
                     };
+                case "L":
+
+                    return {
+                        sourceProperty: "schadnr",
+                        targetProperty: "target_number",
+
+                        columns: [
+                            {
+                                label: "Loss",
+                                property: "schadnr"
+                            },
+                            {
+                                label: "Loss Name",
+                                property: "schadbez"
+                            },
+                            {
+                                label: "Loss Event",
+                                property: "g_schadkz"
+                            },
+                            {
+                                label: "Process Ref ID",
+                                property: "process_id"
+                            },
+                            {
+                                label: "Target System",
+                                property: "systemm"
+                            },
+                            {
+                                label: "Target Loss",
+                                property: "target_number"
+                            }
+                        ]
+                    };
+
                 case "TCR":
 
                     return {
@@ -1814,7 +2111,7 @@ oExecutionModel.read(
                     break;
 
                 case "L":
-                    sTargetProperty = "TargetLoss";
+                    sTargetProperty = "target_number";
                     break;
 
                 default:
@@ -2696,12 +2993,12 @@ oExecutionModel.read(
             );
 
             aFilters.push(
-    new Filter(
-        "iv_copy_with",
-        FilterOperator.EQ,
-        true
-    )
-);
+                new Filter(
+                    "iv_copy_with",
+                    FilterOperator.EQ,
+                    true
+                )
+            );
 
 
             // IMPORTANT:
@@ -2728,44 +3025,44 @@ oExecutionModel.read(
             oExecutionModel.read(
                 "/RIPSet",
                 {
-         
-         
+
+
                     filters: aFilters,
 
-  success: function (oData) {
+                    success: function (oData) {
 
-    this._oBusyDialog.close();
+                        this._oBusyDialog.close();
 
-    var sProcessId = "";
+                        var sProcessId = "";
 
-    if (
-        oData.results &&
-        oData.results.length > 0
-    ) {
-        sProcessId =
-            oData.results[0].process_id;
-    }
+                        if (
+                            oData.results &&
+                            oData.results.length > 0
+                        ) {
+                            sProcessId =
+                                oData.results[0].process_id;
+                        }
 
-    if (sProcessId) {
+                        if (sProcessId) {
 
-        oModel.setProperty(
-            "/accountProcessRefId",
-            sProcessId
-        );
+                            oModel.setProperty(
+                                "/accountProcessRefId",
+                                sProcessId
+                            );
 
-    }
+                        }
 
-    MessageToast.show(
-        "Execution started successfully. Process ID: " +
-        sProcessId
-    );
-    if (this._pAccountCopyWithDialog) {
-        this._pAccountCopyWithDialog.then(function (oDialog) {
-            oDialog.close();
-        });
-    }
+                        MessageToast.show(
+                            "Execution started successfully. Process ID: " +
+                            sProcessId
+                        );
+                        if (this._pAccountCopyWithDialog) {
+                            this._pAccountCopyWithDialog.then(function (oDialog) {
+                                oDialog.close();
+                            });
+                        }
 
-}.bind(this),
+                    }.bind(this),
 
 
                     error: function (oError) {
@@ -2913,795 +3210,894 @@ oExecutionModel.read(
                 aFilters
             );
         },
-//  onTreatyProcessLog: function () {
+        //  onTreatyProcessLog: function () {
 
-//     var oWizardModel =
-//         this.getView().getModel("wizard");
+        //     var oWizardModel =
+        //         this.getView().getModel("wizard");
 
-//     var aSelectedResults =
-//         oWizardModel.getProperty("/selectedResults") || [];
+        //     var aSelectedResults =
+        //         oWizardModel.getProperty("/selectedResults") || [];
 
-//     if (!aSelectedResults.length) {
+        //     if (!aSelectedResults.length) {
 
-//         MessageToast.show(
-//             "Please select at least one Treaty row."
-//         );
+        //         MessageToast.show(
+        //             "Please select at least one Treaty row."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     // ==========================================
-//     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
-//     // ==========================================
-//     var aProcessIds = [];
+        //     // ==========================================
+        //     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
+        //     // ==========================================
+        //     var aProcessIds = [];
 
-//     aSelectedResults.forEach(function (oRow) {
+        //     aSelectedResults.forEach(function (oRow) {
 
-//         var sProcessId =
-//             oRow.processingID;
+        //         var sProcessId =
+        //             oRow.processingID;
 
-//         if (
-//             sProcessId &&
-//             aProcessIds.indexOf(sProcessId) === -1
-//         ) {
-//             aProcessIds.push(sProcessId);
-//         }
+        //         if (
+        //             sProcessId &&
+        //             aProcessIds.indexOf(sProcessId) === -1
+        //         ) {
+        //             aProcessIds.push(sProcessId);
+        //         }
 
-//     });
+        //     });
 
 
-//     if (!aProcessIds.length) {
+        //     if (!aProcessIds.length) {
 
-//         MessageToast.show(
-//             "No Process Ref ID available for the selected rows."
-//         );
+        //         MessageToast.show(
+        //             "No Process Ref ID available for the selected rows."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     console.log(
-//         "SELECTED PROCESS IDS:",
-//         aProcessIds
-//     );
+        //     console.log(
+        //         "SELECTED PROCESS IDS:",
+        //         aProcessIds
+        //     );
 
 
-//     var oModel =
-//         this.getView()
-//             .getModel("ZRI_S_TTY_DATA");
+        //     var oModel =
+        //         this.getView()
+        //             .getModel("ZRI_S_TTY_DATA");
 
 
-//     if (!oModel) {
+        //     if (!oModel) {
 
-//         MessageToast.show(
-//             "Treaty service is not available."
-//         );
+        //         MessageToast.show(
+        //             "Treaty service is not available."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     // ==========================================
-//     // CREATE OR FILTER:
-//     //
-//     // ProcessingId = X
-//     // OR
-//     // ProcessingId = Y
-//     // OR
-//     // ProcessingId = Z
-//     // ==========================================
-//     var aProcessFilters =
-//         aProcessIds.map(function (sProcessId) {
+        //     // ==========================================
+        //     // CREATE OR FILTER:
+        //     //
+        //     // ProcessingId = X
+        //     // OR
+        //     // ProcessingId = Y
+        //     // OR
+        //     // ProcessingId = Z
+        //     // ==========================================
+        //     var aProcessFilters =
+        //         aProcessIds.map(function (sProcessId) {
 
-//             return new Filter(
-//                 "ProcessingId",
-//                 FilterOperator.EQ,
-//                 sProcessId
-//             );
+        //             return new Filter(
+        //                 "ProcessingId",
+        //                 FilterOperator.EQ,
+        //                 sProcessId
+        //             );
 
-//         });
+        //         });
 
 
-//     var oProcessFilter =
-//         new Filter({
-//             filters: aProcessFilters,
-//             and: false
-//         });
+        //     var oProcessFilter =
+        //         new Filter({
+        //             filters: aProcessFilters,
+        //             and: false
+        //         });
 
 
-//     this._oBusyDialog.open();
+        //     this._oBusyDialog.open();
 
 
-//     oModel.read(
-//         "/ProcessLog",
-//         {
-//             filters: [oProcessFilter],
+        //     oModel.read(
+        //         "/ProcessLog",
+        //         {
+        //             filters: [oProcessFilter],
 
-//             success: function (oData) {
+        //             success: function (oData) {
 
-//                 this._oBusyDialog.close();
+        //                 this._oBusyDialog.close();
 
-//                 console.log(
-//                     "TREATY PROCESS LOG:",
-//                     oData.results
-//                 );
+        //                 console.log(
+        //                     "TREATY PROCESS LOG:",
+        //                     oData.results
+        //                 );
 
-//                 this._openTreatyProcessLogDialog(
-//                     oData.results || []
-//                 );
+        //                 this._openTreatyProcessLogDialog(
+        //                     oData.results || []
+        //                 );
 
-//             }.bind(this),
+        //             }.bind(this),
 
-//             error: function (oError) {
+        //             error: function (oError) {
 
-//                 this._oBusyDialog.close();
+        //                 this._oBusyDialog.close();
 
-//                 console.error(
-//                     "PROCESS LOG ERROR:",
-//                     oError
-//                 );
+        //                 console.error(
+        //                     "PROCESS LOG ERROR:",
+        //                     oError
+        //                 );
 
-//                 MessageToast.show(
-//                     "Unable to load Process Log."
-//                 );
+        //                 MessageToast.show(
+        //                     "Unable to load Process Log."
+        //                 );
 
-//             }.bind(this)
-//         }
-//     );
-// },
-// _openTreatyProcessLogDialog: function (aLogs) {
+        //             }.bind(this)
+        //         }
+        //     );
+        // },
+        // _openTreatyProcessLogDialog: function (aLogs) {
 
-//     var oLogModel =
-//         new JSONModel({
-//             logs: aLogs
-//         });
+        //     var oLogModel =
+        //         new JSONModel({
+        //             logs: aLogs
+        //         });
 
 
-//     if (!this._oTreatyProcessLogDialog) {
+        //     if (!this._oTreatyProcessLogDialog) {
 
-//         this._oTreatyProcessLogDialog =
-//             new sap.m.Dialog({
+        //         this._oTreatyProcessLogDialog =
+        //             new sap.m.Dialog({
 
-//                 title: "Treaty Process Log",
+        //                 title: "Treaty Process Log",
 
-//                 contentWidth: "70rem",
+        //                 contentWidth: "70rem",
 
-//                 contentHeight: "30rem",
+        //                 contentHeight: "30rem",
 
-//                 content: [
+        //                 content: [
 
-//                     new sap.m.Table({
+        //                     new sap.m.Table({
 
-//                         columns: [
+        //                         columns: [
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Process Ref ID"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Process Ref ID"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Message Type"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Message Type"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Message"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Message"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Source Number"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Source Number"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Target Number"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Target Number"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "System"
-//                                     })
-//                             })
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "System"
+        //                                     })
+        //                             })
 
-//                         ],
+        //                         ],
 
-//                         items: {
-//                             path: "log>/logs",
+        //                         items: {
+        //                             path: "log>/logs",
 
-//                             template:
-//                                 new sap.m.ColumnListItem({
+        //                             template:
+        //                                 new sap.m.ColumnListItem({
 
-//                                     cells: [
+        //                                     cells: [
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>ProcessingId}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>ProcessingId}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Type}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Type}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Message}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Message}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>SourceNumber}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>SourceNumber}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>TargetNumber}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>TargetNumber}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Systemm}"
-//                                         })
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Systemm}"
+        //                                         })
 
-//                                     ]
-//                                 })
-//                         }
+        //                                     ]
+        //                                 })
+        //                         }
 
-//                     })
+        //                     })
 
-//                 ],
+        //                 ],
 
-//                 endButton:
-//                     new sap.m.Button({
+        //                 endButton:
+        //                     new sap.m.Button({
 
-//                         text: "Close",
+        //                         text: "Close",
 
-//                         press: function () {
-//                             this._oTreatyProcessLogDialog.close();
-//                         }.bind(this)
+        //                         press: function () {
+        //                             this._oTreatyProcessLogDialog.close();
+        //                         }.bind(this)
 
-//                     })
+        //                     })
 
-//             });
+        //             });
 
 
-//         this.getView()
-//             .addDependent(
-//                 this._oTreatyProcessLogDialog
-//             );
-//     }
+        //         this.getView()
+        //             .addDependent(
+        //                 this._oTreatyProcessLogDialog
+        //             );
+        //     }
 
 
-//     this._oTreatyProcessLogDialog
-//         .setModel(
-//             oLogModel,
-//             "log"
-//         );
+        //     this._oTreatyProcessLogDialog
+        //         .setModel(
+        //             oLogModel,
+        //             "log"
+        //         );
 
 
-//     this._oTreatyProcessLogDialog.open();
-// },
-// onRIPProcessLog: function () {
+        //     this._oTreatyProcessLogDialog.open();
+        // },
+        // onRIPProcessLog: function () {
 
-//     var oWizardModel =
-//         this.getView().getModel("wizard");
+        //     var oWizardModel =
+        //         this.getView().getModel("wizard");
 
-//     var aSelectedResults =
-//         oWizardModel.getProperty("/selectedResults") || [];
+        //     var aSelectedResults =
+        //         oWizardModel.getProperty("/selectedResults") || [];
 
-//     if (!aSelectedResults.length) {
+        //     if (!aSelectedResults.length) {
 
-//         MessageToast.show(
-//             "Please select at least one RIP row."
-//         );
+        //         MessageToast.show(
+        //             "Please select at least one RIP row."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     // ==========================================
-//     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
-//     // ==========================================
-//     var aProcessIds = [];
+        //     // ==========================================
+        //     // GET UNIQUE PROCESS IDS FROM SELECTED ROWS
+        //     // ==========================================
+        //     var aProcessIds = [];
 
-//     aSelectedResults.forEach(function (oRow) {
+        //     aSelectedResults.forEach(function (oRow) {
 
-//         var sProcessId =
-//             oRow.processingID;
+        //         var sProcessId =
+        //             oRow.processingID;
 
-//         if (
-//             sProcessId &&
-//             aProcessIds.indexOf(sProcessId) === -1
-//         ) {
-//             aProcessIds.push(sProcessId);
-//         }
+        //         if (
+        //             sProcessId &&
+        //             aProcessIds.indexOf(sProcessId) === -1
+        //         ) {
+        //             aProcessIds.push(sProcessId);
+        //         }
 
-//     });
+        //     });
 
 
-//     if (!aProcessIds.length) {
+        //     if (!aProcessIds.length) {
 
-//         MessageToast.show(
-//             "No Process Ref ID available for the selected rows."
-//         );
+        //         MessageToast.show(
+        //             "No Process Ref ID available for the selected rows."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     console.log(
-//         "SELECTED PROCESS IDS:",
-//         aProcessIds
-//     );
+        //     console.log(
+        //         "SELECTED PROCESS IDS:",
+        //         aProcessIds
+        //     );
 
 
-//     var oModel =
-//         this.getView()
-//             .getModel("ZRI_SB_RIP_DATA");
+        //     var oModel =
+        //         this.getView()
+        //             .getModel("ZRI_SB_RIP_DATA");
 
 
-//     if (!oModel) {
+        //     if (!oModel) {
 
-//         MessageToast.show(
-//             "RIP service is not available."
-//         );
+        //         MessageToast.show(
+        //             "RIP service is not available."
+        //         );
 
-//         return;
-//     }
+        //         return;
+        //     }
 
 
-//     // ==========================================
-//     // CREATE OR FILTER:
-//     //
-//     // ProcessingId = X
-//     // OR
-//     // ProcessingId = Y
-//     // OR
-//     // ProcessingId = Z
-//     // ==========================================
-//     var aProcessFilters =
-//         aProcessIds.map(function (sProcessId) {
+        //     // ==========================================
+        //     // CREATE OR FILTER:
+        //     //
+        //     // ProcessingId = X
+        //     // OR
+        //     // ProcessingId = Y
+        //     // OR
+        //     // ProcessingId = Z
+        //     // ==========================================
+        //     var aProcessFilters =
+        //         aProcessIds.map(function (sProcessId) {
 
-//             return new Filter(
-//                 "ProcessingId",
-//                 FilterOperator.EQ,
-//                 sProcessId
-//             );
+        //             return new Filter(
+        //                 "ProcessingId",
+        //                 FilterOperator.EQ,
+        //                 sProcessId
+        //             );
 
-//         });
+        //         });
 
 
-//     var oProcessFilter =
-//         new Filter({
-//             filters: aProcessFilters,
-//             and: false
-//         });
+        //     var oProcessFilter =
+        //         new Filter({
+        //             filters: aProcessFilters,
+        //             and: false
+        //         });
 
 
-//     this._oBusyDialog.open();
+        //     this._oBusyDialog.open();
 
 
-//     oModel.read(
-//         "/ProcessLog",
-//         {
-//             filters: [oProcessFilter],
+        //     oModel.read(
+        //         "/ProcessLog",
+        //         {
+        //             filters: [oProcessFilter],
 
-//             success: function (oData) {
+        //             success: function (oData) {
 
-//                 this._oBusyDialog.close();
+        //                 this._oBusyDialog.close();
 
-//                 console.log(
-//                     "RIP PROCESS LOG:",
-//                     oData.results
-//                 );
+        //                 console.log(
+        //                     "RIP PROCESS LOG:",
+        //                     oData.results
+        //                 );
 
-//                 this._openRIPProcessLogDialog(
-//                     oData.results || []
-//                 );
+        //                 this._openRIPProcessLogDialog(
+        //                     oData.results || []
+        //                 );
 
-//             }.bind(this),
+        //             }.bind(this),
 
-//             error: function (oError) {
+        //             error: function (oError) {
 
-//                 this._oBusyDialog.close();
+        //                 this._oBusyDialog.close();
 
-//                 console.error(
-//                     "PROCESS LOG ERROR:",
-//                     oError
-//                 );
+        //                 console.error(
+        //                     "PROCESS LOG ERROR:",
+        //                     oError
+        //                 );
 
-//                 MessageToast.show(
-//                     "Unable to load Process Log."
-//                 );
+        //                 MessageToast.show(
+        //                     "Unable to load Process Log."
+        //                 );
 
-//             }.bind(this)
-//         }
-//     );
-// },
-// _openRIPProcessLogDialog: function (aLogs) {
+        //             }.bind(this)
+        //         }
+        //     );
+        // },
+        // _openRIPProcessLogDialog: function (aLogs) {
 
-//     var oLogModel =
-//         new JSONModel({
-//             logs: aLogs
-//         });
+        //     var oLogModel =
+        //         new JSONModel({
+        //             logs: aLogs
+        //         });
 
 
-//     if (!this._oRIPProcessLogDialog) {
+        //     if (!this._oRIPProcessLogDialog) {
 
-//         this._oRIPProcessLogDialog =
-//             new sap.m.Dialog({
+        //         this._oRIPProcessLogDialog =
+        //             new sap.m.Dialog({
 
-//                 title: "RIP Process Log",
+        //                 title: "RIP Process Log",
 
-//                 contentWidth: "70rem",
+        //                 contentWidth: "70rem",
 
-//                 contentHeight: "30rem",
+        //                 contentHeight: "30rem",
 
-//                 content: [
+        //                 content: [
 
-//                     new sap.m.Table({
+        //                     new sap.m.Table({
 
-//                         columns: [
+        //                         columns: [
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Process Ref ID"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Process Ref ID"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Message Type"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Message Type"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Message"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Message"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Source Number"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Source Number"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "Target Number"
-//                                     })
-//                             }),
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "Target Number"
+        //                                     })
+        //                             }),
 
-//                             new sap.m.Column({
-//                                 header:
-//                                     new sap.m.Text({
-//                                         text: "System"
-//                                     })
-//                             })
+        //                             new sap.m.Column({
+        //                                 header:
+        //                                     new sap.m.Text({
+        //                                         text: "System"
+        //                                     })
+        //                             })
 
-//                         ],
+        //                         ],
 
-//                         items: {
-//                             path: "log>/logs",
+        //                         items: {
+        //                             path: "log>/logs",
 
-//                             template:
-//                                 new sap.m.ColumnListItem({
+        //                             template:
+        //                                 new sap.m.ColumnListItem({
 
-//                                     cells: [
+        //                                     cells: [
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>ProcessingId}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>ProcessingId}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Type}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Type}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Message}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Message}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>SourceNumber}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>SourceNumber}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>TargetNumber}"
-//                                         }),
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>TargetNumber}"
+        //                                         }),
 
-//                                         new sap.m.Text({
-//                                             text:
-//                                                 "{log>Systemm}"
-//                                         })
+        //                                         new sap.m.Text({
+        //                                             text:
+        //                                                 "{log>Systemm}"
+        //                                         })
 
-//                                     ]
-//                                 })
-//                         }
+        //                                     ]
+        //                                 })
+        //                         }
 
-//                     })
+        //                     })
 
-//                 ],
+        //                 ],
 
-//                 endButton:
-//                     new sap.m.Button({
+        //                 endButton:
+        //                     new sap.m.Button({
 
-//                         text: "Close",
+        //                         text: "Close",
 
-//                         press: function () {
-//                             this._oRIPProcessLogDialog.close();
-//                         }.bind(this)
+        //                         press: function () {
+        //                             this._oRIPProcessLogDialog.close();
+        //                         }.bind(this)
 
-//                     })
+        //                     })
 
-//             });
+        //             });
 
 
-//         this.getView()
-//             .addDependent(
-//                 this._oRIPProcessLogDialog
-//             );
-//     }
+        //         this.getView()
+        //             .addDependent(
+        //                 this._oRIPProcessLogDialog
+        //             );
+        //     }
 
 
-//     this._oRIPProcessLogDialog
-//         .setModel(
-//             oLogModel,
-//             "log"
-//         );
+        //     this._oRIPProcessLogDialog
+        //         .setModel(
+        //             oLogModel,
+        //             "log"
+        //         );
 
 
-//     this._oRIPProcessLogDialog.open();
-// },
-onProcessLogPress: function () {
+        //     this._oRIPProcessLogDialog.open();
+        // },
+        onProcessLogPress: function () {
 
-    var oWizardModel =
-        this.getView().getModel("wizard");
+            var oWizardModel =
+                this.getView().getModel("wizard");
 
-    var sGroupId =
-        oWizardModel.getProperty("/groupId");
+            var sGroupId =
+                oWizardModel.getProperty("/groupId");
 
-    var aSelectedRows =
-        oWizardModel.getProperty("/selectedResults") || [];
+            var aSelectedRows =
+                oWizardModel.getProperty("/selectedResults") || [];
 
-    if (!aSelectedRows.length) {
-        MessageToast.show(
-            "Please select at least one row."
-        );
-        return;
-    }
+            if (!aSelectedRows.length) {
+                MessageToast.show(
+                    "Please select at least one row."
+                );
+                return;
+            }
 
-    var oResultConfig =
-        this._getResultTableConfig(sGroupId);
+            var oResultConfig =
+                this._getResultTableConfig(sGroupId);
 
-    if (!oResultConfig) {
-        MessageToast.show(
-            "Process Log configuration not found."
-        );
-        return;
-    }
+            if (!oResultConfig) {
+                MessageToast.show(
+                    "Process Log configuration not found."
+                );
+                return;
+            }
 
-    var sObjectType = "";
+            var sObjectType = "";
 
-    switch (sGroupId) {
+            switch (sGroupId) {
 
-        case "A":
-            sObjectType = "ACCOUNT";
-            break;
+                case "A":
+                    sObjectType = "ACCOUNT";
+                    break;
 
-        case "T":
-            sObjectType = "TREATY";
-            break;
+                case "T":
+                    sObjectType = "TREATY";
+                    break;
 
-        case "TCR":
-            sObjectType = "TCR";
-            break;
+                case "TCR":
+                    sObjectType = "TCR";
+                    break;
 
-        case "RIP":
-            sObjectType = "RIP";
-            break;
+                case "RIP":
+                    sObjectType = "RIP";
+                    break;
 
-        case "B":
-            sObjectType = "BP";
-            break;
+                case "B":
+                    sObjectType = "BP";
+                    break;
 
-        case "L":
-            sObjectType = "LOSS";
-            break;
+                case "L":
+                    sObjectType = "LOSS";
+                    break;
 
-        default:
-            MessageToast.show(
-                "Process Log not configured for this object."
-            );
-            return;
-    }
+                default:
+                    MessageToast.show(
+                        "Process Log not configured for this object."
+                    );
+                    return;
+            }
 
 
-    // =============================================
-    // Build RootSourceNumber filters
-    // =============================================
-    var aRootFilters = [];
+            // =============================================
+            // Build RootSourceNumber filters
+            // =============================================
+            var aRootFilters = [];
 
-    aSelectedRows.forEach(function (oRow) {
+            aSelectedRows.forEach(function (oRow) {
 
-        var sRoot =
-            oRow[oResultConfig.sourceProperty];
+                var sRoot =
+                    oRow[oResultConfig.sourceProperty];
 
-        if (sRoot) {
+                if (sRoot) {
 
-            aRootFilters.push(
+                    aRootFilters.push(
+                        new Filter(
+                            "RootSourceNumber",
+                            FilterOperator.EQ,
+                            String(sRoot)
+                        )
+                    );
+                }
+
+            });
+
+
+            if (!aRootFilters.length) {
+                MessageToast.show(
+                    "No source object found."
+                );
+                return;
+            }
+
+
+            // =============================================
+            // Object type filter
+            // =============================================
+            var oObjectTypeFilter =
                 new Filter(
-                    "RootSourceNumber",
+                    "ObjectType",
                     FilterOperator.EQ,
-                    String(sRoot)
-                )
+                    sObjectType
+                );
+
+
+            // =============================================
+            // Root 1 OR Root 2 OR Root 3
+            // =============================================
+            var oRootFilter =
+                new Filter({
+                    filters: aRootFilters,
+                    and: false
+                });
+
+
+            // =============================================
+            // Final:
+            // ObjectType AND (Root1 OR Root2 OR Root3)
+            // =============================================
+            var oFinalFilter =
+                new Filter({
+                    filters: [
+                        oObjectTypeFilter,
+                        oRootFilter
+                    ],
+                    and: true
+                });
+
+
+            var oModel =
+                this.getView().getModel(
+                    "ZGS_SRT_SRV"
+                );
+
+
+            if (!oModel) {
+                MessageToast.show(
+                    "Process Log service is not available."
+                );
+                return;
+            }
+
+
+            this._oBusyDialog.open();
+
+
+            oModel.read(
+                "/ProcessLogSet",
+                {
+                    filters: [
+                        oFinalFilter
+                    ],
+
+                    success: function (oData) {
+
+                        this._oBusyDialog.close();
+
+                        console.log(
+                            "PROCESS LOG RESULT:",
+                            oData.results
+                        );
+
+                        this._openProcessLogDialog(
+                            "Process Log",
+                            oData.results || []
+                        );
+
+                    }.bind(this),
+
+                    error: function (oError) {
+
+                        this._oBusyDialog.close();
+
+                        console.error(
+                            "PROCESS LOG ERROR:",
+                            oError
+                        );
+
+                        MessageToast.show(
+                            "Unable to load Process Log."
+                        );
+
+                    }.bind(this)
+                }
             );
-        }
+        },
+        _openProcessLogDialog: function (sTitle, aLogs) {
 
-    });
+            if (!this._pProcessLogDialog) {
 
+                this._pProcessLogDialog =
+                    this.loadFragment({
+                        name: "srt.app.view.fragments.ProcessLog"
+                    });
+            }
 
-    if (!aRootFilters.length) {
-        MessageToast.show(
-            "No source object found."
-        );
-        return;
-    }
+            this._pProcessLogDialog.then(function (oDialog) {
 
+                var oLogModel = new JSONModel({
+                    logs: aLogs
+                });
 
-    // =============================================
-    // Object type filter
-    // =============================================
-    var oObjectTypeFilter =
-        new Filter(
-            "ObjectType",
-            FilterOperator.EQ,
-            sObjectType
-        );
-
-
-    // =============================================
-    // Root 1 OR Root 2 OR Root 3
-    // =============================================
-    var oRootFilter =
-        new Filter({
-            filters: aRootFilters,
-            and: false
-        });
-
-
-    // =============================================
-    // Final:
-    // ObjectType AND (Root1 OR Root2 OR Root3)
-    // =============================================
-    var oFinalFilter =
-        new Filter({
-            filters: [
-                oObjectTypeFilter,
-                oRootFilter
-            ],
-            and: true
-        });
-
-
-    var oModel =
-        this.getView().getModel(
-            "ZGS_SRT_SRV"
-        );
-
-
-    if (!oModel) {
-        MessageToast.show(
-            "Process Log service is not available."
-        );
-        return;
-    }
-
-
-    this._oBusyDialog.open();
-
-
-    oModel.read(
-        "/ProcessLogSet",
-        {
-            filters: [
-                oFinalFilter
-            ],
-
-            success: function (oData) {
-
-                this._oBusyDialog.close();
-
-                console.log(
-                    "PROCESS LOG RESULT:",
-                    oData.results
+                oDialog.setModel(
+                    oLogModel,
+                    "processLog"
                 );
 
-                this._openProcessLogDialog(
-    "Process Log",
-    oData.results || []
-);
+                oDialog.setTitle(sTitle);
 
-            }.bind(this),
+                oDialog.open();
 
-            error: function (oError) {
+            });
+        },
+        onProcessLogClose: function () {
 
-                this._oBusyDialog.close();
+            if (this._pProcessLogDialog) {
 
-                console.error(
-                    "PROCESS LOG ERROR:",
-                    oError
+                this._pProcessLogDialog.then(function (oDialog) {
+                    oDialog.close();
+                });
+
+            }
+        },
+        onLossGo: function () {
+
+            var oWizardModel =
+                this.getView().getModel("wizard");
+
+            var aFilters = [];
+
+            var sLoss =
+                oWizardModel.getProperty("/loss");
+
+            var sProcessRefId =
+                oWizardModel.getProperty("/lossProcessRefId");
+
+            var sTargetSystem =
+                oWizardModel.getProperty("/lossTargetSystem");
+
+
+            // ==========================================
+            // LOSS FILTER
+            // ==========================================
+
+            if (sLoss) {
+
+                aFilters.push(
+                    new Filter(
+                        "schadnr",
+                        FilterOperator.EQ,
+                        sLoss
+                    )
                 );
+            }
+
+
+            // ==========================================
+            // PROCESS REF ID FILTER
+            // ==========================================
+
+            if (sProcessRefId) {
+
+                aFilters.push(
+                    new Filter(
+                        "process_id",
+                        FilterOperator.EQ,
+                        sProcessRefId
+                    )
+                );
+            }
+
+
+            // ==========================================
+            // TARGET SYSTEM FILTER
+            // ==========================================
+
+            if (sTargetSystem) {
+
+                aFilters.push(
+                    new Filter(
+                        "systemm",
+                        FilterOperator.EQ,
+                        sTargetSystem
+                    )
+                );
+            }
+
+
+            // ==========================================
+            // LOSS SERVICE MODEL
+            // ==========================================
+
+            var oModel =
+                this.getView()
+                    .getModel("ZRI_SB_CLM_PROC");
+
+
+            if (!oModel) {
 
                 MessageToast.show(
-                    "Unable to load Process Log."
+                    "Loss service is not available."
                 );
 
-            }.bind(this)
-        }
-    );
-},
-_openProcessLogDialog: function (sTitle, aLogs) {
+                console.error(
+                    "OData model 'ZRI_SB_CLM_PROC' not found."
+                );
 
-    if (!this._pProcessLogDialog) {
+                return;
+            }
 
-        this._pProcessLogDialog =
-            this.loadFragment({
-                name: "srt.app.view.fragments.ProcessLog"
-            });
-    }
 
-    this._pProcessLogDialog.then(function (oDialog) {
+            // ==========================================
+            // LOAD RESULT TABLE
+            // ==========================================
 
-        var oLogModel = new JSONModel({
-            logs: aLogs
-        });
+            this._showResultTable(
+                oModel,
+                "/Claims",
+                aFilters
+            );
 
-        oDialog.setModel(
-            oLogModel,
-            "processLog"
-        );
-
-        oDialog.setTitle(sTitle);
-
-        oDialog.open();
-
-    });
-},
-onProcessLogClose: function () {
-
-    if (this._pProcessLogDialog) {
-
-        this._pProcessLogDialog.then(function (oDialog) {
-            oDialog.close();
-        });
-
-    }
-}
+        },
 
     });
 

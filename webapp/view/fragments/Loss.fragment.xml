@@ -1,0 +1,146 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+>
+    <VBox class="srtFilterContainer">
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            alignItems="Center"
+            justifyContent="SpaceBetween"
+            class="sapUiTinyMarginBottom"
+        >
+            <!-- LEFT: TITLE -->
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon"
+                />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle"
+                />
+            </HBox>
+
+            <!-- RIGHT: ACTIONS -->
+            <HBox
+                alignItems="Center"
+                justifyContent="End"
+            >
+                <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                    class="sapUiTinyMarginEnd"
+                />
+
+                <CheckBox
+                    id="copyLossEventAgain"
+                    text="Copy Loss Event Again"
+                    selected="{wizard>/copyLossEventAgain}"
+                    enabled="{wizard>/copyLossEventAgainEnabled}"
+                    class="sapUiTinyMarginEnd"
+                />
+
+                <CheckBox
+                    id="copyLossAgain"
+                    text="Copy Loss Again"
+                    selected="{wizard>/copyLossAgain}"
+                    enabled="{wizard>/copyLossAgainEnabled}"
+                />
+                <CheckBox
+                    id="copyAcc"
+                    text="Copy Account"
+                    selected="{wizard>/copyAccount}"
+                    
+                />
+            </HBox>
+        </HBox>
+
+        <!-- FILTER ROW -->
+        <HBox
+            width="100%"
+            alignItems="End"
+            justifyContent="Start"
+            wrap="Wrap"
+            class="srtFilterRow"
+        >
+            <!-- LOSS -->
+            <VBox width="20rem">
+                <Label
+                    text="Loss"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    id="LossInput"
+                    width="100%"
+                    value="{wizard>/loss}"
+                    placeholder="Enter Loss ID"
+                    showValueHelp="true"
+                    valueHelpRequest="onLossValueHelp"
+                />
+            </VBox>
+
+            <VBox width="2rem" />
+
+            <!-- PROCESS REF ID -->
+            <VBox width="20rem">
+                <Label
+                    text="Process Ref ID"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    id="lossProcessRefInput"
+                    width="100%"
+                    value="{wizard>/lossProcessRefId}"
+                    placeholder="Enter Process Ref ID"
+                />
+            </VBox>
+
+            <ToolbarSpacer width="2rem" />
+
+            <!-- TARGET SYSTEM -->
+            <VBox width="20rem">
+                <Label
+                    text="Target System"
+                    class="srtFieldLabel"
+                />
+
+                <ComboBox
+                    id="LossDestination"
+                    width="100%"
+                    selectedKey="{wizard>/lossTargetSystem}"
+                    items="{ZRI_SB_RIP_DATA>/RFC}"
+                    showSecondaryValues="false"
+                >
+                    <core:Item
+                        key="{ZRI_SB_RIP_DATA>rfcdest}"
+                        text="{ZRI_SB_RIP_DATA>rfcdest}"
+                    />
+                </ComboBox>
+            </VBox>
+
+            <ToolbarSpacer width="2rem" />
+
+            <!-- GO -->
+            <VBox width="5rem">
+                <Label
+                    text=" "
+                    class="srtFieldLabel"
+                />
+
+                <Button
+                    text="Go"
+                    type="Emphasized"
+                    width="100%"
+                    press="onLossGo"
+                />
+            </VBox>
+        </HBox>
+    </VBox>
+</core:FragmentDefinition>

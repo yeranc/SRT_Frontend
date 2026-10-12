@@ -104,7 +104,7 @@
 
 
 <!-- GAP -->
-<VBox height="0.5rem" />
+<VBox height="0.75rem" />
 
 
 <!-- ROW 2 -->
@@ -165,7 +165,7 @@
 
 
 <!-- GAP -->
-<VBox height="0.5rem" />
+<VBox height="0.75rem" />
 
 
 <!-- ROW 3 -->
