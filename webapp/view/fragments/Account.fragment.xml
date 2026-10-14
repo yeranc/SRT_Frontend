@@ -37,6 +37,11 @@
                 />
 
                 <CheckBox
+                    id="accountCopyLoss"
+                    text="Copy Loss"
+                    selected="{wizard>/copyLoss}"
+                />
+                <CheckBox
                     id="accountCopyAgain"
                     text="Copy Again"
                     selected="{wizard>/copyAgain}"
@@ -54,9 +59,8 @@
 >
     <VBox class="srtFilterField">
         <Label text="Account Number" />
-        <MultiInput
+        <MultiInput submit="onAccountGo"
             id="accountNumberInput"
-            value="{wizard>/accountNumber}"
             placeholder="Enter Account Number"
             showValueHelp="true"
             valueHelpRequest="onAccountValHelp"
@@ -76,7 +80,7 @@
 
     <VBox class="srtFilterField">
         <Label text="Section Number" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountSectionNumberInput"
             value="{wizard>/accountSectionNumber}"
             placeholder="Enter Section Number"
@@ -85,7 +89,7 @@
 
     <VBox class="srtFilterField">
         <Label text="UW Year" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountUWYearInput"
             value="{wizard>/accountUWYear}"
             placeholder="Enter UW Year"
@@ -94,7 +98,7 @@
 
     <VBox class="srtFilterField">
         <Label text="Line of Business" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountLineOfBusinessInput"
             value="{wizard>/accountLineOfBusiness}"
             placeholder="Enter Line of Business"
@@ -115,7 +119,7 @@
 >
     <VBox class="srtFilterField">
         <Label text="Class of Business" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountClassOfBusinessInput"
             value="{wizard>/accountClassOfBusiness}"
             placeholder="Enter Class of Business"
@@ -124,7 +128,7 @@
 
     <VBox class="srtFilterField">
         <Label text="Business Type" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountBusinessTypeInput"
             value="{wizard>/accountBusinessType}"
             placeholder="Enter Business Type"
@@ -155,7 +159,7 @@
 
     <VBox class="srtFilterField">
         <Label text="Account Function" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountFunctionInput"
             value="{wizard>/accountFunction}"
             placeholder="Enter Account Function"
@@ -176,7 +180,7 @@
 >
     <VBox class="srtFilterField">
         <Label text="Created By" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountCreatedByInput"
             value="{wizard>/accountCreatedBy}"
             placeholder="Enter Created By"
@@ -196,7 +200,7 @@
 
     <VBox class="srtFilterField">
         <Label text="Process Ref ID" />
-        <Input
+        <Input submit="onAccountGo"
             id="accountProcessRefIdInput"
             value="{wizard>/accountProcessRefId}"
             placeholder="Enter Process Ref ID"

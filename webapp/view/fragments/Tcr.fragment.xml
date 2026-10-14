@@ -56,9 +56,8 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <MultiInput submit="onTCRGo"
                     id="tcrNumberInput"
-                    value="{wizard>/tcrNumber}"
                     placeholder="Enter TCR Number"
                     showValueHelp="true"
                     valueHelpRequest="onTCRValueHelp"
@@ -72,7 +71,7 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <Input submit="onTCRGo"
                     id="tcrCreatedByInput"
                     value="{wizard>/tcrCreatedBy}"
                     placeholder="Enter Created By"
@@ -102,7 +101,7 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <Input submit="onTCRGo"
                     id="tcrProcessRefIdInput"
                     value="{wizard>/tcrProcessRefId}"
                     placeholder="Enter Process Ref ID"

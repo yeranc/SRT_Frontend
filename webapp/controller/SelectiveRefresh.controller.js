@@ -1,4 +1,3 @@
-
 sap.ui.define([
     "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
@@ -17,6 +16,7 @@ sap.ui.define([
     "sap/ui/comp/filterbar/FilterGroupItem",
     "sap/ui/comp/valuehelpdialog/ValueHelpDialog",
     "sap/m/Token",
+    "sap/m/SearchField",
 ], function (
     Controller,
     JSONModel,
@@ -34,11 +34,14 @@ sap.ui.define([
     FilterBar,
     FilterGroupItem,
     ValueHelpDialog,
-    Token
+    Token,
+    SearchField
 ) {
     "use strict";
 
     var RIP_ENTITY_SET = "ZRI_I_RIPNO_VH";
+    var EXEC_POLL_INTERVAL_MS = 500;
+    var EXEC_POLL_TIMEOUT_MS = 50000;
 
     return Controller.extend("srt.app.controller.SelectiveRefresh", {
 
@@ -123,7 +126,7 @@ sap.ui.define([
             }
             this._oBusyDialog = new BusyDialog({
 
-                text: "Please wait while the data is being fetched..."
+                // text: "Please wait while the data is being fetched..."
 
             });
 
@@ -154,12 +157,16 @@ sap.ui.define([
                 ]
             });
 
-            var oAccountInput =
-                this.byId("accountNumberInput");
-
-            if (oAccountInput) {
-                oAccountInput.removeAllTokens();
-            }
+            [
+                "treatyInput", "accountNumberInput", "ripNumberInput",
+                "tcrNumberInput", "LossInput"
+            ].forEach(function (sId) {
+                var oInp = this.byId(sId);
+                if (oInp && oInp.removeAllTokens) {
+                    oInp.removeAllTokens();
+                    oInp.setValue("");
+                }
+            }, this);
             this._clearResultTable();
         },
 
@@ -204,6 +211,8 @@ sap.ui.define([
             oWizardModel.setProperty("/copyAgain", false);
             oWizardModel.setProperty("/copyLoss", false);
             oWizardModel.setProperty("/copyAccount", false);
+            oWizardModel.setProperty("/copyRip", false);
+            oWizardModel.setProperty("/copyTcr", false);
 
             // Also reset the switches themselves
 
@@ -361,6 +370,8 @@ sap.ui.define([
 
                 oContainer.addItem(oFragment);
 
+                this._attachTokenValidators();
+
             }.bind(this)).catch(function (oError) {
 
                 console.error("Error loading selection fragment:", oError);
@@ -459,6 +470,7 @@ sap.ui.define([
             var iSuccess = 0;
             var iFailed = 0;
 
+
             console.log(
                 "TOTAL SELECTED:",
                 aSelectedResults.length,
@@ -520,7 +532,6 @@ sap.ui.define([
                 sObjectKeys
             );
 
-
             var aFilters = [];
 
 
@@ -559,6 +570,37 @@ sap.ui.define([
                 )
             );
 
+            // ==========================================
+            // DEPENDENT OBJECTS (Treaty / RIP)
+            // Sent only for the checkboxes the user ticked
+            // ==========================================
+            var mDependents = {
+                T: [
+                    ["copyLoss", "iv_is_loss_req"],
+                    ["copyAccount", "iv_is_acc_req"],
+                    ["copyRip", "iv_is_rip_req"],
+                    ["copyTcr", "iv_is_tcr_req"]
+                ],
+                RIP: [
+                    ["copyLoss", "iv_is_loss_req"],
+                    ["copyAccount", "iv_is_acc_req"]
+                ]
+            };
+
+            (mDependents[sGroupId] || []).forEach(function (aMap) {
+
+                if (oWizardModel.getProperty("/" + aMap[0])) {
+
+                    aFilters.push(
+                        new Filter(
+                            aMap[1],
+                            FilterOperator.EQ,
+                            true
+                        )
+                    );
+                }
+            });
+
 
             // ==========================================
             // ONE RIPSet CALL ONLY
@@ -570,86 +612,54 @@ sap.ui.define([
 
                     success: function (oData) {
 
-                        console.log("RIPSet SUCCESS");
-                        console.log("Objects:", sObjectKeys);
-                        console.log("Response:", oData);
-
                         var sProcessId =
-                            oData.results &&
-                                oData.results.length > 0
+                            oData.results && oData.results.length > 0
                                 ? oData.results[0].process_id
-                                : "NO PROCESS ID";
+                                : "";
 
-                        console.log("ONE PROCESS ID:", sProcessId);
+                        // this._oBusyDialog.setText(
+                        //     "..."
+                        // );
 
-                        iSuccess = aObjectKeys.length;
+                        (sProcessId
+                            ? this._waitForExecution(sGroupId, aObjectKeys, sProcessId)
+                            : Promise.resolve(false)
+                        )
+                            .then(function (bDone) {
 
-                        // ==========================================
-                        // KEEP BUSY DIALOG OPEN WHILE PROCESSING
-                        // ==========================================
-                        this._oBusyDialog.setText(
-                            "Processing " +
-                            iSuccess +
-                            " object(s)..."
-                        );
+                                // Reload the table with the same filters as the last Go
+                                var oBinding = this._oResultTable.getBinding("rows");
 
-                        // ==========================================
-                        // REFRESH RESULT TABLE AFTER PROCESSING
-                        // ==========================================
+                                return new Promise(function (resolve) {
+                                    oBinding.attachEventOnce("dataReceived", function () {
+                                        resolve(bDone);
+                                    });
+                                    oBinding.refresh(true);
+                                });
 
-                        var oController = this;
+                            }.bind(this))
 
-                        setTimeout(function () {
+                            .then(function (bDone) {
 
-                            console.log(
-                                "Refreshing result table after execution..."
-                            );
+                                this._oBusyDialog.close();
 
-                            if (sGroupId === "B") {
-                                oController.onBPGo();
-                            }
-                            else if (sGroupId === "A") {
-                                oController.onAccountGo();
-                            }
-                            else if (sGroupId === "L") {
-                                oController.onLossGo();
-                            }
-                            else if (sGroupId === "T") {
-                                oController.onTreatyGo();
-                            }
-                            else if (sGroupId === "TCR") {
-                                oController.onTCRGo();
-                            }
-                            else if (sGroupId === "RIP") {
+                                MessageToast.show(
+                                    bDone
+                                        ? aObjectKeys.length + " object(s) replicated. Processing ID: " + sProcessId
+                                        : aObjectKeys.length + " object(s) submitted. Not confirmed yet - press Go again to refresh."
+                                );
 
-                                var oRipModel =
-                                    oController.getView()
-                                        .getModel("ZRI_SB_RIP_DATA");
+                            }.bind(this))
 
-                                if (oRipModel) {
-                                    oRipModel.refresh(true);
-                                }
+                            .catch(function (oError) {
 
-                                oController.onRIPGo();
-                            }
+                                this._oBusyDialog.close();
 
-                            // ==========================================
-                            // PROCESSING COMPLETED
-                            // ==========================================
+                                MessageToast.show(
+                                    "Refresh failed. " + this._getErrorText(oError)
+                                );
 
-                            oController._oBusyDialog.close();
-
-                            MessageToast.show(
-                                iSuccess +
-                                " object(s) processed successfully under Processing ID: " +
-                                sProcessId
-                            );
-
-                            console.log(
-                                "Result table refresh completed."
-                            );
-
-                        }, 5000);
+                            }.bind(this));
 
                     }.bind(this),
 
@@ -665,7 +675,8 @@ sap.ui.define([
 
 
                         MessageToast.show(
-                            "Execution failed."
+                            "Execution failed. " +
+                            this._getErrorText(oError)
                         );
 
                     }.bind(this)
@@ -680,7 +691,47 @@ sap.ui.define([
                 "Variant saved."
             );
         },
+        _waitForExecution: function (sGroupId, aKeys, sProcessId) {
 
+            var oConfig = this._getResultTableConfig(sGroupId);
+            var oBinding = this._oResultTable.getBinding("rows");
+            var sProcessProperty = oConfig.columns.filter(function (oColumn) {
+                return oColumn.label === "Process Ref ID";
+            })[0].property;
+            var iStart = Date.now();
+
+            return new Promise(function (resolve, reject) {
+
+                (function poll() {
+
+                    oBinding.getModel().read(oBinding.getPath(), {
+                        filters: [new Filter({
+                            filters: aKeys.map(function (sKey) {
+                                return new Filter(oConfig.sourceProperty, FilterOperator.EQ, sKey);
+                            }),
+                            and: false
+                        })],
+                        success: function (oData) {
+
+                            var bDone = aKeys.every(function (sKey) {
+                                return oData.results.some(function (oRow) {
+                                    return String(oRow[oConfig.sourceProperty]).trim() === sKey &&
+                                        String(oRow[sProcessProperty] || "").trim() === sProcessId;
+                                });
+                            });
+
+                            if (bDone || Date.now() - iStart >= EXEC_POLL_TIMEOUT_MS) {
+                                resolve(bDone);
+                            } else {
+                                setTimeout(poll, EXEC_POLL_INTERVAL_MS);
+                            }
+                        },
+                        error: reject
+                    });
+
+                })();
+            });
+        },
 
         onAddRange: function () {
 
@@ -888,7 +939,8 @@ sap.ui.define([
                                                     {
                                                         month: "short",
                                                         day: "2-digit",
-                                                        year: "numeric"
+                                                        year: "numeric",
+                                                        timeZone: "UTC"
                                                     }
                                                 );
                                         }
@@ -1463,7 +1515,8 @@ sap.ui.define([
 
                                 return sap.ui.core.format.DateFormat
                                     .getDateInstance({
-                                        pattern: "dd.MM.yyyy"
+                                        pattern: "dd.MM.yyyy",
+                                        UTC: true
                                     })
                                     .format(oDate);
                             }
@@ -1510,7 +1563,8 @@ sap.ui.define([
             // Now bind the new entity
             oTable.bindRows({
                 path: "result>" + sPath,
-                filters: aFilters
+                filters: aFilters,
+                parameters: { countMode: "Inline" }
             });
 
         },
@@ -1638,82 +1692,82 @@ sap.ui.define([
 
             if (sGroupId === "L") {
 
-    var bHasLossEvent =
-        oSelectedObject &&
-        oSelectedObject.g_schadkz !== null &&
-        oSelectedObject.g_schadkz !== undefined &&
-        String(oSelectedObject.g_schadkz).trim() !== "";
+                var bHasLossEvent =
+                    oSelectedObject &&
+                    oSelectedObject.g_schadkz !== null &&
+                    oSelectedObject.g_schadkz !== undefined &&
+                    String(oSelectedObject.g_schadkz).trim() !== "";
 
-    var bHasTargetLoss =
-        oSelectedObject &&
-        oSelectedObject.target_number !== null &&
-        oSelectedObject.target_number !== undefined &&
-        String(oSelectedObject.target_number).trim() !== "";
+                var bHasTargetLoss =
+                    oSelectedObject &&
+                    oSelectedObject.target_number !== null &&
+                    oSelectedObject.target_number !== undefined &&
+                    String(oSelectedObject.target_number).trim() !== "";
 
-    // -------------------------------------------------
-    // COPY LOSS EVENT AGAIN
-    // Enabled ONLY when:
-    // Loss Event exists AND Target Loss exists
-    // -------------------------------------------------
-    var bCanCopyLossEventAgain =
-        bHasLossEvent &&
-        bHasTargetLoss;
+                // -------------------------------------------------
+                // COPY LOSS EVENT AGAIN
+                // Enabled ONLY when:
+                // Loss Event exists AND Target Loss exists
+                // -------------------------------------------------
+                var bCanCopyLossEventAgain =
+                    bHasLossEvent &&
+                    bHasTargetLoss;
 
-    oWizardModel.setProperty(
-        "/copyLossEventAgainEnabled",
-        bCanCopyLossEventAgain
-    );
+                oWizardModel.setProperty(
+                    "/copyLossEventAgainEnabled",
+                    bCanCopyLossEventAgain
+                );
 
-    if (!bCanCopyLossEventAgain) {
-        oWizardModel.setProperty(
-            "/copyLossEventAgain",
-            false
-        );
-    }
+                if (!bCanCopyLossEventAgain) {
+                    oWizardModel.setProperty(
+                        "/copyLossEventAgain",
+                        false
+                    );
+                }
 
-    // -------------------------------------------------
-    // COPY LOSS AGAIN
-    // Enabled ONLY when:
-    // Target Loss exists AND Loss Event does NOT exist
-    // -------------------------------------------------
-    var bCanCopyLossAgain =
-        bHasTargetLoss &&
-        !bHasLossEvent;
+                // -------------------------------------------------
+                // COPY LOSS AGAIN
+                // Enabled ONLY when:
+                // Target Loss exists AND Loss Event does NOT exist
+                // -------------------------------------------------
+                var bCanCopyLossAgain =
+                    bHasTargetLoss &&
+                    !bHasLossEvent;
 
-    oWizardModel.setProperty(
-        "/copyLossAgainEnabled",
-        bCanCopyLossAgain
-    );
+                oWizardModel.setProperty(
+                    "/copyLossAgainEnabled",
+                    bCanCopyLossAgain
+                );
 
-    if (!bCanCopyLossAgain) {
-        oWizardModel.setProperty(
-            "/copyLossAgain",
-            false
-        );
-    }
+                if (!bCanCopyLossAgain) {
+                    oWizardModel.setProperty(
+                        "/copyLossAgain",
+                        false
+                    );
+                }
 
-    console.log("========== LOSS COPY STATE ==========");
-    console.log("Loss:", oSelectedObject.schadnr);
-    console.log("Loss Event:", oSelectedObject.g_schadkz);
-    console.log("Target Loss:", oSelectedObject.target_number);
+                console.log("========== LOSS COPY STATE ==========");
+                console.log("Loss:", oSelectedObject.schadnr);
+                console.log("Loss Event:", oSelectedObject.g_schadkz);
+                console.log("Target Loss:", oSelectedObject.target_number);
 
-    console.log("Has Loss Event:", bHasLossEvent);
-    console.log("Has Target Loss:", bHasTargetLoss);
+                console.log("Has Loss Event:", bHasLossEvent);
+                console.log("Has Target Loss:", bHasTargetLoss);
 
-    console.log(
-        "Copy Loss Event Again Enabled:",
-        bCanCopyLossEventAgain
-    );
+                console.log(
+                    "Copy Loss Event Again Enabled:",
+                    bCanCopyLossEventAgain
+                );
 
-    console.log(
-        "Copy Loss Again Enabled:",
-        bCanCopyLossAgain
-    );
+                console.log(
+                    "Copy Loss Again Enabled:",
+                    bCanCopyLossAgain
+                );
 
-    console.log("=====================================");
+                console.log("=====================================");
 
-    return;
-}
+                return;
+            }
 
 
             // =========================================================
@@ -2149,91 +2203,333 @@ sap.ui.define([
         },
 
         //Treaty
-        onTreatyGo: function () {
 
-            var oWizardModel =
-                this.getView().getModel("wizard");
+        // =========================================================
+        // GENERIC HELPERS (filters / dates / tokens)
+        // =========================================================
 
-            var aFilters = [];
+        /**
+         * "yyyy-MM-dd" -> Date at 00:00 UTC.
+         * OData V2 serialises Edm.DateTime filters using the UTC fields, so a
+         * local-midnight Date shifts the day in any timezone east/west of UTC.
+         */
+        _toUTCDate: function (sYmd) {
+            if (!sYmd) { return null; }
+            var a = String(sYmd).split("-");
+            if (a.length !== 3) { return null; }
+            return new Date(Date.UTC(+a[0], +a[1] - 1, +a[2]));
+        },
 
-            var sTreaty =
-                oWizardModel.getProperty("/treaty");
+        _addEqFilter: function (aFilters, sProperty, vValue, bUpper) {
+            if (vValue === undefined || vValue === null) { return; }
+            var s = String(vValue).trim();
+            if (!s) { return; }
+            aFilters.push(new Filter(
+                sProperty, FilterOperator.EQ, bUpper ? s.toUpperCase() : s
+            ));
+        },
 
-            var sProcessRefId =
-                oWizardModel.getProperty(
-                    "/treatyProcessRefId"
-                );
+        _addDateFilter: function (aFilters, sProperty, sYmd) {
+            var oDate = this._toUTCDate(sYmd);
+            if (oDate) {
+                aFilters.push(new Filter(sProperty, FilterOperator.EQ, oDate));
+            }
+        },
 
-            var sTargetSystem =
-                oWizardModel.getProperty(
-                    "/treatyTargetSystem"
-                );
+        /** Text typed by the user -> range descriptor (supports 1...5, >=1, <5, !=1, *x*, x*, *x) */
+        _parseRangeText: function (sText) {
+            var s = (sText || "").trim();
+            var m;
+            if (!s) { return null; }
 
+            if ((m = s.match(/^(.+?)\.\.\.(.+)$/))) {
+                return {
+                    operation: "BT",
+                    value1: m[1].trim().toUpperCase(),
+                    value2: m[2].trim().toUpperCase()
+                };
+            }
+            if ((m = s.match(/^(>=|<=|<>|!=|>|<|=|!)\s*(.+)$/))) {
+                var mOps = {
+                    ">=": "GE", "<=": "LE", ">": "GT", "<": "LT",
+                    "=": "EQ", "<>": "EQ", "!=": "EQ", "!": "EQ"
+                };
+                return {
+                    operation: mOps[m[1]],
+                    value1: m[2].trim().toUpperCase(),
+                    exclude: ["<>", "!=", "!"].indexOf(m[1]) !== -1
+                };
+            }
+            if ((m = s.match(/^\*(.+)\*$/))) {
+                return { operation: "Contains", value1: m[1].toUpperCase() };
+            }
+            if ((m = s.match(/^(.+)\*$/))) {
+                return { operation: "StartsWith", value1: m[1].toUpperCase() };
+            }
+            if ((m = s.match(/^\*(.+)$/))) {
+                return { operation: "EndsWith", value1: m[1].toUpperCase() };
+            }
+            return { operation: "EQ", value1: s.toUpperCase() };
+        },
 
-            if (sTreaty) {
+        _rangeText: function (o) {
+            var t;
+            switch (o.operation) {
+                case "BT": t = o.value1 + "..." + o.value2; break;
+                case "GE": t = ">=" + o.value1; break;
+                case "LE": t = "<=" + o.value1; break;
+                case "GT": t = ">" + o.value1; break;
+                case "LT": t = "<" + o.value1; break;
+                case "Contains": t = "*" + o.value1 + "*"; break;
+                case "StartsWith": t = o.value1 + "*"; break;
+                case "EndsWith": t = "*" + o.value1; break;
+                default: t = o.value1;
+            }
+            return o.exclude ? "!(" + t + ")" : t;
+        },
 
-                aFilters.push(
-                    new Filter(
-                        "vtgnr",
-                        FilterOperator.EQ,
-                        sTreaty
-                    )
-                );
+        _tokenValidator: function (oArgs) {
+            var oRange = this._parseRangeText(oArgs.text);
+            if (!oRange) { return null; }
+            var sText = this._rangeText(oRange);
+            var oToken = new Token({ key: sText, text: sText });
+            oToken.data("range", {
+                exclude: !!oRange.exclude,
+                operation: oRange.operation,
+                keyField: "key",
+                value1: oRange.value1,
+                value2: oRange.value2
+            });
+            return oToken;
+        },
+
+        /** Enables typing "100", "100...200", ">=100" + Enter in the token inputs */
+        _attachTokenValidators: function () {
+            [
+                "treatyInput", "accountNumberInput", "ripNumberInput",
+                "tcrNumberInput", "LossInput"
+            ].forEach(function (sId) {
+                var oInput = this.byId(sId);
+                if (oInput && oInput.addValidator && !oInput.data("srtValidator")) {
+                    oInput.addValidator(this._tokenValidator.bind(this));
+                    oInput.data("srtValidator", true);
+                }
+            }, this);
+        },
+
+        _rangeToFilter: function (sProperty, sOp, v1, v2, bExclude) {
+            var FO = FilterOperator;
+            if (bExclude) {
+                if (sOp === "EQ") { return new Filter(sProperty, FO.NE, v1); }
+                if (sOp === "BT") {
+                    return FO.NB
+                        ? new Filter(sProperty, FO.NB, v1, v2)
+                        : new Filter({
+                            filters: [
+                                new Filter(sProperty, FO.LT, v1),
+                                new Filter(sProperty, FO.GT, v2)
+                            ],
+                            and: false
+                        });
+                }
+                var sNot = "Not" + sOp;
+                return FO[sNot] ? new Filter(sProperty, FO[sNot], v1) : null;
+            }
+            switch (sOp) {
+                case "BT": return new Filter(sProperty, FO.BT, v1, v2);
+                case "EQ": case "GT": case "GE": case "LT": case "LE":
+                case "Contains": case "StartsWith": case "EndsWith":
+                    return new Filter(sProperty, FO[sOp], v1);
+                default: return null;
+            }
+        },
+
+        /**
+         * Builds ONE filter from all tokens of a token input
+         * (includes OR-ed, excludes AND-ed, both AND-ed together).
+         */
+        _getTokenFilter: function (sInputId, sProperty) {
+            var oInput = this.byId(sInputId);
+            if (!oInput || !oInput.getTokens) { return null; }
+
+            // "Enter" fires submit BEFORE the typed text becomes a token
+            var sPending = (oInput.getValue() || "").trim();
+            if (sPending) {
+                var oTok = this._tokenValidator({ text: sPending });
+                if (oTok) { oInput.addToken(oTok); }
+                oInput.setValue("");
             }
 
-            if (sProcessRefId) {
+            var aInc = [], aExc = [];
+            oInput.getTokens().forEach(function (oToken) {
+                var oR = oToken.data("range");
+                var sOp = "EQ", v1 = oToken.getKey(), v2, bExc = false;
+                if (oR) {
+                    sOp = oR.operation; v1 = oR.value1;
+                    v2 = oR.value2; bExc = !!oR.exclude;
+                }
+                var oF = this._rangeToFilter(sProperty, sOp, v1, v2, bExc);
+                if (oF) { (bExc ? aExc : aInc).push(oF); }
+            }, this);
 
-                aFilters.push(
-                    new Filter(
-                        "processingID",
-                        FilterOperator.EQ,
-                        sProcessRefId
-                    )
-                );
+            var aAll = [];
+            if (aInc.length === 1) { aAll.push(aInc[0]); }
+            else if (aInc.length > 1) { aAll.push(new Filter({ filters: aInc, and: false })); }
+            aAll = aAll.concat(aExc);
+
+            if (!aAll.length) { return null; }
+            return aAll.length === 1 ? aAll[0] : new Filter({ filters: aAll, and: true });
+        },
+
+        _getErrorText: function (oError) {
+            try {
+                var o = JSON.parse(oError.responseText);
+                return (o.error && o.error.message && (o.error.message.value || o.error.message)) || "";
+            } catch (e) {
+                return (oError && (oError.message || oError.statusText)) || "";
             }
+        },
 
-            if (sTargetSystem) {
+        // =========================================================
+        // F4 WITH RANGES (between / greater than / less than ...)
+        // =========================================================
+        _openRangeValueHelp: function (mCfg) {
 
-                aFilters.push(
-                    new Filter(
-                        "syst",
-                        FilterOperator.EQ,
-                        sTargetSystem
-                    )
-                );
-            }
+            var oView = this.getView();
+            var oInput = this.byId(mCfg.inputId);
+            var oModel = oView.getModel(mCfg.model);
 
-
-            var oModel =
-                this.getView()
-                    .getModel("ZRI_S_TTY_DATA");
-
-            if (!oModel) {
-
-                MessageToast.show(
-                    "Treaty service is not available."
-                );
-
+            if (!oInput || !oModel) {
+                MessageToast.show("Value help is not available.");
                 return;
             }
 
+            var oVHD = new ValueHelpDialog({
+                title: mCfg.title,
+                supportMultiselect: true,
+                supportRanges: true,
+                supportRangesOnly: false,
+                key: mCfg.key,
+                descriptionKey: mCfg.descriptionKey,
+                ok: function (oEvent) {
+                    oInput.setTokens(oEvent.getParameter("tokens"));
+                    oVHD.close();
+                },
+                cancel: function () { oVHD.close(); },
+                afterClose: function () { oVHD.destroy(); }
+            });
 
-            // if (aFilters.length === 0) {
+            oVHD.setRangeKeyFields([{
+                label: mCfg.title,
+                key: mCfg.key,
+                type: "string"
+            }]);
 
-            //     MessageToast.show(
-            //         "Please enter at least one search criterion."
-            //     );
+            oVHD.setTokens(oInput.getTokens().map(function (t) { return t.clone(); }));
 
-            //     return;
-            // }
+            var oSearch = new SearchField({ placeholder: "Search" });
+            var oFB = new FilterBar({
+                advancedMode: true,
+                search: function () {
+                    oVHD.getTableAsync().then(function (oTable) {
+                        var sV = (oSearch.getValue() || "").trim();
+                        var oB = oTable.getBinding("rows");
+                        if (!oB) { return; }
+                        oB.filter(sV ? [new Filter({
+                            filters: [
+                                new Filter(mCfg.key, FilterOperator.Contains, sV.toUpperCase()),
+                                new Filter(mCfg.descriptionKey, FilterOperator.Contains, sV)
+                            ],
+                            and: false
+                        })] : []);
+                    });
+                }
+            });
+            oSearch.attachSearch(function () { oFB.search(); });
+            oFB.setBasicSearch(oSearch);
+            oVHD.setFilterBar(oFB);
 
+            oVHD.getTableAsync().then(function (oTable) {
+                oTable.setModel(oModel);
+                mCfg.columns.forEach(function (c) {
+                    oTable.addColumn(new TableColumn({
+                        label: new Label({ text: c.label }),
+                        template: new Text({ text: "{" + c.property + "}" })
+                    }));
+                });
+                oTable.bindRows({ path: "/" + mCfg.entitySet });
+                oVHD.update();
+            });
 
-            this._showResultTable(
-                oModel,
-                "/Treaty",
-                aFilters
-            );
+            oView.addDependent(oVHD);
+            oVHD.open();
         },
+
+        onTtyValueHelp: function () {
+            this._openRangeValueHelp({
+                inputId: "treatyInput", title: "Treaty Number",
+                model: "ZRI_S_TTY_DATA", entitySet: "ZRI_I_VTGNR_VH",
+                key: "vtgnr", descriptionKey: "Vtgbez",
+                columns: [
+                    { label: "Treaty Number", property: "vtgnr" },
+                    { label: "Treaty Name", property: "Vtgbez" },
+                    { label: "Company Code", property: "Bukrs" }
+                ]
+            });
+        },
+
+        onTCRValueHelp: function () {
+            this._openRangeValueHelp({
+                inputId: "tcrNumberInput", title: "TCR Number",
+                model: "ZRI_SB_TCR_DATA", entitySet: "ZRI_I_TCRNO_VH",
+                key: "vtgrrnr", descriptionKey: "Vtgrrbez",
+                columns: [
+                    { label: "TCR Number", property: "vtgrrnr" },
+                    { label: "TCR Name", property: "Vtgrrbez" },
+                    { label: "Company Code", property: "Bukrs" }
+                ]
+            });
+        },
+
+        onLossValueHelp: function () {
+            this._openRangeValueHelp({
+                inputId: "LossInput", title: "Loss",
+                model: "ZRI_SB_CLM_PROC", entitySet: "Claims",
+                key: "schadnr", descriptionKey: "schadbez",
+                columns: [
+                    { label: "Loss", property: "schadnr" },
+                    { label: "Loss Name", property: "schadbez" },
+                    { label: "Loss Event", property: "g_schadkz" }
+                ]
+            });
+        },
+
+        onTreatyGo: function () {
+
+            var oWizardModel = this.getView().getModel("wizard");
+            var aFilters = [];
+
+            var fTreaty = this._getTokenFilter("treatyInput", "vtgnr");
+            if (fTreaty) { aFilters.push(fTreaty); }
+
+            this._addDateFilter(aFilters, "PeriodStartDate", oWizardModel.getProperty("/treatyPeriodStartDate"));
+            this._addEqFilter(aFilters, "LineOfBusiness", oWizardModel.getProperty("/treatyLineOfBusiness"), true);
+            this._addEqFilter(aFilters, "ClassOfBusiness", oWizardModel.getProperty("/treatyClassOfBusiness"), true);
+            this._addEqFilter(aFilters, "Area", oWizardModel.getProperty("/treatyArea"), true);
+            this._addEqFilter(aFilters, "CreatedBy", oWizardModel.getProperty("/treatyCreatedBy"), true);
+            this._addDateFilter(aFilters, "CreationDate", oWizardModel.getProperty("/treatyCreationDate"));
+            this._addEqFilter(aFilters, "processingID", oWizardModel.getProperty("/treatyProcessRefId"));
+            this._addEqFilter(aFilters, "syst", oWizardModel.getProperty("/treatyTargetSystem"));
+
+            var oModel = this.getView().getModel("ZRI_S_TTY_DATA");
+            if (!oModel) {
+                MessageToast.show("Treaty service is not available.");
+                return;
+            }
+
+            this._showResultTable(oModel, "/Treaty", aFilters);
+        },
+
 
 
 
@@ -2242,260 +2538,39 @@ sap.ui.define([
         // =========================================================
         onAccountGo: function () {
 
-            var oWizardModel =
-                this.getView().getModel("wizard");
-
+            var oWizardModel = this.getView().getModel("wizard");
             var aFilters = [];
 
-            var aAccountNumbers =
-                oWizardModel.getProperty("/accountNumbers") || [];
+            var fAcc = this._getTokenFilter("accountNumberInput", "AccountNumber");
+            if (fAcc) { aFilters.push(fAcc); }
 
-            var sFIPostingDate =
-                oWizardModel.getProperty("/accountFIPostingDate");
-
-            var sSectionNumber =
-                oWizardModel.getProperty("/accountSectionNumber");
-
-            var sUWYear =
-                oWizardModel.getProperty("/accountUWYear");
-
-            var sLineOfBusiness =
-                oWizardModel.getProperty("/accountLineOfBusiness");
-
-            var sClassOfBusiness =
-                oWizardModel.getProperty("/accountClassOfBusiness");
-
-            var sBusinessType =
-                oWizardModel.getProperty("/accountBusinessType");
-
-            var sStartPeriodDate =
-                oWizardModel.getProperty("/accountStartPeriodDate");
-
-            var sEndPeriodDate =
-                oWizardModel.getProperty("/accountEndPeriodDate");
-
-            var sAccountFunction =
-                oWizardModel.getProperty("/accountFunction");
-
-            var sCreatedBy =
-                oWizardModel.getProperty("/accountCreatedBy");
-
-            var sCreationDate =
-                oWizardModel.getProperty("/accountCreationDate");
-
-            var sProcessRefId =
-                oWizardModel.getProperty("/accountProcessRefId");
-
-
-            if (aAccountNumbers.length > 0) {
-
-                var aAccountNumberFilters =
-                    aAccountNumbers.map(function (sAccountNumber) {
-
-                        return new Filter(
-                            "AccountNumber",
-                            FilterOperator.EQ,
-                            sAccountNumber
-                        );
-
-                    });
-
-                aFilters.push(
-                    new Filter({
-                        filters: aAccountNumberFilters,
-                        and: false
-                    })
-                );
-            }
-
-
-            if (sFIPostingDate) {
-
-                aFilters.push(
-                    new Filter(
-                        "FIpostingdate",
-                        FilterOperator.EQ,
-                        new Date(
-                            sFIPostingDate +
-                            "T00:00:00"
-                        )
-                    )
-                );
-            }
-
-
-            if (sSectionNumber) {
-
-                aFilters.push(
-                    new Filter(
-                        "SectionNumber",
-                        FilterOperator.EQ,
-                        sSectionNumber
-                    )
-                );
-            }
-
-
-            if (sUWYear) {
-
-                aFilters.push(
-                    new Filter(
-                        "UWyear",
-                        FilterOperator.EQ,
-                        sUWYear
-                    )
-                );
-            }
-
-
-            if (sLineOfBusiness) {
-
-                aFilters.push(
-                    new Filter(
-                        "Lineofbusiness",
-                        FilterOperator.EQ,
-                        sLineOfBusiness
-                    )
-                );
-            }
-
-
-            if (sClassOfBusiness) {
-
-                aFilters.push(
-                    new Filter(
-                        "Classofbusiness",
-                        FilterOperator.EQ,
-                        sClassOfBusiness
-                    )
-                );
-            }
-
-
-            if (sBusinessType) {
-
-                aFilters.push(
-                    new Filter(
-                        "Businesstype",
-                        FilterOperator.EQ,
-                        sBusinessType
-                    )
-                );
-            }
-
-
-            if (sStartPeriodDate) {
-
-                aFilters.push(
-                    new Filter(
-                        "Startofaccperiod",
-                        FilterOperator.EQ,
-                        new Date(
-                            sStartPeriodDate +
-                            "T00:00:00"
-                        )
-                    )
-                );
-            }
-
-
-            if (sEndPeriodDate) {
-
-                aFilters.push(
-                    new Filter(
-                        "Endofaccperiod",
-                        FilterOperator.EQ,
-                        new Date(
-                            sEndPeriodDate +
-                            "T00:00:00"
-                        )
-                    )
-                );
-            }
-
-
-            if (sAccountFunction) {
-
-                aFilters.push(
-                    new Filter(
-                        "AccFunction",
-                        FilterOperator.EQ,
-                        sAccountFunction
-                    )
-                );
-            }
-
-
-            if (sCreatedBy) {
-
-                aFilters.push(
-                    new Filter(
-                        "CreatedBy",
-                        FilterOperator.EQ,
-                        sCreatedBy
-                    )
-                );
-            }
-
-
-            if (sCreationDate) {
-
-                aFilters.push(
-                    new Filter(
-                        "CreationDate",
-                        FilterOperator.EQ,
-                        new Date(
-                            sCreationDate +
-                            "T00:00:00"
-                        )
-                    )
-                );
-            }
-
-
-            if (sProcessRefId) {
-
-                aFilters.push(
-                    new Filter(
-                        "processingID",
-                        FilterOperator.EQ,
-                        sProcessRefId
-                    )
-                );
-            }
-
+            this._addDateFilter(aFilters, "FIpostingdate", oWizardModel.getProperty("/accountFIPostingDate"));
+            this._addEqFilter(aFilters, "SectionNumber", oWizardModel.getProperty("/accountSectionNumber"), true);
+            this._addEqFilter(aFilters, "UWyear", oWizardModel.getProperty("/accountUWYear"));
+            this._addEqFilter(aFilters, "Lineofbusiness", oWizardModel.getProperty("/accountLineOfBusiness"), true);
+            this._addEqFilter(aFilters, "Classofbusiness", oWizardModel.getProperty("/accountClassOfBusiness"), true);
+            this._addEqFilter(aFilters, "Businesstype", oWizardModel.getProperty("/accountBusinessType"), true);
+            this._addDateFilter(aFilters, "Startofaccperiod", oWizardModel.getProperty("/accountStartPeriodDate"));
+            this._addDateFilter(aFilters, "Endofaccperiod", oWizardModel.getProperty("/accountEndPeriodDate"));
+            this._addEqFilter(aFilters, "AccFunction", oWizardModel.getProperty("/accountFunction"), true);
+            this._addEqFilter(aFilters, "CreatedBy", oWizardModel.getProperty("/accountCreatedBy"), true);
+            this._addDateFilter(aFilters, "CreationDate", oWizardModel.getProperty("/accountCreationDate"));
+            this._addEqFilter(aFilters, "processingID", oWizardModel.getProperty("/accountProcessRefId"));
 
             if (aFilters.length === 0) {
-
-                MessageToast.show(
-                    "Please enter at least one search criterion."
-                );
-
+                MessageToast.show("Please enter at least one search criterion.");
                 return;
             }
 
-
-            var oModel =
-                this.getView()
-                    .getModel("ZRI_SB_ACC_DATA");
-
-
+            var oModel = this.getView().getModel("ZRI_SB_ACC_DATA");
             if (!oModel) {
-
-                MessageToast.show(
-                    "Account service is not available."
-                );
-
+                MessageToast.show("Account service is not available.");
                 return;
             }
 
-
-            this._showResultTable(
-                oModel,
-                "/Account",
-                aFilters
-            );
+            this._showResultTable(oModel, "/Account", aFilters);
         },
+
         onAccountValHelp: function () {
 
             var oView = this.getView();
@@ -2614,89 +2689,58 @@ sap.ui.define([
         //                 }.bind(this)
         //             });
         //         },
+
         onRIPGo: function () {
-
-            var oWizardModel =
-                this.getView().getModel("wizard");
-
+            var oWizardModel = this.getView().getModel("wizard");
             var aFilters = [];
 
-            var sRIPNumber =
-                oWizardModel.getProperty("/ripNumber");
-
-            var sCreatedBy =
-                oWizardModel.getProperty("/ripCreatedBy");
-
-            var sCreationDate =
-                oWizardModel.getProperty("/ripCreationDate");
-
-            var sProcessRefId =
-                oWizardModel.getProperty("/ripProcessRefId");
-
-
-            if (sRIPNumber) {
-                aFilters.push(
-                    new Filter(
-                        "RIPNumber",
-                        FilterOperator.EQ,
-                        sRIPNumber
-                    )
-                );
+            var fRip = this._getTokenFilter("ripNumberInput", "RIPNumber");
+            if (fRip) {
+                aFilters.push(fRip);
             }
 
-            if (sCreatedBy) {
-                aFilters.push(
-                    new Filter(
-                        "CreatedBy",
-                        FilterOperator.EQ,
-                        sCreatedBy
-                    )
-                );
-            }
+            this._addEqFilter(
+                aFilters,
+                "CreatedBy",
+                oWizardModel.getProperty("/ripCreatedBy"),
+                true
+            );
 
-            if (sCreationDate) {
-                aFilters.push(
-                    new Filter(
-                        "Createdon",
-                        FilterOperator.EQ,
-                        new Date(
-                            sCreationDate + "T00:00:00"
-                        )
-                    )
-                );
-            }
+            this._addDateFilter(
+                aFilters,
+                "Createdon",
+                oWizardModel.getProperty("/ripCreationDate")
+            );
+            console.log(
+                "Latest RIP Process ID:",
+                oWizardModel.getProperty("/ripProcessRefId")
+            );
 
-            if (sProcessRefId) {
-                aFilters.push(
-                    new Filter(
-                        "ProcessingID",
-                        FilterOperator.EQ,
-                        sProcessRefId
-                    )
-                );
-            }
+            // Filter using the latest execution process ID
+            this._addEqFilter(
+                aFilters,
+                "ProcessingID",
+                oWizardModel.getProperty("/ripProcessRefId")
+            );
 
+            // Filter using the selected target system
+            this._addEqFilter(
+                aFilters,
+                "Syst",
+                oWizardModel.getProperty("/ripTargetSystem")
+            );
 
-            var oModel =
-                this.getView()
-                    .getModel("ZRI_SB_RIP_DATA");
+            var oModel = this.getView().getModel("ZRI_SB_RIP_DATA");
 
             if (!oModel) {
-
-                MessageToast.show(
-                    "RIP service is not available."
-                );
-
+                MessageToast.show("RIP service is not available.");
                 return;
             }
 
-
-            this._showResultTable(
-                oModel,
-                "/RIP",
-                aFilters
-            );
+            this._showResultTable(oModel, "/RIP", aFilters);
         },
+
+
         onAccountVHSearch: function () {
 
             var sPrefix =
@@ -2822,45 +2866,25 @@ sap.ui.define([
         },
         onAccountVHOk: function (oEvent) {
 
-            var aTokens =
-                oEvent.getParameter("tokens") || [];
-
-            var oMultiInput =
-                this.byId("accountNumberInput");
-
-            var aAccountNumbers =
-                aTokens.map(function (oToken) {
-                    return oToken.getKey();
-                });
-
+            var aTokens = oEvent.getParameter("tokens") || [];
+            var oMultiInput = this.byId("accountNumberInput");
 
             if (oMultiInput) {
-
-                oMultiInput.removeAllTokens();
-
-                aAccountNumbers.forEach(function (sAccountNumber) {
-
-                    oMultiInput.addToken(
-                        new Token({
-                            key: sAccountNumber,
-                            text: sAccountNumber
-                        })
-                    );
-
-                });
+                oMultiInput.setTokens(aTokens);
             }
-
 
             this.getView()
                 .getModel("wizard")
                 .setProperty(
                     "/accountNumbers",
-                    aAccountNumbers
+                    aTokens
+                        .filter(function (t) { return !t.data("range"); })
+                        .map(function (t) { return t.getKey(); })
                 );
-
 
             this._oAccountVHD.close();
         },
+
 
 
         onAccountVHCancel: function () {
@@ -2868,7 +2892,16 @@ sap.ui.define([
             this._oAccountVHD.close();
         },
         onRIPValueHelp: function () {
-            console.log("RIP Value help");
+            this._openRangeValueHelp({
+                inputId: "ripNumberInput", title: "RIP Number",
+                model: "ZRI_SB_RIP_DATA", entitySet: "ZRI_I_RIPNO_VH",
+                key: "Rvonr", descriptionKey: "Rvonrbez",
+                columns: [
+                    { label: "RIP Number", property: "Rvonr" },
+                    { label: "RIP Name", property: "Rvonrbez" },
+                    { label: "Created By", property: "Ernam" }
+                ]
+            });
         },
         onAccountCopyWithOpen: function () {
 
@@ -2917,10 +2950,10 @@ sap.ui.define([
                 oView.getModel("ZGS_SRT_SRV");
 
 
+            // Target system is the one already selected on the main screen
             var sRfc =
-                oModel.getProperty(
-                    "/copyWithRfcDestination"
-                );
+                oModel.getProperty("/copyWithRfcDestination") ||
+                oModel.getProperty("/rfcDestination");
 
             var sTreatyFrom =
                 oModel.getProperty(
@@ -3000,7 +3033,6 @@ sap.ui.define([
                 )
             );
 
-
             // IMPORTANT:
             // iv_rip_to is Nullable="false"
             // so always send something
@@ -3075,7 +3107,8 @@ sap.ui.define([
                         );
 
                         MessageToast.show(
-                            "Account copy failed."
+                            "Account copy failed. " +
+                            this._getErrorText(oError)
                         );
 
                     }.bind(this)
@@ -3111,105 +3144,25 @@ sap.ui.define([
         },
         onTCRGo: function () {
 
-            var oWizardModel =
-                this.getView().getModel("wizard");
-
+            var oWizardModel = this.getView().getModel("wizard");
             var aFilters = [];
 
+            var fTcr = this._getTokenFilter("tcrNumberInput", "vtgrrnr");
+            if (fTcr) { aFilters.push(fTcr); }
 
-            var sTCRNumber =
-                oWizardModel.getProperty(
-                    "/tcrNumber"
-                );
+            this._addEqFilter(aFilters, "CreatedBy", oWizardModel.getProperty("/tcrCreatedBy"), true);
+            this._addDateFilter(aFilters, "CreatedDate", oWizardModel.getProperty("/tcrCreationDate"));
+            this._addEqFilter(aFilters, "processingID", oWizardModel.getProperty("/tcrProcessRefId"));
 
-            var sCreatedBy =
-                oWizardModel.getProperty(
-                    "/tcrCreatedBy"
-                );
-
-            var sCreationDate =
-                oWizardModel.getProperty(
-                    "/tcrCreationDate"
-                );
-
-            var sProcessRefId =
-                oWizardModel.getProperty(
-                    "/tcrProcessRefId"
-                );
-
-
-            if (sTCRNumber) {
-
-                aFilters.push(
-                    new Filter(
-                        "vtgrrnr",
-                        FilterOperator.EQ,
-                        sTCRNumber
-                    )
-                );
-            }
-
-
-            if (sCreatedBy) {
-
-                aFilters.push(
-                    new Filter(
-                        "CreatedBy",
-                        FilterOperator.EQ,
-                        sCreatedBy
-                    )
-                );
-            }
-
-
-            if (sCreationDate) {
-
-                aFilters.push(
-                    new Filter(
-                        "CreatedDate",
-                        FilterOperator.EQ,
-                        new Date(
-                            sCreationDate +
-                            "T00:00:00"
-                        )
-                    )
-                );
-            }
-
-
-            if (sProcessRefId) {
-
-                aFilters.push(
-                    new Filter(
-                        "processingID",
-                        FilterOperator.EQ,
-                        sProcessRefId
-                    )
-                );
-            }
-
-
-            var oModel =
-                this.getView()
-                    .getModel("ZRI_SB_TCR_DATA");
-
-
+            var oModel = this.getView().getModel("ZRI_SB_TCR_DATA");
             if (!oModel) {
-
-                MessageToast.show(
-                    "TCR service is not available."
-                );
-
+                MessageToast.show("TCR service is not available.");
                 return;
             }
 
-
-            this._showResultTable(
-                oModel,
-                "/TCR",
-                aFilters
-            );
+            this._showResultTable(oModel, "/TCR", aFilters);
         },
+
         //  onTreatyProcessLog: function () {
 
         //     var oWizardModel =
@@ -3895,14 +3848,9 @@ sap.ui.define([
             // Final:
             // ObjectType AND (Root1 OR Root2 OR Root3)
             // =============================================
-            var oFinalFilter =
-                new Filter({
-                    filters: [
-                        oObjectTypeFilter,
-                        oRootFilter
-                    ],
-                    and: true
-                });
+            // No ObjectType restriction: dependent objects (loss, account, ...)
+            // are logged under their own object type, same root number.
+            var oFinalFilter = oRootFilter;
 
 
             var oModel =
@@ -4001,105 +3949,25 @@ sap.ui.define([
         },
         onLossGo: function () {
 
-            var oWizardModel =
-                this.getView().getModel("wizard");
-
+            var oWizardModel = this.getView().getModel("wizard");
             var aFilters = [];
 
-            var sLoss =
-                oWizardModel.getProperty("/loss");
+            var fLoss = this._getTokenFilter("LossInput", "schadnr");
+            if (fLoss) { aFilters.push(fLoss); }
 
-            var sProcessRefId =
-                oWizardModel.getProperty("/lossProcessRefId");
+            this._addEqFilter(aFilters, "process_id", oWizardModel.getProperty("/lossProcessRefId"));
+            this._addEqFilter(aFilters, "systemm", oWizardModel.getProperty("/lossTargetSystem"));
 
-            var sTargetSystem =
-                oWizardModel.getProperty("/lossTargetSystem");
-
-
-            // ==========================================
-            // LOSS FILTER
-            // ==========================================
-
-            if (sLoss) {
-
-                aFilters.push(
-                    new Filter(
-                        "schadnr",
-                        FilterOperator.EQ,
-                        sLoss
-                    )
-                );
-            }
-
-
-            // ==========================================
-            // PROCESS REF ID FILTER
-            // ==========================================
-
-            if (sProcessRefId) {
-
-                aFilters.push(
-                    new Filter(
-                        "process_id",
-                        FilterOperator.EQ,
-                        sProcessRefId
-                    )
-                );
-            }
-
-
-            // ==========================================
-            // TARGET SYSTEM FILTER
-            // ==========================================
-
-            if (sTargetSystem) {
-
-                aFilters.push(
-                    new Filter(
-                        "systemm",
-                        FilterOperator.EQ,
-                        sTargetSystem
-                    )
-                );
-            }
-
-
-            // ==========================================
-            // LOSS SERVICE MODEL
-            // ==========================================
-
-            var oModel =
-                this.getView()
-                    .getModel("ZRI_SB_CLM_PROC");
-
-
+            var oModel = this.getView().getModel("ZRI_SB_CLM_PROC");
             if (!oModel) {
-
-                MessageToast.show(
-                    "Loss service is not available."
-                );
-
-                console.error(
-                    "OData model 'ZRI_SB_CLM_PROC' not found."
-                );
-
+                MessageToast.show("Loss service is not available.");
                 return;
             }
 
-
-            // ==========================================
-            // LOAD RESULT TABLE
-            // ==========================================
-
-            this._showResultTable(
-                oModel,
-                "/Claims",
-                aFilters
-            );
-
+            this._showResultTable(oModel, "/Claims", aFilters);
         },
+
 
     });
 
 });
-

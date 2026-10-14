@@ -71,9 +71,8 @@
                     class="srtFieldLabel" 
                     />
 
-                <Input
+                <MultiInput submit="onRIPGo"
                     id="ripNumberInput"
-                    value="{wizard>/ripNumber}"
                     placeholder="Enter RIP Number"
                     showValueHelp="true"
                     valueHelpRequest="onRIPValueHelp" />
@@ -88,7 +87,7 @@
                     text="Created By"
                     class="srtFieldLabel" />
 
-                <Input
+                <Input submit="onRIPGo"
                     value="{wizard>/ripCreatedBy}"
                     placeholder="Enter Created By" />
 
@@ -118,7 +117,7 @@
                     text="Process Ref ID"
                     class="srtFieldLabel" />
 
-                <Input
+                <Input submit="onRIPGo"
                     value="{wizard>/ripProcessRefId}"
                     placeholder="Enter Process Ref ID" />
 

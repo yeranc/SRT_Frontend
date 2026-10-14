@@ -75,10 +75,9 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <MultiInput submit="onLossGo"
                     id="LossInput"
                     width="100%"
-                    value="{wizard>/loss}"
                     placeholder="Enter Loss ID"
                     showValueHelp="true"
                     valueHelpRequest="onLossValueHelp"
@@ -94,7 +93,7 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <Input submit="onLossGo"
                     id="lossProcessRefInput"
                     width="100%"
                     value="{wizard>/lossProcessRefId}"

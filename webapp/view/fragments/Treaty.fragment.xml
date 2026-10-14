@@ -73,9 +73,8 @@
             <VBox class="srtFilterField"> 
                 <Label text="Treaty Number" /> 
 
-                <Input 
+                <MultiInput submit="onTreatyGo" 
                     id="treatyInput" 
-                    value="{wizard>/treaty}" 
                     placeholder="Enter Treaty Number" 
                     showValueHelp="true" 
                     valueHelpRequest="onTtyValueHelp" /> 
@@ -99,7 +98,7 @@
             <VBox class="srtFilterField"> 
                 <Label text="Line of Business" /> 
 
-                <Input 
+                <Input submit="onTreatyGo" 
                     id="treatyLineOfBusiness" 
                     value="{wizard>/treatyLineOfBusiness}" 
                     placeholder="Enter Line of Business" /> 
@@ -110,7 +109,7 @@
             <VBox class="srtFilterField"> 
                 <Label text="Class of Business" /> 
 
-                <Input 
+                <Input submit="onTreatyGo" 
                     id="treatyClassOfBusiness" 
                     value="{wizard>/treatyClassOfBusiness}" 
                     placeholder="Enter Class of Business" /> 
@@ -121,7 +120,7 @@
             <VBox class="srtFilterField"> 
                 <Label text="Process Ref ID" /> 
 
-                <Input 
+                <Input submit="onTreatyGo" 
                     id="treatyProcessRefIdInput" 
                     value="{wizard>/treatyProcessRefId}" 
                     placeholder="Enter Process Ref ID" /> 
@@ -132,7 +131,7 @@
             <VBox class="srtFilterField"> 
                 <Label text="Area" /> 
 
-                <Input 
+                <Input submit="onTreatyGo" 
                     id="treatyArea" 
                     value="{wizard>/treatyArea}" 
                     placeholder="Enter Area" /> 
@@ -143,7 +142,7 @@
             <VBox class="srtFilterField"> 
                 <Label text="Created By" /> 
 
-                <Input 
+                <Input submit="onTreatyGo" 
                     id="treatyCreatedBy" 
                     value="{wizard>/treatyCreatedBy}" 
                     placeholder="Enter Created By" /> 

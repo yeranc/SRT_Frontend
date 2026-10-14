@@ -48,7 +48,7 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <Input submit="onBPGo"
                     id="businessPartnerInput"
                     width="100%"
                     value="{wizard>/businessPartner}"
@@ -67,7 +67,7 @@
                     class="srtFieldLabel"
                 />
 
-                <Input
+                <Input submit="onBPGo"
                     id="processRefIdInput"
                     width="100%"
                     value="{wizard>/processRefId}"
