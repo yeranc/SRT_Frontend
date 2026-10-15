@@ -1,22 +1,36 @@
+
 <core:FragmentDefinition
     xmlns="sap.ui.table"
     xmlns:core="sap.ui.core"
-    xmlns:m="sap.m">
+    xmlns:m="sap.m"
+    xmlns:rowm="sap.ui.table.rowmodes">
 
     <Table
         id="resultTable"
         width="100%"
         class="srtResultTable"
         selectionMode="Multi"
+        selectionBehavior="RowSelector"
+        showRowActions="true"
+        rowActionCount="1"
         enableSelectAll="false"
         enableColumnReordering="true"
         alternateRowColors="false"
         threshold="100">
 
         <rowMode>
-            <rowm:Auto
-                xmlns:rowm="sap.ui.table.rowmodes" />
+            <rowm:Auto />
         </rowMode>
+
+        <rowActionTemplate>
+            <RowAction>
+                <items>
+                    <RowActionItem
+                        type="Navigation"
+                        press=".onOpenObjectDetails" />
+                </items>
+            </RowAction>
+        </rowActionTemplate>
 
     </Table>
 

@@ -1,0 +1,72 @@
+
+<mvc:View
+    controllerName="srt.app.controller.ObjectDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form"
+    xmlns:layout="sap.ui.layout">
+
+    <Page
+        id="objectDetailsPage"
+        title="{details>/pageTitle}"
+        showNavButton="true"
+        navButtonPress=".onNavBack"
+        class="sapUiContentPadding">
+
+        <content>
+            <VBox class="sapUiMediumMarginBottom" width="100%">
+
+                <ObjectHeader
+                    title="{details>/objectTitle}"
+                    intro="{details>/groupLabel}"
+                    responsive="true"
+                    class="sapUiSmallMarginBottom" />
+
+                <Panel
+                    headerText="Object Information"
+                    expandable="false"
+                    class="sapUiResponsiveMargin"
+                    width="auto">
+
+                    <layout:Grid
+                        defaultSpan="XL4 L4 M6 S12"
+                        hSpacing="2"
+                        vSpacing="1"
+                        width="100%">
+
+                        <layout:content>
+                            <VBox
+                                items="{details>/properties}"
+                                class="sapUiSmallMarginBottom">
+
+                                <Label
+                                    text="{details>label}"
+                                    design="Bold" />
+
+                                <Text
+                                    text="{details>value}"
+                                    wrapping="true"
+                                    width="100%" />
+
+                            </VBox>
+                        </layout:content>
+
+                    </layout:Grid>
+                </Panel>
+
+            </VBox>
+        </content>
+
+        <footer>
+            <Toolbar>
+                <ToolbarSpacer />
+                <Button
+                    text="Back to Results"
+                    icon="sap-icon://nav-back"
+                    press=".onNavBack" />
+            </Toolbar>
+        </footer>
+
+    </Page>
+</mvc:View>

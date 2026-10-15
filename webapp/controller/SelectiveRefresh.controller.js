@@ -3966,6 +3966,65 @@ sap.ui.define([
 
             this._showResultTable(oModel, "/Claims", aFilters);
         },
+        onRowSelectionChange: function (oEvent) {
+    var oTable = oEvent.getSource();
+    var iIndex = oEvent.getParameter("rowIndex");
+
+    if (iIndex < 0) {
+        return;
+    }
+
+    var oRow = oTable.getRows()[iIndex];
+    var oContext = oRow && oRow.getBindingContext();
+
+    if (!oContext) {
+        return;
+    }
+
+    var oSelectedObject = oContext.getObject();
+
+    // Keep the selected object's data available for the details page.
+    var oDetailModel = new sap.ui.model.json.JSONModel(
+        oSelectedObject
+    );
+
+    this.getView().setModel(oDetailModel, "detail");
+
+    // Navigate to your reusable details route.
+    this.getOwnerComponent().getRouter().navTo("objectDetails");
+},
+
+onOpenObjectDetails: function (oEvent) {
+    var oRow = oEvent.getSource().getParent();
+    var oContext = oRow.getBindingContext("result");
+
+    if (!oContext) {
+        oContext = oRow.getBindingContext();
+    }
+
+    if (!oContext) {
+        return;
+    }
+
+    var oSelectedObject = oContext.getObject();
+
+    var oModel = new sap.ui.model.json.JSONModel({
+        groupId: this.getView()
+            .getModel("wizard")
+            .getProperty("/groupId"),
+        data: oSelectedObject
+    });
+
+    this.getOwnerComponent().setModel(
+        oModel,
+        "selectedObject"
+    );
+
+    this.getOwnerComponent()
+        .getRouter()
+        .navTo("objectDetails");
+},
+
 
 
     });

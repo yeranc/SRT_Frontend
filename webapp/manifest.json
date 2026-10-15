@@ -156,6 +156,24 @@
           "localUri": "localService/ZRI_SB_CLM_PROC/metadata.xml",
           "odataVersion": "2.0"
         }
+      },
+      "ZRI_S_LRM_DATA_VAN": {
+        "uri": "/sap/opu/odata/IWFND/CATALOGSERVICE;v=2/Annotations(TechnicalName='ZRI_S_LRM_DATA_VAN',Version='0001')/$value/",
+        "type": "ODataAnnotation",
+        "settings": {
+          "localUri": "localService/ZRI_S_LRM_DATA/ZRI_S_LRM_DATA_VAN.xml"
+        }
+      },
+      "ZRI_S_LRM_DATA": {
+        "uri": "/sap/opu/odata/sap/ZRI_S_LRM_DATA/",
+        "type": "OData",
+        "settings": {
+          "annotations": [
+            "ZRI_S_LRM_DATA_VAN"
+          ],
+          "localUri": "localService/ZRI_S_LRM_DATA/metadata.xml",
+          "odataVersion": "2.0"
+        }
       }
     }
   },
@@ -248,6 +266,11 @@
         "dataSource": "ZRI_SB_CLM_PROC",
         "preload": true,
         "settings": {}
+      },
+      "ZRI_S_LRM_DATA": {
+        "dataSource": "ZRI_S_LRM_DATA",
+        "preload": true,
+        "settings": {}
       }
     },
     "resources": {
@@ -292,7 +315,12 @@
           "pattern": "reports",
           "name": "reports",
           "target": "reports"
-        }
+        },
+        {
+      "name": "objectDetails",
+      "pattern": "objectDetails",
+      "target": "objectDetails"
+    }
       ],
       "targets": {
         "home": {
@@ -319,7 +347,12 @@
           "viewId": "reports",
           "viewName": "Reports",
           "viewLevel": 2
-        }
+        },
+        "objectDetails": {
+      "viewName": "ObjectDetails",
+      "viewType": "XML",
+      "viewLevel": 2
+    }
       }
     }
   }

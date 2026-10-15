@@ -1,0 +1,131 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+
+    <VBox class="srtFilterContainer">
+
+        <!-- HEADER -->
+        <HBox
+            width="100%"
+            justifyContent="SpaceBetween"
+            alignItems="Center"
+            class="sapUiTinyMarginBottom">
+
+            <HBox alignItems="Center">
+                <core:Icon
+                    src="sap-icon://filter"
+                    size="1.4rem"
+                    class="srtSectionIcon" />
+
+                <Title
+                    text="Selection Criteria"
+                    level="H3"
+                    class="srtSectionTitle" />
+            </HBox>
+
+            <HBox
+                alignItems="Center"
+                wrap="Wrap">
+
+                <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                    class="sapUiTinyMarginEnd" />               
+
+                <CheckBox
+                    text="Copy LRM"
+                    selected="{wizard>/copyAccount}"
+                    class="sapUiTinyMarginEnd" />
+
+                <CheckBox
+                    text="Copy LRM With"
+                    selected="{wizard>/copyAccount}"
+                    class="sapUiTinyMarginEnd" />
+
+
+            </HBox>
+
+        </HBox>
+
+
+        <!-- RIP FILTER ROW -->
+        <HBox
+            class="srtFilterRow"
+            wrap="Wrap"
+            alignItems="End"
+            justifyContent="Start">
+
+
+            <!-- RIP NUMBER -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="RIP Number"
+                    class="srtFieldLabel" 
+                    />
+
+                <MultiInput submit="onRIPGo"
+                    id="ripNumberInput"
+                    placeholder="Enter RIP Number"
+                    showValueHelp="true"
+                    valueHelpRequest="onRIPValueHelp" />
+
+            </VBox>
+
+
+            <!-- CREATED BY -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="Created By"
+                    class="srtFieldLabel" />
+
+                <Input submit="onRIPGo"
+                    value="{wizard>/ripCreatedBy}"
+                    placeholder="Enter Created By" />
+
+            </VBox>
+
+
+            <!-- CREATION DATE -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="Creation Date"
+                    class="srtFieldLabel" />
+
+                <DatePicker
+                    value="{wizard>/ripCreationDate}"
+                    valueFormat="yyyy-MM-dd"
+                    displayFormat="dd.MM.yyyy"
+                    placeholder="Select Date" />
+
+            </VBox>
+
+
+            <!-- PROCESS REF ID -->
+            <VBox class="srtFilterField">
+
+                <Label
+                    text="Process Ref ID"
+                    class="srtFieldLabel" />
+
+                <Input submit="onRIPGo"
+                    value="{wizard>/ripProcessRefId}"
+                    placeholder="Enter Process Ref ID" />
+
+            </VBox>
+
+
+            <Button
+                text="Go"
+                type="Emphasized"
+                press="onRIPGo"
+                class="srtGoButton" />
+
+        </HBox>
+
+    </VBox>
+
+</core:FragmentDefinition>
