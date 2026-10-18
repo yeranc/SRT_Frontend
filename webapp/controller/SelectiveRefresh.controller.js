@@ -73,7 +73,7 @@ sap.ui.define([
 
             );
 
-
+           
             /*
              * Debug OData requests from ZGS_SRT_SRV.
              * This is only for debugging and can be removed later.
@@ -133,6 +133,7 @@ sap.ui.define([
             this._oBusyDialog.addStyleClass("srtBusyDialog");
 
             this.getView().addDependent(this._oBusyDialog);
+            this._loadGroupIds();
         },
 
 
@@ -168,6 +169,58 @@ sap.ui.define([
                 }
             }, this);
             this._clearResultTable();
+        },
+        _loadGroupIds: function () {
+
+            // In onInit the view is not attached to the component yet,
+            // so take the default model from the component directly.
+            var oODataModel = this.getOwnerComponent().getModel();
+
+            if (!oODataModel) {
+                console.error("Default OData model is not available.");
+                MessageToast.show("OData model is not available.");
+                return;
+            }
+
+            var oGroupModel = new JSONModel({ items: [] });
+            this.getView().setModel(oGroupModel, "groupIds");
+
+            oODataModel.read("/ZRI_GRPID_VH", {
+                filters: [
+                    new Filter({
+                        filters: [
+                            new Filter("GrpId", FilterOperator.NE, "CD"),
+                            new Filter("GrpId", FilterOperator.NE, "INSOBJ")
+                        ],
+                        and: true
+                    })
+                ],
+                success: function (oData) {
+
+                    var aItems = (oData.results || []).map(function (oItem) {
+                        return {
+                            GrpId: oItem.GrpId,
+                            text: oItem.GrpId + " - " + (oItem.Description || "")
+                        };
+                    });
+
+                    // LRM exists only in the frontend
+                    if (!aItems.some(function (oItem) {
+                        return oItem.GrpId === "LRM";
+                    })) {
+                        aItems.push({
+                            GrpId: "LRM",
+                            text: "LRM"
+                        });
+                    }
+
+                    oGroupModel.setProperty("/items", aItems);
+                },
+                error: function (oError) {
+                    console.error("Failed to load Group IDs:", oError);
+                    MessageToast.show("Unable to load Group IDs.");
+                }
+            });
         },
 
 
@@ -353,6 +406,8 @@ sap.ui.define([
                 sFragmentName = "srt.app.view.fragments.Ram";
             } else if (sGroupId === "L") {
                 sFragmentName = "srt.app.view.fragments.Loss";
+            } else if (sGroupId === "LRM") {
+    sFragmentName = "srt.app.view.fragments.Lrm";
             } else {
                 console.log("No selection fragment configured for:", sGroupId);
                 return;
@@ -2127,6 +2182,25 @@ sap.ui.define([
                             }
                         ]
                     };
+                                    case "LRM":
+
+                    return {
+                        sourceProperty: "Polno",
+                        targetProperty: "TargetNumber",
+
+                        columns: [
+                            { label: "Policy ID",         property: "Polid" },
+                            { label: "Policy Number",     property: "Polno" },
+                            { label: "Process Ref ID",    property: "ProcessingId" },
+                            { label: "Cedent",            property: "Cedent" },
+                            { label: "Company Code",      property: "CompanyCode" },
+                            { label: "Policy Company ID", property: "Polcompid" },
+                            { label: "Treaty Number",     property: "TtyNo" },
+                            { label: "Ident ID",          property: "Identid" },
+                            { label: "Life ID",           property: "Lifeid" },
+                            { label: "Target LRM",        property: "TargetNumber" }
+                        ]
+                    };
 
                 default:
                     return null;
@@ -2528,6 +2602,55 @@ sap.ui.define([
             }
 
             this._showResultTable(oModel, "/Treaty", aFilters);
+        },
+                onLRMGo: function () {
+
+            var oWizardModel = this.getView().getModel("wizard");
+            var aFilters = [];
+
+            // GUID fields: accept with or without hyphens
+            var aGuids = [
+                ["Polid", "/lrmPolicyId", "Policy ID"],
+                ["Identid", "/lrmIdentId", "Ident ID"],
+                ["Lifeid", "/lrmLifeId", "Life ID"]
+            ];
+
+            for (var i = 0; i < aGuids.length; i++) {
+
+                var sHex = String(oWizardModel.getProperty(aGuids[i][1]) || "")
+                    .trim()
+                    .replace(/[{}-]/g, "");
+
+                if (!sHex) { continue; }
+
+                if (!/^[0-9a-fA-F]{32}$/.test(sHex)) {
+                    MessageToast.show(aGuids[i][2] + " is not a valid GUID.");
+                    return;
+                }
+
+                aFilters.push(new Filter(
+                    aGuids[i][0],
+                    FilterOperator.EQ,
+                    (sHex.substr(0, 8) + "-" + sHex.substr(8, 4) + "-" +
+                        sHex.substr(12, 4) + "-" + sHex.substr(16, 4) + "-" +
+                        sHex.substr(20)).toLowerCase()
+                ));
+            }
+
+            this._addEqFilter(aFilters, "Polno",        oWizardModel.getProperty("/lrmPolicyNumber"), true);
+            this._addEqFilter(aFilters, "ProcessingId", oWizardModel.getProperty("/lrmProcessRefId"));
+            this._addEqFilter(aFilters, "Cedent",       oWizardModel.getProperty("/lrmCedent"), true);
+            this._addEqFilter(aFilters, "CompanyCode",  oWizardModel.getProperty("/lrmCompanyCode"), true);
+            this._addEqFilter(aFilters, "TtyNo",        oWizardModel.getProperty("/lrmTreatyNumber"), true);
+
+            var oModel = this.getView().getModel("ZRI_S_LRM_DATA");
+
+            if (!oModel) {
+                MessageToast.show("LRM service is not available.");
+                return;
+            }
+
+            this._showResultTable(oModel, "/ZRI_C_LRM_DATA", aFilters);
         },
 
 

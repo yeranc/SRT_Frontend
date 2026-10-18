@@ -30,99 +30,131 @@
                 <Button
                     text="Process Log"
                     type="Transparent"
-                    press="onProcessLogPress"
-                    class="sapUiTinyMarginEnd" />               
+                    press="onProcessLogPress" />
 
                 <CheckBox
                     text="Copy LRM"
-                    selected="{wizard>/copyAccount}"
+                    selected="{wizard>/copyLrm}"
                     class="sapUiTinyMarginEnd" />
 
                 <CheckBox
                     text="Copy LRM With"
-                    selected="{wizard>/copyAccount}"
-                    class="sapUiTinyMarginEnd" />
-
+                    selected="{wizard>/copyLrmWith}" />
 
             </HBox>
 
         </HBox>
 
 
-        <!-- RIP FILTER ROW -->
+        <!-- FILTERS -->
         <HBox
-            class="srtFilterRow"
             wrap="Wrap"
             alignItems="End"
+            class="srtFilterRow"
             justifyContent="Start">
 
-
-            <!-- RIP NUMBER -->
+            <!-- Policy ID -->
             <VBox class="srtFilterField">
-
-                <Label
-                    text="RIP Number"
-                    class="srtFieldLabel" 
-                    />
-
-                <MultiInput submit="onRIPGo"
-                    id="ripNumberInput"
-                    placeholder="Enter RIP Number"
+                <Label text="Policy ID" />
+                <Input
+                    id="lrmPolicyId"
+                    value="{wizard>/lrmPolicyId}"
+                    placeholder="Enter Policy ID"
                     showValueHelp="true"
-                    valueHelpRequest="onRIPValueHelp" />
-
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
             </VBox>
 
-
-            <!-- CREATED BY -->
+            <!-- Policy Number -->
             <VBox class="srtFilterField">
-
-                <Label
-                    text="Created By"
-                    class="srtFieldLabel" />
-
-                <Input submit="onRIPGo"
-                    value="{wizard>/ripCreatedBy}"
-                    placeholder="Enter Created By" />
-
+                <Label text="Policy Number" />
+                <Input
+                    id="lrmPolicyNumber"
+                    value="{wizard>/lrmPolicyNumber}"
+                    placeholder="Enter Policy Number"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
             </VBox>
 
-
-            <!-- CREATION DATE -->
+            <!-- Process Ref ID -->
             <VBox class="srtFilterField">
-
-                <Label
-                    text="Creation Date"
-                    class="srtFieldLabel" />
-
-                <DatePicker
-                    value="{wizard>/ripCreationDate}"
-                    valueFormat="yyyy-MM-dd"
-                    displayFormat="dd.MM.yyyy"
-                    placeholder="Select Date" />
-
+                <Label text="Process Ref ID" />
+                <Input
+                    id="lrmProcessRefId"
+                    value="{wizard>/lrmProcessRefId}"
+                    placeholder="Enter Process Ref ID"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
             </VBox>
 
-
-            <!-- PROCESS REF ID -->
+            <!-- Cedent -->
             <VBox class="srtFilterField">
-
-                <Label
-                    text="Process Ref ID"
-                    class="srtFieldLabel" />
-
-                <Input submit="onRIPGo"
-                    value="{wizard>/ripProcessRefId}"
-                    placeholder="Enter Process Ref ID" />
-
+                <Label text="Cedent" />
+                <Input
+                    id="lrmCedent"
+                    value="{wizard>/lrmCedent}"
+                    placeholder="Enter Cedent"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
             </VBox>
 
+            <!-- Company Code -->
+            <VBox class="srtFilterField">
+                <Label text="Company Code" />
+                <Input
+                    id="lrmCompanyCode"
+                    value="{wizard>/lrmCompanyCode}"
+                    placeholder="Enter Company Code"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
+            </VBox>
 
+            <!-- Treaty Number -->
+            <VBox class="srtFilterField">
+                <Label text="Treaty Number" />
+                <Input
+                    id="lrmTreatyNumber"
+                    value="{wizard>/lrmTreatyNumber}"
+                    placeholder="Enter Treaty Number"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
+            </VBox>
+
+            <!-- Ident ID -->
+            <VBox class="srtFilterField">
+                <Label text="Ident ID" />
+                <Input
+                    id="lrmIdentId"
+                    value="{wizard>/lrmIdentId}"
+                    placeholder="Enter Ident ID"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
+            </VBox>
+
+            <!-- Life ID -->
+            <VBox class="srtFilterField">
+                <Label text="Life ID" />
+                <Input
+                    id="lrmLifeId"
+                    value="{wizard>/lrmLifeId}"
+                    placeholder="Enter Life ID"
+                    showValueHelp="true"
+                    valueHelpRequest="onLrmValueHelp"
+                    submit="onLRMGo" />
+            </VBox>
+
+            <!-- Search -->
             <Button
                 text="Go"
                 type="Emphasized"
-                press="onRIPGo"
-                class="srtGoButton" />
+                class="srtFilterGoButton"
+                press="onLRMGo" />
 
         </HBox>
 

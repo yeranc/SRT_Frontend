@@ -130,37 +130,19 @@
             class="srtFieldLabel"
         />
 
-        <ComboBox
-            id="groupIdSelect"
-            width="100%"
-            selectedKey="{wizard>/groupId}"
-            placeholder="Please select an object"
-            change="onGroupIdChange"
-            items="{
-                path: '/ZRI_GRPID_VH',
-                filters: [{
-                    filters: [
-                        {
-                            path: 'GrpId',
-                            operator: 'NE',
-                            value1: 'CD'
-                        },
-                        {
-                            path: 'GrpId',
-                            operator: 'NE',
-                            value1: 'INSOBJ'
-                        }
-                    ],
-                    and: true
-                }]
-            }">
+      <ComboBox
+    id="groupIdSelect"
+    width="100%"
+    selectedKey="{wizard>/groupId}"
+    placeholder="Please select an object"
+    change="onGroupIdChange"
+    items="{groupIds>/items}">
 
-            <core:Item
-                key="{GrpId}"
-                text="{GrpId} - {Description}"
-            />
+    <core:Item
+        key="{groupIds>GrpId}"
+        text="{groupIds>text}" />
 
-        </ComboBox>
+</ComboBox>
 
     </VBox>
 

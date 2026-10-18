@@ -164,17 +164,17 @@
           "localUri": "localService/ZRI_S_LRM_DATA/ZRI_S_LRM_DATA_VAN.xml"
         }
       },
-      "ZRI_S_LRM_DATA": {
-        "uri": "/sap/opu/odata/sap/ZRI_S_LRM_DATA/",
-        "type": "OData",
-        "settings": {
-          "annotations": [
-            "ZRI_S_LRM_DATA_VAN"
-          ],
-          "localUri": "localService/ZRI_S_LRM_DATA/metadata.xml",
-          "odataVersion": "2.0"
+        "ZRI_S_LRM_DATA": {
+          "uri": "/sap/opu/odata/sap/ZRI_S_LRM_DATA/",
+          "type": "OData",
+          "settings": {
+            "annotations": [
+              "ZRI_S_LRM_DATA_VAN"
+            ],
+            "localUri": "localService/ZRI_S_LRM_DATA/metadata.xml",
+            "odataVersion": "2.0"
+          }
         }
-      }
     }
   },
   "sap.ui": {
