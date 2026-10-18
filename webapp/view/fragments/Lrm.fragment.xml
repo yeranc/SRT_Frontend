@@ -27,19 +27,19 @@
                 alignItems="Center"
                 wrap="Wrap">
 
-                <Button
-                    text="Process Log"
-                    type="Transparent"
-                    press="onProcessLogPress" />
+                
 
                 <CheckBox
                     text="Copy LRM"
                     selected="{wizard>/copyLrm}"
                     class="sapUiTinyMarginEnd" />
 
-                <CheckBox
-                    text="Copy LRM With"
-                    selected="{wizard>/copyLrmWith}" />
+                <Button
+                    id="accountCopywith"
+                    text="Copy LRM with"
+                    type="Transparent"
+                    press="onAccountCopyWithOpen"
+                />
 
             </HBox>
 
