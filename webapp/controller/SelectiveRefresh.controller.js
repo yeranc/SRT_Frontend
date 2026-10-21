@@ -44,7 +44,8 @@ sap.ui.define([
     var DEFAULT_RFC = "T30CLNT700";
     var EXEC_POLL_INTERVAL_MS = 500;
     var EXEC_POLL_TIMEOUT_MS = 50000;
-
+    // add next to the other constants
+var PROCESS_LOG_PAGE_SIZE = 200;
     var SELECTION_FRAGMENTS = {
         B: "srt.app.view.fragments.Partner",
         T: "srt.app.view.fragments.Treaty",
@@ -70,7 +71,16 @@ sap.ui.define([
         ]
     };
 
-    var PROCESS_LOG_GROUPS = ["A", "T", "TCR", "RIP", "B", "L"];
+    // wizard group id -> ObjectType expected by ZRI_CL_PROCESS_LOGS
+var PROCESS_LOG_OBJECT_TYPE = {
+    A: "ACCOUNT",
+    T: "TREATY",
+    TCR: "TCR",
+    RIP: "RIP",
+    B: "BP",
+    L: "LOSS",
+    LRM: "LRM"
+};
 
     var TOKEN_INPUT_IDS = [
         "treatyInput", "accountNumberInput", "ripNumberInput",
@@ -1862,93 +1872,164 @@ sap.ui.define([
         // =========================================================
         // PROCESS LOG
         // =========================================================
-        onProcessLogPress: function () {
+onProcessLogPress: function () {
 
-            var oWizard = this._getWizardModel();
-            var sGroupId = oWizard.getProperty("/groupId");
-            var aSelectedRows = oWizard.getProperty("/selectedResults") || [];
+    var oWizard = this._getWizardModel();
+    var sGroupId = oWizard.getProperty("/groupId");
+    var aSelectedRows = oWizard.getProperty("/selectedResults") || [];
 
-            if (!aSelectedRows.length) {
-                MessageToast.show("Please select at least one row.");
-                return;
-            }
+    if (!aSelectedRows.length) {
+        MessageToast.show("Please select at least one row.");
+        return;
+    }
 
-            var oConfig = this._getResultTableConfig(sGroupId);
+    var oConfig = this._getResultTableConfig(sGroupId);
 
-            if (!oConfig || PROCESS_LOG_GROUPS.indexOf(sGroupId) === -1) {
-                MessageToast.show("Process Log not configured for this object.");
-                return;
-            }
+    if (!oConfig || !PROCESS_LOG_OBJECT_TYPE[sGroupId]) {
+        MessageToast.show("Process Log not configured for this object.");
+        return;
+    }
 
-            // unique root numbers
-            var aRoots = [];
-            aSelectedRows.forEach(function (oRow) {
-                var sRoot = hasValue(oRow, oConfig.sourceProperty)
-                    ? String(oRow[oConfig.sourceProperty])
-                    : "";
-                if (sRoot && aRoots.indexOf(sRoot) === -1) {
-                    aRoots.push(sRoot);
+    if (!this.getView().getModel("ZGS_SRT_SRV")) {
+        MessageToast.show("Process Log service is not available.");
+        return;
+    }
+
+    // unique root numbers per object type
+    var mRootsByType = {};
+
+    aSelectedRows.forEach(function (oRow) {
+
+        if (!hasValue(oRow, oConfig.sourceProperty)) {
+            return;
+        }
+
+        var sRoot = String(oRow[oConfig.sourceProperty]).trim();
+        var sType = PROCESS_LOG_OBJECT_TYPE[sGroupId];
+
+        if (sGroupId === "L" && hasValue(oRow, "g_schadkz")) {
+            sType = "LOSS GROUP";
+        }
+
+        mRootsByType[sType] = mRootsByType[sType] || [];
+
+        if (mRootsByType[sType].indexOf(sRoot) === -1) {
+            mRootsByType[sType].push(sRoot);
+        }
+    });
+
+    var aTypes = Object.keys(mRootsByType);
+
+    if (!aTypes.length) {
+        MessageToast.show("No source object found.");
+        return;
+    }
+
+    // paging state: one query per object type, each with its own skip
+    this._oLogState = {
+        loading: false,
+        queries: aTypes.map(function (sType) {
+            return { type: sType, roots: mRootsByType[sType], skip: 0, done: false };
+        })
+    };
+
+    this._oProcessLogModel = this._oProcessLogModel || new JSONModel({ logs: [] });
+    this._oProcessLogModel.setData({ logs: [] });
+
+    this._openBusy();
+
+    this._loadNextLogPage().then(function () {
+        this._oBusyDialog.close();
+        this._openProcessLogDialog("Process Log");
+    }.bind(this)).catch(function () {
+        this._oBusyDialog.close();
+        MessageToast.show("Unable to load Process Log.");
+    }.bind(this));
+},
+
+/** Loads ONE more page and appends it. Resolves when done. */
+_loadNextLogPage: function () {
+
+    var oState = this._oLogState;
+    var oModel = this.getView().getModel("ZGS_SRT_SRV");
+
+    var oQuery = oState && oState.queries.find(function (q) { return !q.done; });
+
+    if (!oQuery || oState.loading) {
+        return Promise.resolve();
+    }
+
+    oState.loading = true;
+
+    return new Promise(function (resolve, reject) {
+
+        oModel.read("/ProcessLogSet", {
+            filters: [
+                new Filter("ObjectType", FilterOperator.EQ, oQuery.type),
+                new Filter({
+                    filters: oQuery.roots.map(function (sRoot) {
+                        return new Filter("RootSourceNumber", FilterOperator.EQ, sRoot);
+                    }),
+                    and: false
+                })
+            ],
+            urlParameters: {
+                "$top": PROCESS_LOG_PAGE_SIZE,
+                "$skip": oQuery.skip,
+                "$select": "ProcessingId,ObjectType,SourceNumber,Type,Message,TargetNumber,Systemm,RootSourceNumber"
+            },
+            success: function (oData) {
+
+                var aRows = oData.results || [];
+
+                oQuery.skip += aRows.length;
+                if (aRows.length < PROCESS_LOG_PAGE_SIZE) {
+                    oQuery.done = true;
                 }
-            });
 
-            if (!aRoots.length) {
-                MessageToast.show("No source object found.");
-                return;
+                var aLogs = this._oProcessLogModel.getProperty("/logs");
+                this._oProcessLogModel.setProperty("/logs", aLogs.concat(aRows));
+
+                oState.loading = false;
+                resolve();
+            }.bind(this),
+            error: function (oError) {
+                oState.loading = false;
+                reject(oError);
             }
+        });
 
-            var oModel = this.getView().getModel("ZGS_SRT_SRV");
+    }.bind(this));
+},
 
-            if (!oModel) {
-                MessageToast.show("Process Log service is not available.");
-                return;
-            }
+/** Called by the table's updateFinished event */
+onProcessLogUpdateFinished: function (oEvent) {
 
-            // No ObjectType restriction: dependent objects (loss, account, ...)
-            // are logged under their own object type with the same root number.
-            var oRootFilter = new Filter({
-                filters: aRoots.map(function (sRoot) {
-                    return new Filter("RootSourceNumber", FilterOperator.EQ, sRoot);
-                }),
-                and: false
-            });
+    var iActual = oEvent.getParameter("actual");
+    var iTotal = oEvent.getParameter("total");
 
-            this._openBusy();
+    // everything loaded so far is visible -> fetch the next page from the backend
+    if (iActual >= iTotal) {
+        this._loadNextLogPage().catch(function () {
+            MessageToast.show("Unable to load more Process Log entries.");
+        });
+    }
+},
 
-            oModel.read("/ProcessLogSet", {
-                filters: [oRootFilter],
+_openProcessLogDialog: function (sTitle) {
 
-                success: function (oData) {
-                    this._oBusyDialog.close();
-                    this._openProcessLogDialog("Process Log", oData.results || []);
-                }.bind(this),
+    if (!this._pProcessLogDialog) {
+        this._pProcessLogDialog = this.loadFragment({
+            name: "srt.app.view.fragments.ProcessLog"
+        });
+    }
 
-                error: function () {
-                    this._oBusyDialog.close();
-                    MessageToast.show("Unable to load Process Log.");
-                }.bind(this)
-            });
-        },
-
-        _openProcessLogDialog: function (sTitle, aLogs) {
-
-            if (!this._oProcessLogModel) {
-                this._oProcessLogModel = new JSONModel({ logs: [] });
-            }
-
-            this._oProcessLogModel.setData({ logs: aLogs });
-
-            if (!this._pProcessLogDialog) {
-                this._pProcessLogDialog = this.loadFragment({
-                    name: "srt.app.view.fragments.ProcessLog"
-                });
-            }
-
-            this._pProcessLogDialog.then(function (oDialog) {
-                oDialog.setModel(this._oProcessLogModel, "processLog");
-                oDialog.setTitle(sTitle);
-                oDialog.open();
-            }.bind(this));
-        },
+    this._pProcessLogDialog.then(function (oDialog) {
+        oDialog.setModel(this._oProcessLogModel, "processLog");
+        oDialog.setTitle(sTitle);
+        oDialog.open();
+    }.bind(this));
+},
 
         onProcessLogClose: function () {
             if (this._pProcessLogDialog) {

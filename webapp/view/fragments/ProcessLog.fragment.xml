@@ -4,104 +4,69 @@
 
     <Dialog
         id="processLogDialog"
-        
         contentWidth="75rem"
         contentHeight="32rem"
         resizable="true"
         draggable="true"
+        verticalScrolling="false"
         class="srtProcessLogDialog">
+
         <customHeader>
-    <Toolbar class="srtProcessLogHeader">
-        <Title
-            text="Process Log"
-            level="H3"/>
-    </Toolbar>
-</customHeader>
-        
+            <Toolbar class="srtProcessLogHeader">
+                <Title text="Process Log" level="H3"/>
+            </Toolbar>
+        </customHeader>
 
         <content>
-        
 
-            <Table
-                items="{processLog>/logs}"
-                width="100%">
+            <ScrollContainer
+                height="100%"
+                width="100%"
+                vertical="true"
+                horizontal="false">
 
-                <columns>
+                <Table
+                    id="processLogTable"
+                    items="{processLog>/logs}"
+                    width="100%"
+                    sticky="ColumnHeaders"
+                    growing="true"
+                    growingThreshold="100"
+                    growingScrollToLoad="true"
+                    updateFinished=".onProcessLogUpdateFinished">
 
-                    <Column>
-                        <Text text="Process Ref ID"/>
-                    </Column>
+                    <columns>
+                        <Column><Text text="Process Ref ID"/></Column>
+                        <Column><Text text="Object Type"/></Column>
+                        <Column><Text text="Source Object"/></Column>
+                        <Column><Text text="Message Type"/></Column>
+                        <Column width="25rem"><Text text="Message"/></Column>
+                        <Column><Text text="Created Object"/></Column>
+                        <Column><Text text="Target System"/></Column>
+                    </columns>
 
-                    <Column>
-                        <Text text="Object Type"/>
-                    </Column>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="{processLog>ProcessingId}"/>
+                                <Text text="{processLog>ObjectType}"/>
+                                <Text text="{processLog>SourceNumber}"/>
+                                <Text text="{processLog>Type}"/>
+                                <Text text="{processLog>Message}" wrapping="true"/>
+                                <Text text="{processLog>TargetNumber}"/>
+                                <Text text="{processLog>Systemm}"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
 
-                    <Column>
-                        <Text text="Source Object"/>
-                    </Column>
+                </Table>
 
-                    <Column>
-                        <Text text="Message Type"/>
-                    </Column>
-
-                    <Column width="25rem">
-                        <Text text="Message"/>
-                    </Column>
-
-                    <Column>
-                        <Text text="Created Object"/>
-                    </Column>
-
-                    <Column>
-                        <Text text="Target System"/>
-                    </Column>
-
-                </columns>
-
-                <items>
-
-                    <ColumnListItem>
-
-                        <cells>
-
-                            <Text
-                                text="{processLog>ProcessingId}"/>
-
-                            <Text
-                                text="{processLog>ObjectType}"/>
-
-                            <Text
-                                text="{processLog>SourceNumber}"/>
-
-                            <Text
-                                text="{processLog>Type}"/>
-
-                            <Text
-                                text="{processLog>Message}"
-                                wrapping="true"/>
-
-                            <Text
-                                text="{processLog>TargetNumber}"/>
-
-                            <Text
-                                text="{processLog>Systemm}"/>
-
-                        </cells>
-
-                    </ColumnListItem>
-
-                </items>
-
-            </Table>
+            </ScrollContainer>
 
         </content>
 
         <endButton>
-
-            <Button
-                text="Close"
-                press="onProcessLogClose"/>
-
+            <Button text="Close" press="onProcessLogClose"/>
         </endButton>
 
     </Dialog>

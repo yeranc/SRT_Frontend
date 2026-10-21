@@ -26,7 +26,12 @@
             <HBox
                 alignItems="Center"
                 wrap="Wrap">
-
+            <Button
+                    text="Process Log"
+                    type="Transparent"
+                    press="onProcessLogPress"
+                    class="sapUiTinyMarginEnd"
+                />
                 
 
                 <CheckBox
