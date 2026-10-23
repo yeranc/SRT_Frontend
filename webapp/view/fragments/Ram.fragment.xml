@@ -1,126 +1,134 @@
 <core:FragmentDefinition
     xmlns="sap.m"
-    xmlns:core="sap.ui.core">
-
+    xmlns:core="sap.ui.core"
+>
     <VBox class="srtFilterContainer">
-
         <!-- HEADER -->
         <HBox
             width="100%"
             justifyContent="SpaceBetween"
             alignItems="Center"
-            class="sapUiTinyMarginBottom">
-
+            class="sapUiTinyMarginBottom"
+        >
             <HBox alignItems="Center">
                 <core:Icon
                     src="sap-icon://filter"
                     size="1.4rem"
-                    class="srtSectionIcon" />
+                    class="srtSectionIcon"
+                />
 
                 <Title
                     text="Selection Criteria"
                     level="H3"
-                    class="srtSectionTitle" />
+                    class="srtSectionTitle"
+                />
             </HBox>
 
             <HBox
                 alignItems="Center"
-                wrap="Wrap">
-
+                wrap="Wrap"
+            >
                 <Button
                     text="Process Log"
                     type="Transparent"
                     press="onProcessLogPress"
-                    class="sapUiTinyMarginEnd" />
-
+                    class="sapUiTinyMarginEnd"
+                />
                 <CheckBox
-                    text="Copy Again"
-                    selected="{wizard>/copyAgain}"
-                    enabled="{wizard>/copyAgainEnabled}"
-                    class="sapUiTinyMarginEnd" />
-
-
+                    id="copyAccs"
+                    text="Copy Account"
+                    selected="{wizard>/copyAccount}"
+                    
+                />
             </HBox>
-
         </HBox>
 
-
-        <!-- RIP FILTER ROW -->
+        <!-- RAM FILTER ROW -->
         <HBox
             class="srtFilterRow"
-            wrap="Wrap"
+            width="100%"
+            wrap="NoWrap"
             alignItems="End"
-            justifyContent="Start">
-
-
-            <!-- RIP NUMBER -->
+            justifyContent="Start"
+        >
+            <!-- EXTERNAL SYSTEM ID -->
             <VBox class="srtFilterField">
-
                 <Label
                     text="External System ID"
-                    class="srtFieldLabel" 
-                    />
+                    class="srtFieldLabel"
+                />
 
                 <Input
-                    id="ExtNumberInput"
-                    value="{wizard>/extNumber}"
-                    placeholder="Enter External Sys ID"
-                    showValueHelp="true"
-                    valueHelpRequest="onRIPValueHelp" />
-
+                    value="{wizard>/ramExternalSystemId}"
+                    placeholder="External System ID"
+                    submit="onRAMGo"
+                />
             </VBox>
 
-
-            <!-- CREATED BY -->
+            <!-- EXTERNAL ID -->
             <VBox class="srtFilterField">
-
                 <Label
                     text="External ID"
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <Input
-                    value="{wizard>/ripCreatedBy}"
-                    placeholder="External ID" />
-
+                    value="{wizard>/ramExternalId}"
+                    placeholder="External ID"
+                    submit="onRAMGo"
+                />
             </VBox>
-
-
-            <!-- CREATION DATE -->
-            <VBox class="srtFilterField">
-
-                <Label
-                    text="Target RAM"
-                    class="srtFieldLabel" />
-
-                <Input
-                    value="{wizard>/ripCreationDate}"
-                    placeholder="Target RAM" />
-
-            </VBox>
-
 
             <!-- PROCESS REF ID -->
             <VBox class="srtFilterField">
-
                 <Label
                     text="Process Ref ID"
-                    class="srtFieldLabel" />
+                    class="srtFieldLabel"
+                />
 
                 <Input
-                    value="{wizard>/ripProcessRefId}"
-                    placeholder="Enter Process Ref ID" />
-
+                    value="{wizard>/ramProcessRefId}"
+                    placeholder="Process Ref ID"
+                    submit="onRAMGo"
+                />
+                
             </VBox>
 
+            <!-- TARGET RAM -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="Target RAM"
+                    class="srtFieldLabel"
+                />
 
+                <Input
+                    value="{wizard>/ramTargetRam}"
+                    placeholder="Target RAM"
+                    submit="onRAMGo"
+                />
+            </VBox>
+
+            <!-- TARGET SYSTEM -->
+            <VBox class="srtFilterField">
+                <Label
+                    text="Target System"
+                    class="srtFieldLabel"
+                />
+
+                <Input
+                    value="{wizard>/ramTargetSystem}"
+                    placeholder="Target System"
+                    submit="onRAMGo"
+                />
+            </VBox>
+
+            <!-- GO -->
             <Button
                 text="Go"
                 type="Emphasized"
-                press="onRIPGo"
-                class="srtGoButton" />
-
+                press="onRAMGo"
+                class="srtGoButton"
+            />
         </HBox>
-
     </VBox>
-
 </core:FragmentDefinition>

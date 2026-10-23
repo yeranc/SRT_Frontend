@@ -5,10 +5,9 @@
     <Dialog
         id="processLogDialog"
         contentWidth="75rem"
-        contentHeight="32rem"
+        verticalScrolling="false"
         resizable="true"
         draggable="true"
-        verticalScrolling="false"
         class="srtProcessLogDialog">
 
         <customHeader>
@@ -18,9 +17,8 @@
         </customHeader>
 
         <content>
-
             <ScrollContainer
-                height="100%"
+                height="28rem"
                 width="100%"
                 vertical="true"
                 horizontal="false">
@@ -31,8 +29,8 @@
                     width="100%"
                     sticky="ColumnHeaders"
                     growing="true"
-                    growingThreshold="100"
-                    growingScrollToLoad="true"
+                    growingThreshold="50"
+                    growingScrollToLoad="false"
                     updateFinished=".onProcessLogUpdateFinished">
 
                     <columns>
@@ -60,9 +58,7 @@
                     </items>
 
                 </Table>
-
             </ScrollContainer>
-
         </content>
 
         <endButton>
