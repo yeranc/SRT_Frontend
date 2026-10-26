@@ -943,8 +943,8 @@
     background: #6b1327 !important;
     border: none !important;
     box-shadow: none !important;
-    height: 3.25rem !important;
-    min-height: 3.25rem !important;
+    height: 2rem !important;
+    min-height: 2rem !important;
     padding: 0 1rem !important;
 }
 
@@ -952,8 +952,8 @@
 /* WHITE TITLE */
 .srtProcessLogDialog .srtProcessLogHeader .sapMTitle {
     color: #ffffff !important;
-    font-weight: 700 !important;
-    font-size: 1.3rem !important;
+    font-weight: 500 !important;
+    font-size: 1            rem !important;
 }
 
 
