@@ -50,7 +50,8 @@
                     class="sapUiTinyMarginEnd" />
 
                 <Button
-                    text="Delete "
+                    
+                    icon="sap-icon://delete"
                     class="sapUiTinyMarginEnd"
                     press = "onDelete"/>
 

@@ -2192,7 +2192,7 @@ onDelete: function () {
         aSourceRips.join(", ") +
         "\n\nDo you want to continue?",
         {
-            title: "Confirm RIP Deletion",
+            title: "Confirm Deletion",
             actions: [
                 sap.m.MessageBox.Action.OK,
                 sap.m.MessageBox.Action.CANCEL
