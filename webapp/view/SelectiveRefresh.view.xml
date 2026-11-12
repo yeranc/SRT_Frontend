@@ -129,9 +129,9 @@
             required="true"
             class="srtFieldLabel" />
 
-        <ComboBox
+        <ComboBox   
             id="groupIdSelect"
-            width="100%"
+            width="50%"
             selectedKey="{wizard>/groupId}"
             placeholder="Please select an object"
             change="onGroupIdChange"
@@ -144,7 +144,7 @@
     </VBox>
 
     <!-- RFC DESTINATION -->
-    <VBox class="srtField" width="50%">
+    <VBox class="srtField" width="100%">
         <Label
             text="RFC Destination"
             required="true"

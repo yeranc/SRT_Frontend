@@ -981,3 +981,7 @@
 .srtProcessLogDialog.sapMDialog {
     border: 1px solid rgba(107, 19, 39, 0.20) !important;
 }
+.srtParameterRow .sapMInputBaseInner {
+    line-height: normal !important;
+    height: 100% !important;
+}
