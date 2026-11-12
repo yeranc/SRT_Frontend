@@ -2117,7 +2117,151 @@ sap.ui.define([
             );
 
             this.getOwnerComponent().getRouter().navTo("objectDetails");
+        },
+    
+
+onDelete: function () {
+    var oWizard = this._getWizardModel();
+    var oModel = this.getView().getModel("ZGS_SRT_SRV");
+
+    var sGroupId = oWizard.getProperty("/groupId");
+    var sRfc = oWizard.getProperty("/rfcDestination");
+    var aSelected = oWizard.getProperty("/selectedResults") || [];
+
+    if (!oModel) {
+        sap.m.MessageBox.error("Deletion service is not available.");
+        return;
+    }
+
+    // if (sGroupId !== "RIP") {
+    //     sap.m.MessageToast.show(
+    //         "Delete is currently available only for RIP."
+    //     );
+    //     return;
+    // }
+
+    if (!sRfc) {
+        sap.m.MessageToast.show("Please select an RFC destination.");
+        return;
+    }
+
+    if (!aSelected.length) {
+        sap.m.MessageToast.show("Please select at least one row.");
+        return;
+    }
+
+    var oConfig = this._getResultTableConfig(sGroupId);
+
+    if (!oConfig || !oConfig.sourceProperty) {
+        sap.m.MessageBox.error(
+            " source property configuration was not found."
+        );
+        return;
+    }
+
+    // Collect unique SOURCE RIP numbers from selected result rows
+    var aSourceRips = [];
+
+    aSelected.forEach(function (oRow) {
+        var vSourceRip = oRow[oConfig.sourceProperty];
+
+        if (vSourceRip !== undefined &&
+            vSourceRip !== null &&
+            String(vSourceRip).trim() !== "") {
+
+            var sSourceRip = String(vSourceRip).trim();
+
+            if (aSourceRips.indexOf(sSourceRip) === -1) {
+                aSourceRips.push(sSourceRip);
+            }
         }
+    });
+
+    if (!aSourceRips.length) {
+        sap.m.MessageBox.error(
+            "No valid source numbers found in the selected rows."
+        );
+        return;
+    }
+
+    var that = this;
+
+    sap.m.MessageBox.confirm(
+        "The target objects mapped from the following source object " +
+        "numbers will be deleted:\n\n" +
+        aSourceRips.join(", ") +
+        "\n\nDo you want to continue?",
+        {
+            title: "Confirm RIP Deletion",
+            actions: [
+                sap.m.MessageBox.Action.OK,
+                sap.m.MessageBox.Action.CANCEL
+            ],
+            emphasizedAction: sap.m.MessageBox.Action.OK,
+
+            onClose: function (sAction) {
+                if (sAction !== sap.m.MessageBox.Action.OK) {
+                    return;
+                }
+
+                that._openBusy("Deleting target objects...");
+
+                oModel.create("/DeleteSet", {
+                    iv_grp_id: sGroupId,
+                    iv_rfc: sRfc,
+                    iv_rip_from: aSourceRips.join(",")
+                }, {
+                   
+success: function (oData) {
+    if (that._oBusyDialog) {
+        that._oBusyDialog.close();
+    }
+
+    // Use the exact property names exposed by $metadata
+    var iSubrc = Number(oData.ev_subrc);
+    var sMessage = oData.Message || "";
+
+    if (isNaN(iSubrc) || iSubrc !== 0) {
+        sap.m.MessageBox.error(
+            sMessage || "deletion failed."
+        );
+        return;
+    }
+
+    sap.m.MessageBox.success(
+        sMessage || "Target object deletion completed successfully.",
+        {
+            onClose: function () {
+                Promise.resolve(
+                    that._refreshResultTable()
+                ).catch(function () {
+                    sap.m.MessageToast.show(
+                        "Deleted successfully, but refreshing the table failed."
+                    );
+                });
+            }
+        }
+    );
+},
+
+
+                    error: function (oError) {
+                        if (that._oBusyDialog) {
+                            that._oBusyDialog.close();
+                        }
+
+                        sap.m.MessageBox.error(
+                            "deletion failed.\n" +
+                            that._getErrorText(oError)
+                        );
+                    }
+                });
+            }
+        }
+    );
+},
+
+
 
     });
 });

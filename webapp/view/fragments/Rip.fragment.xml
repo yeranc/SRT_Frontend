@@ -49,6 +49,11 @@
                     selected="{wizard>/copyAccount}"
                     class="sapUiTinyMarginEnd" />
 
+                <Button
+                    text="Delete "
+                    class="sapUiTinyMarginEnd"
+                    press = "onDelete"/>
+
 
             </HBox>
 

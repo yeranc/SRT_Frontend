@@ -56,6 +56,10 @@
                 <CheckBox
                     text="Copy TCR"
                     selected="{wizard>/copyTcr}" />
+                <Button
+                    text="Delete"
+                    class="sapUiTinyMarginEnd" 
+                    press="onDelete"/>
 
             </HBox>
 
