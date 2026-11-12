@@ -117,79 +117,53 @@
                     />
                 </HBox>
 
-                <HBox
-                    class="srtParameterRow"
-                    alignItems="Start"
-                >
-                    <!-- GROUP ID -->
-                    <VBox class="srtField srtFieldGroup">
+              <HBox
+    class="srtParameterRow"
+    alignItems="Start"
+    width="100%">
 
+    <!-- GROUP ID -->
+    <VBox class="srtField srtFieldGroup" width="50%">
         <Label
             text="Group Id"
             required="true"
-            class="srtFieldLabel"
-        />
+            class="srtFieldLabel" />
 
-      <ComboBox
-    id="groupIdSelect"
-    width="100%"
-    selectedKey="{wizard>/groupId}"
-    placeholder="Please select an object"
-    change="onGroupIdChange"
-    items="{groupIds>/items}">
+        <ComboBox
+            id="groupIdSelect"
+            width="100%"
+            selectedKey="{wizard>/groupId}"
+            placeholder="Please select an object"
+            change="onGroupIdChange"
+            items="{groupIds>/items}">
 
-    <core:Item
-        key="{groupIds>GrpId}"
-        text="{groupIds>text}" />
-
-</ComboBox>
-
+            <core:Item
+                key="{groupIds>GrpId}"
+                text="{groupIds>text}" />
+        </ComboBox>
     </VBox>
 
-                    <!-- PROCESS ID -->
-                    <!-- <VBox class="srtField">
-                        <Label
-                            text="Process Id"
-                            class="srtFieldLabel"
-                        />
+    <!-- RFC DESTINATION -->
+    <VBox class="srtField" width="50%">
+        <Label
+            text="RFC Destination"
+            required="true"
+            class="srtFieldLabel" />
 
-                        <HBox>
-                            <Input
-                                id="processIdInput"
-                                width="50%"
-                                placeholder="Enter Process Id"
-                                value="{wizard>/processId}"
-                            />
+        <ComboBox
+            id="rfcDestinationSelect"
+            width="100%"
+            selectedKey="{wizard>/rfcDestination}"
+            items="{ZRI_SB_RIP_DATA>/RFC}"
+            showSecondaryValues="false">
 
-                            <core:Icon
-                                src="sap-icon://message-information"
-                                class="srtInfoIcon"
-                            />
-                        </HBox>
-                    </VBox> -->
+            <core:Item
+                key="{ZRI_SB_RIP_DATA>rfcdest}"
+                text="{ZRI_SB_RIP_DATA>rfcdest}" />
+        </ComboBox>
+    </VBox>
 
-                    <!-- RFC DESTINATION -->
-                    <VBox class="srtField">
-                        <Label
-                            text="RFC Destination"
-                            required="true"
-                            class="srtFieldLabel"
-                        />
-
-                        <ComboBox
-                            id="rfcDestinationSelect"
-                            width="50%"
-                            selectedKey="{wizard>/rfcDestination}"
-                            items="{ZRI_SB_RIP_DATA>/RFC}"
-                            showSecondaryValues="false"
-                        >
-                            <core:Item
-                                key="{ZRI_SB_RIP_DATA>rfcdest}"
-                                text="{ZRI_SB_RIP_DATA>rfcdest}"
-                            />
-                        </ComboBox>
-                    </VBox>
-                </HBox>
+</HBox>
 
                 <HBox class="srtDashedLine" />
             </VBox>
